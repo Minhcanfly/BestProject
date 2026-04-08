@@ -1,0 +1,31 @@
+# System Files
+.DS_Store
+Thumbs.db
+*.OSX
+
+# IDEs & Editors
+.idea/
+.vscode/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# Build & Dependencies
+target/
+node_modules/
+dist/
+build/
+*.log
+*.class
+*.jar
+*.war
+*.ear
+
+# Environment variables
+.env
+.env.local
+
+# Logs
+logs/
+*.log

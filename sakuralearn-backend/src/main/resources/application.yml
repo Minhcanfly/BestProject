@@ -1,18 +1,22 @@
 spring:
+  ai:
+    openai:
+      api-key: ${OPENAI_API_KEY:sk-dummy-key-for-local-dev}
   application:
     name: sakuralearn-backend
   datasource:
-    url: jdbc:postgresql://localhost:5432/sakuralearn_db
-    username: sakura_user
-    password: sakura_password
+    url: jdbc:postgresql://localhost:5433/sakuralearn_db
+    username: admin
+    password: 123456
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
+    show-sql: true
   data:
     redis:
       host: localhost
@@ -21,17 +25,37 @@ spring:
     enabled: true
     baseline-on-migrate: true
     locations: classpath:db/migration
+  
+  # --- NEW: KAFKA CONFIG ---
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: sakuralearn-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-  messages:
-    basename: messages
-    encoding: UTF-8
-    fallback-to-system-locale: false
+  # --- NEW: MAILPIT CONFIG ---
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
 
-server:
-  port: 8080
-
+# Custom properties
 app:
   jwt:
-    secret: 928374982364982374982374982374982374982347923847923847923847923847923847 # Example secret for local dev
-    expiration: 86400000 # 1 day
-    refresh-expiration: 604800000 # 7 days
+    secret: 9283749823749823749823749823749823479238472938479283749823749823749823749283
+    expiration: 86400000 # 24 hours
+  minio:
+    url: http://localhost:9000
+    access-key: admin
+    secret-key: minio_password
+    bucket-name: sakuralearn-bucket

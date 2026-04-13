@@ -22,8 +22,8 @@ jobs:
       postgres:
         image: postgres:16-alpine
         env:
-          POSTGRES_USER: sakura_user
-          POSTGRES_PASSWORD: sakura_password
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: 123456
           POSTGRES_DB: sakuralearn_db
         ports:
           - 5432:5432

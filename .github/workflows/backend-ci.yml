@@ -10,6 +10,7 @@ on:
     branches: [ "main", "develop" ]
     paths:
       - 'sakuralearn-backend/**'
+      - '.github/workflows/backend-ci.yml'
 
 jobs:
   build:
@@ -48,4 +49,10 @@ jobs:
         cache: maven
         
     - name: Build with Maven
+      env:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/sakuralearn_db
+        SPRING_DATASOURCE_USERNAME: admin
+        SPRING_DATASOURCE_PASSWORD: 123456
+        SPRING_DATA_REDIS_HOST: localhost
+        SPRING_DATA_REDIS_PORT: 6379
       run: mvn -B clean package --file pom.xml

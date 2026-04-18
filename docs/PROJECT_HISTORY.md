@@ -18,11 +18,11 @@
 
 ---
 
-## Giai đoạn 2 (Phase 2): Xây dựng Lõi Bảo Mật (Spring Security 6 & JWT)
-**Mục tiêu:** Tạo hệ thống cửa từ an ninh chốt chặn mọi API (Đăng nhập / Đăng ký).
+## Giai đoạn 3 (Phase 3): Đồng bộ Đặc tả Sản phẩm & Tối ưu hóa Tài liệu
+**Mục tiêu:** Chốt hạ bản đặc tả cuối cùng và tinh gọn hệ thống tài liệu dự án để dễ quản lý.
 **Các công việc đã hoàn thành:**
-1. **Lớp Cốt Lõi (JWT):** Tạo `JwtUtils` (Máy đánh khóa/dịch mã thẻ từ JWT) và `JwtAuthFilter` (Ông bảo vệ đứng canh cửa chặn xem Request có mang JWT hợp lệ không).
-2. **Lớp Cấu hình (Config):** Tạo `SecurityConfig` để thiết lập nội quy tòa nhà: Các đường dẫn gốc `/api/v1/auth/**` thì mở cửa tự do, các đường dẫn khác thì khóa chặt.
-3. **Lớp Phiên Dịch (UserDetails):** Viết `UserDetailsImpl` và `UserDetailsServiceImpl` làm nhiệm vụ lấy dữ liệu User từ bảng Postgres dịch sang chuẩn của khung Spring Security.
-4. **Lớp Nghiệp vụ (Service & Controller):** Viết `AuthService` (Xử lý mã hóa Password bcrypt, lưu tài khoản) và `AuthController` (Các điểm cuối REST API POST `/login`, `/register`).
-5. **Lớp Chuẩn Hóa Lỗi (Exception Handler):** Bổ sung `GlobalExceptionHandler` kết hợp `ErrorResponse`. Mục đích để chặn toàn bộ lỗi mã nguồn đỏ loét của Java, biến chúng thành định dạng khối JSON thân thiện trả về cho Lập trình viên Frontend.
+1. **Chốt đặc tả Sản phẩm:** Thiết lập [FINAL_PRODUCT_SPECIFICATION.md](file:///d:/BestProject/docs/FINAL_PRODUCT_SPECIFICATION.md) làm nguồn chân lý duy nhất cho 8 Module của SakuraLearn.
+2. **Chốt đặc tả Công nghệ:** Cập nhật [TECHNOLOGY_STACK.md](file:///d:/BestProject/docs/TECHNOLOGY_STACK.md) v1.0, xác định rõ lộ trình áp dụng công nghệ (MVP vs Phase 2).
+3. **Tổng hợp Tiêu chuẩn Kỹ thuật:** Gộp các bản Kit lẻ thành [ENGINEERING_STANDARDS.md](file:///d:/BestProject/docs/ENGINEERING_STANDARDS.md) (Quy mô chuẩn cho cả Backend & Frontend).
+4. **Tổng hợp Vận hành:** Gộp các tài liệu hướng dẫn cài đặt và CI/CD thành [OPS_RUNBOOK.md](file:///d:/BestProject/docs/OPS_RUNBOOK.md).
+5. **Vệ sinh dữ liệu:** Xóa các file bản nháp (SRS.md, README cũ) và các file nguồn đã được gộp để đảm bảo thư mục `docs` luôn tinh gọn và chuyên nghiệp.

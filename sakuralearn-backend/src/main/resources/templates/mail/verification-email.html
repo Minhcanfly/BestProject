@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Xác thực tài khoản SakuraLearn</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 20px auto; padding: 20px; border: 1px solid #ddd; border-radius: 10px; }
+        .header { text-align: center; border-bottom: 2px solid #ee5253; padding-bottom: 10px; }
+        .logo { color: #ee5253; font-size: 24px; font-weight: bold; text-decoration: none; }
+        .content { padding: 20px 0; }
+        .button { display: inline-block; padding: 12px 24px; color: #fff !important; background-color: #ee5253; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 10px; }
+        .footer { font-size: 12px; color: #777; margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="#" class="logo">SakuraLearn</a>
+        </div>
+        <div class="content">
+            <h2>Chào <span th:text="${name}">Người dùng</span>,</h2>
+            <p>Cảm ơn bạn đã đăng ký tài khoản tại <strong>SakuraLearn</strong> - Nền tảng học tiếng Nhật thông minh.</p>
+            <p>Để hoàn tất quá trình đăng ký và bắt đầu trải nghiệm các khóa học, vui lòng nhấn vào nút bên dưới để xác thực email của bạn:</p>
+            <div style="text-align: center;">
+                <a th:href="${verifyUrl}" class="button">Xác thực tài khoản</a>
+            </div>
+            <p>Nếu nút trên không hoạt động, bạn có thể copy link sau dán vào trình duyệt:</p>
+            <p th:text="${verifyUrl}"></p>
+            <p>Link này sẽ hết hạn sau 24 giờ.</p>
+        </div>
+        <div class="footer">
+            <p>Đây là email tự động, vui lòng không trả lời email này.</p>
+            <p>&copy; 2026 SakuraLearn. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

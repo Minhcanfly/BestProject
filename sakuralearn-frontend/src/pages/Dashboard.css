@@ -1,0 +1,241 @@
+.dashboard-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Welcome Banner */
+.welcome-banner {
+  padding: 40px;
+  border-radius: 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+.banner-content h1 {
+  font-size: 32px;
+  margin-bottom: 12px;
+}
+
+.banner-content p {
+  color: var(--text-muted);
+  font-size: 16px;
+  margin-bottom: 25px;
+  max-width: 500px;
+}
+
+.cta-btn {
+  background: var(--primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
+
+.cta-btn:hover {
+  background: var(--primary-hover);
+  transform: translateX(5px);
+}
+
+.banner-illustration {
+  position: relative;
+  width: 200px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.blobs {
+  position: absolute;
+  filter: blur(40px);
+}
+
+.blob {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.blob.one { background: var(--primary); top: -20px; left: -20px; opacity: 0.5; }
+.blob.two { background: var(--info); bottom: -20px; right: -20px; opacity: 0.3; }
+
+.cherry-blossom {
+  font-size: 64px;
+  z-index: 1;
+  animation: float 4s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-15px) rotate(10deg); }
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+.stat-card {
+  padding: 24px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-details h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.stat-details p {
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+/* Sections */
+.dashboard-sections {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 30px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.section-header h2 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.text-link {
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.recent-activity, .quick-goals {
+  padding: 24px;
+  border-radius: 24px;
+}
+
+.course-progress-card {
+  padding: 20px;
+  background: var(--bg-card-hover);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+}
+
+.course-info {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.course-badge {
+  background: var(--primary);
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  height: fit-content;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.course-info h4 { font-size: 16px; margin-bottom: 4px; }
+.course-info p { font-size: 13px; color: var(--text-muted); }
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.progress-bar-bg {
+  height: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 10px;
+}
+
+/* Goals List */
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.goal-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.check-box {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.goal-item.completed {
+  color: var(--text-main);
+}
+
+.goal-item.completed .check-box {
+  background: var(--success);
+  border-color: var(--success);
+  color: black;
+}
+
+@media (max-width: 1100px) {
+  .dashboard-sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-banner { flex-direction: column; text-align: center; }
+  .banner-illustration { display: none; }
+  .banner-content p { margin-left: auto; margin-right: auto; }
+  .cta-btn { margin: 0 auto; }
+}

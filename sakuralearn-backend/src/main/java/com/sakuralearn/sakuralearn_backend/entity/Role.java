@@ -3,6 +3,8 @@ package com.sakuralearn.sakuralearn_backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.UUID;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -15,8 +17,8 @@ import java.util.Set;
 public class Role {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
     @Column(nullable = false, unique = true, length = 50)
     private String name;

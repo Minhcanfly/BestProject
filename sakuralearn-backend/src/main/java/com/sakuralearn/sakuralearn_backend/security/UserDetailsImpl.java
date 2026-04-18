@@ -19,22 +19,26 @@ public class UserDetailsImpl implements UserDetails {
 
     private UUID id;
     private String email;
+    private String username;
 
     @JsonIgnore
     private String password;
     private String fullName;
+    private boolean enabled;
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = user.getRoles().stream()
-                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toList());
 
         return new UserDetailsImpl(
                 user.getId(),
                 user.getEmail(),
+                user.getUsername(),
                 user.getPasswordHash(),
                 user.getFullName(),
+                user.getIsActive(),
                 authorities
         );
     }
@@ -71,6 +75,6 @@ public class UserDetailsImpl implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }

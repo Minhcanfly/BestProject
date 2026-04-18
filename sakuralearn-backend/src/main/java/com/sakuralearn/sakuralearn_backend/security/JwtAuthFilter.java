@@ -12,6 +12,8 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
+import com.sakuralearn.sakuralearn_backend.service.JwtService;
+import com.sakuralearn.sakuralearn_backend.service.impl.UserDetailsServiceImpl;
 
 import java.io.IOException;
 
@@ -19,7 +21,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtUtils jwtUtils;
+    private final JwtService jwtService;
     private final UserDetailsServiceImpl userDetailsService;
 
     @Override
@@ -28,12 +30,12 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String jwt = parseJwt(request);
 
             if (jwt != null) {
-                String username = jwtUtils.extractUsername(jwt);
+                String username = jwtService.extractUsername(jwt);
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                    if (jwtUtils.validateToken(jwt, userDetails)) {
+                    if (jwtService.validateToken(jwt, userDetails)) {
                         UsernamePasswordAuthenticationToken authentication =
                                 new UsernamePasswordAuthenticationToken(
                                         userDetails,
@@ -45,8 +47,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     }
                 }
             }
+        } catch (org.springframework.security.authentication.DisabledException e) {
+            logger.error("User is disabled: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.setContentType("application/json");
+            response.getWriter().write("{\"error\": \"User account is disabled or blocked\"}");
+            return;
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e);
+            logger.error("Cannot set user authentication", e);
         }
 
         filterChain.doFilter(request, response);

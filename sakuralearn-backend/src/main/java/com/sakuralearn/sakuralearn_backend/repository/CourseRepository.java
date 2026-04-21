@@ -10,6 +10,8 @@ import java.util.UUID;
 
 @Repository
 public interface CourseRepository extends JpaRepository<Course, UUID> {
+    List<Course> findByIsDeletedFalse();
     List<Course> findByJlptLevel(String jlptLevel);
+    List<Course> findByJlptLevelAndIsDeletedFalse(String jlptLevel);
     Optional<Course> findByIdAndIsDeletedFalse(UUID id);
 }

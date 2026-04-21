@@ -4,6 +4,8 @@ import com.sakuralearn.sakuralearn_backend.entity.enums.LessonBlockType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
@@ -26,7 +28,7 @@ public class LessonBlock {
     private Lesson lesson;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "block_type", nullable = false, columnDefinition = "lesson_block_type")
+    @Column(name = "block_type", nullable = false)
     private LessonBlockType blockType;
 
     @Column(name = "order_index", nullable = false)
@@ -50,6 +52,7 @@ public class LessonBlock {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "metadata", columnDefinition = "jsonb")
     private String metadata;
 

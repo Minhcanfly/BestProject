@@ -11,7 +11,7 @@ CREATE TYPE item_type AS ENUM ('KANJI', 'VOCAB', 'GRAMMAR');
 CREATE TYPE quiz_type AS ENUM ('MULTIPLE_CHOICE', 'FILL_IN_BLANK', 'MATCHING', 'LISTENING', 'REAL_TIME');
 CREATE TYPE payment_status AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED');
 CREATE TYPE notification_type AS ENUM ('LESSON_COMPLETE', 'PAYMENT_SUCCESS', 'REMINDER', 'STREAK', 'ACHIEVEMENT', 'ADMIN_ALERT');
-CREATE TYPE lesson_block_type AS ENUM ('TEXT', 'VIDEO', 'AUDIO', 'IMAGE', 'QUIZ', 'PRACTICE');
+-- CREATE TYPE lesson_block_type AS ENUM ('TEXT', 'VIDEO', 'AUDIO', 'IMAGE', 'QUIZ', 'PRACTICE'); -- Replaced with VARCHAR for JPA compatibility
 
 -- =============================================
 -- 2. ROLES & USERS (Module 1)
@@ -105,7 +105,7 @@ CREATE TABLE lessons (
     title_vi TEXT NOT NULL,
     title_ja TEXT,
     title_en TEXT,
-    lesson_type lesson_block_type NOT NULL DEFAULT 'TEXT',
+    lesson_type VARCHAR(20) NOT NULL DEFAULT 'TEXT' CHECK (lesson_type IN ('TEXT', 'VIDEO', 'AUDIO', 'IMAGE', 'QUIZ', 'PRACTICE')),
     order_index INT NOT NULL,
     duration_minutes INT,
     is_published BOOLEAN DEFAULT false,
@@ -119,7 +119,7 @@ CREATE TABLE lessons (
 CREATE TABLE lesson_blocks (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     lesson_id UUID REFERENCES lessons(id) ON DELETE CASCADE,
-    block_type lesson_block_type NOT NULL,
+    block_type VARCHAR(20) NOT NULL CHECK (block_type IN ('TEXT', 'VIDEO', 'AUDIO', 'IMAGE', 'QUIZ', 'PRACTICE')),
     order_index INT NOT NULL,
     content_vi TEXT,
     content_ja TEXT,
@@ -140,7 +140,7 @@ CREATE TABLE enrollments (
     course_id UUID REFERENCES courses(id) ON DELETE CASCADE,
     enrolled_at TIMESTAMPTZ DEFAULT NOW(),
     completed_at TIMESTAMPTZ,
-    progress_percentage DECIMAL(5,2) DEFAULT 0 CHECK (progress_percentage BETWEEN 0 AND 100),
+    progress_percentage DOUBLE PRECISION DEFAULT 0 CHECK (progress_percentage BETWEEN 0 AND 100),
     last_accessed_at TIMESTAMPTZ,
     UNIQUE(user_id, course_id)
 );
@@ -152,7 +152,7 @@ CREATE TABLE lesson_progress (
     is_completed BOOLEAN DEFAULT false,
     completed_at TIMESTAMPTZ,
     last_accessed_at TIMESTAMPTZ,
-    score DECIMAL(5,2),
+    score DOUBLE PRECISION,
     UNIQUE(user_id, lesson_id)
 );
 
@@ -239,7 +239,7 @@ CREATE TABLE flashcards (
     item_id UUID NOT NULL,
     due_date TIMESTAMPTZ,
     interval_days INT DEFAULT 1,
-    ease_factor DECIMAL(5,2) DEFAULT 2.5,
+    ease_factor DOUBLE PRECISION DEFAULT 2.5,
     reps INT DEFAULT 0,
     last_reviewed_at TIMESTAMPTZ,
     UNIQUE(user_id, item_type, item_id)
@@ -252,9 +252,9 @@ CREATE TABLE flashcard_reviews (
     reviewed_at TIMESTAMPTZ DEFAULT NOW(),
     rating INT CHECK (rating BETWEEN 1 AND 5),
     interval_before INT,
-    ease_factor_before DECIMAL(5,2),
+    ease_factor_before DOUBLE PRECISION,
     new_interval INT,
-    new_ease_factor DECIMAL(5,2)
+    new_ease_factor DOUBLE PRECISION
 );
 
 -- =============================================
@@ -286,7 +286,7 @@ CREATE TABLE quiz_attempts (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     quiz_id UUID REFERENCES quizzes(id) ON DELETE SET NULL,
-    score DECIMAL(5,2),
+    score DOUBLE PRECISION,
     time_taken_seconds INT,
     completed_at TIMESTAMPTZ DEFAULT NOW(),
     is_completed BOOLEAN DEFAULT true

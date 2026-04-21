@@ -1,7 +1,10 @@
 spring:
   ai:
     openai:
-      api-key: ${OPENAI_API_KEY:sk-dummy-key-for-local-dev}
+      api-key: ${OPENAI_API_KEY:sk-dummy-key}
+    google:
+      genai:
+        api-key: ${GOOGLE_GENAI_API_KEY:AIzaSyBHA5BZ7SFnLZ5fdmSLnPtitcaXxEWSwf0}
   application:
     name: sakuralearn-backend
   datasource:
@@ -84,3 +87,7 @@ app:
     access-key: admin
     secret-key: minio_password
     bucket-name: sakuralearn-bucket
+  ai:
+    grok:
+      api-key: ${GROK_API_KEY:dummy-grok-key}
+      base-url: https://api.x.ai/v1

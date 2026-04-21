@@ -1,0 +1,336 @@
+.syllabus-manager-page {
+  padding: 30px;
+  max-width: 1300px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease;
+}
+
+.manager-header {
+  margin-bottom: 30px;
+}
+
+.manager-header h1 {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-top: 10px;
+}
+
+.manager-grid {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  gap: 30px;
+  height: calc(100vh - 200px);
+}
+
+.lessons-sidebar {
+  border-radius: 25px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 15px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+
+.icon-btn-add {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lessons-list-admin {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.lesson-admin-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 15px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.lesson-admin-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.lesson-admin-item.active {
+  background: rgba(238, 82, 83, 0.08);
+  border-color: rgba(238, 82, 83, 0.2);
+}
+
+.drag-handle {
+  color: var(--text-muted);
+  cursor: grab;
+}
+
+.lesson-idx {
+  color: var(--primary);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.lesson-name-admin {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lesson-actions-mini {
+  display: flex;
+  gap: 5px;
+}
+
+.mini-action-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.mini-action-btn:hover {
+  background: var(--primary);
+  color: white;
+}
+
+.mini-action-btn.delete:hover {
+  background: var(--error);
+}
+
+/* Blocks Manager area */
+.blocks-manager {
+  border-radius: 25px;
+  display: flex;
+  flex-direction: column;
+  padding: 30px;
+}
+
+.blocks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.add-block-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  padding: 10px 20px;
+  border-radius: 12px;
+  color: var(--text-main);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.3s;
+}
+
+.add-block-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.blocks-list-admin {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.block-admin-item {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+.block-admin-header {
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.block-type-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--text-muted);
+}
+
+.block-type-name {
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+
+.block-index {
+  font-size: 0.8rem;
+  opacity: 0.6;
+}
+
+.block-admin-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.block-btn-icon {
+  color: var(--text-muted);
+}
+
+.block-btn-icon:hover { color: var(--info); }
+.block-btn-icon.delete:hover { color: var(--error); }
+
+.block-admin-preview {
+  padding: 20px;
+}
+
+.text-preview-mini {
+  font-size: 0.95rem;
+  max-height: 100px;
+  overflow: hidden;
+  opacity: 0.8;
+}
+
+.media-preview-mini {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+/* Form mini cho thêm nhanh bài học */
+.lesson-form-mini {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  padding: 10px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lesson-form-mini input {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.85rem;
+}
+
+.form-mini-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.form-mini-actions button {
+  background: var(--primary);
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.form-mini-actions button.cancel {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Block Editor Inline */
+.block-editor-inline {
+  padding: 25px;
+  border-radius: 20px;
+  border: 1px solid var(--primary);
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.03);
+  animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.editor-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.editor-group label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.editor-group select, .editor-group input, .editor-group textarea {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border);
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+  font-size: 0.95rem;
+}
+
+.editor-actions {
+  display: flex;
+  gap: 15px;
+  padding-top: 10px;
+}
+
+.save-block-btn {
+  background: var(--primary);
+  color: white;
+  padding: 12px 25px;
+  border-radius: 12px;
+  font-weight: 600;
+}
+
+.cancel-block-btn {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  padding: 12px 25px;
+  border-radius: 12px;
+}
+
+.no-blocks-msg, .no-lesson-selected {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}

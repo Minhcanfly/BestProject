@@ -36,7 +36,7 @@ public class Lesson {
     private String titleEn;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "lesson_type", nullable = false, columnDefinition = "lesson_block_type")
+    @Column(name = "lesson_type", nullable = false)
     @Builder.Default
     private LessonBlockType lessonType = LessonBlockType.TEXT;
 

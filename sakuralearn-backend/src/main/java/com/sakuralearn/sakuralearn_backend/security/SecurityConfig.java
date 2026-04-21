@@ -1,5 +1,6 @@
 package com.sakuralearn.sakuralearn_backend.security;
 
+import com.sakuralearn.sakuralearn_backend.security.oauth2.HttpCookieOAuth2AuthorizationRequestRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import com.sakuralearn.sakuralearn_backend.security.oauth2.CustomOAuth2UserService;
 import com.sakuralearn.sakuralearn_backend.security.oauth2.OAuth2AuthenticationSuccessHandler;
+import com.sakuralearn.sakuralearn_backend.security.oauth2.OAuth2AuthenticationFailureHandler;
 import com.sakuralearn.sakuralearn_backend.service.impl.UserDetailsServiceImpl;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -27,6 +29,8 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
     private final CustomOAuth2UserService oauth2UserService;
     private final OAuth2AuthenticationSuccessHandler oauth2SuccessHandler;
+    private final OAuth2AuthenticationFailureHandler oauth2FailureHandler;
+    private final HttpCookieOAuth2AuthorizationRequestRepository cookieAuthorizationRequestRepository;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -55,8 +59,11 @@ public class SecurityConfig {
                             .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
+                        .authorizationEndpoint(authorization -> authorization
+                                .authorizationRequestRepository(cookieAuthorizationRequestRepository))
                         .userInfoEndpoint(userInfo -> userInfo.userService(oauth2UserService))
                         .successHandler(oauth2SuccessHandler)
+                        .failureHandler(oauth2FailureHandler)
                 );
 
         http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

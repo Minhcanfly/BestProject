@@ -5,6 +5,7 @@ import com.sakuralearn.sakuralearn_backend.entity.User;
 import com.sakuralearn.sakuralearn_backend.repository.RoleRepository;
 import com.sakuralearn.sakuralearn_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -17,6 +18,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
@@ -25,12 +27,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     @Override
     @Transactional
     public OAuth2User loadUser(OAuth2UserRequest oAuth2UserRequest) throws OAuth2AuthenticationException {
+        log.info("Loading user from OAuth2 provider: {}", oAuth2UserRequest.getClientRegistration().getRegistrationId());
         OAuth2User oAuth2User = super.loadUser(oAuth2UserRequest);
-        return processOAuth2User(oAuth2User);
+        try {
+            return processOAuth2User(oAuth2User);
+        } catch (Exception ex) {
+            log.error("Error processing OAuth2 user: {}", ex.getMessage(), ex);
+            throw new OAuth2AuthenticationException(ex.getMessage());
+        }
     }
 
     private OAuth2User processOAuth2User(OAuth2User oAuth2User) {
         String email = oAuth2User.getAttribute("email");
+        log.info("Processing OAuth2 user with email: {}", email);
+        
         String name = oAuth2User.getAttribute("name");
         String picture = oAuth2User.getAttribute("picture");
 
@@ -38,15 +48,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         User user;
         if (userOptional.isPresent()) {
             user = userOptional.get();
-            // Update existing user info if needed
+            log.info("Existing user found. Updating info.");
             user.setFullName(name);
             user.setAvatarUrl(picture);
         } else {
-            // Register new user
+            log.info("New OAuth2 user. Registering...");
             user = User.builder()
                     .email(email)
-                    .username(email) // Using email as username for OAuth users
-                    .passwordHash("") // No password for OAuth users
+                    .username(email)
+                    .passwordHash("")
                     .fullName(name)
                     .avatarUrl(picture)
                     .isActive(true)
@@ -54,7 +64,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                     .build();
 
             Role userRole = roleRepository.findByName("STUDENT")
-                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    .orElseThrow(() -> {
+                        log.error("STUDENT role not found in database!");
+                        return new RuntimeException("Error: Role is not found.");
+                    });
             user.setRoles(Collections.singleton(userRole));
         }
 

@@ -5,6 +5,7 @@ import {
   BookOpen, 
   Notebook, 
   User, 
+  Layers,
   Settings, 
   ShieldAlert,
   LogOut
@@ -16,12 +17,17 @@ const Sidebar = () => {
   const { user, logout, hasRole } = useAuth();
   
   const isAdmin = hasRole('ADMIN');
+  const isTeacher = hasRole('TEACHER') || isAdmin;
 
   const menuItems = [
     { name: 'Dashboard', icon: Home, path: '/' },
     { name: 'Khóa học', icon: BookOpen, path: '/courses' },
     { name: 'Sổ tay', icon: Notebook, path: '/notebook' },
     { name: 'Trang cá nhân', icon: User, path: '/profile' },
+  ];
+
+  const teacherItems = [
+    { name: 'Quản lý bài giảng', icon: Layers, path: '/teacher/courses' },
   ];
 
   const adminItems = [
@@ -51,6 +57,22 @@ const Sidebar = () => {
             ))}
           </ul>
         </div>
+
+        {isTeacher && (
+          <div className="nav-section">
+            <p className="section-title">Teacher Space</p>
+            <ul>
+              {teacherItems.map((item) => (
+                <li key={item.path}>
+                  <NavLink to={item.path} className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}>
+                    <item.icon size={20} />
+                    <span>{item.name}</span>
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {isAdmin && (
           <div className="nav-section">

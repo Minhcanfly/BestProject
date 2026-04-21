@@ -25,6 +25,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final JwtService jwtService;
     private final RefreshTokenService refreshTokenService;
     private final UserRepository userRepository;
+    private final HttpCookieOAuth2AuthorizationRequestRepository httpCookieOAuth2AuthorizationRequestRepository;
 
     @Value("${app.oauth2.redirect-uri}")
     private String redirectUri;
@@ -35,23 +36,27 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
             return;
         }
 
+        String targetUrl = determineTargetUrl(request, response, authentication);
+        clearAuthenticationAttributes(request, response);
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getAttribute("email");
         User user = userRepository.findByEmailAndIsDeletedFalse(email).orElseThrow(() -> new RuntimeException("User not found after OAuth2 login"));
 
         if (!user.getIsActive()) {
-            String lockedUrl = UriComponentsBuilder.fromUriString(redirectUri)
+            return UriComponentsBuilder.fromUriString(redirectUri)
                     .queryParam("error", "user_blocked")
                     .build().toUriString();
-            getRedirectStrategy().sendRedirect(request, response, lockedUrl);
-            return;
         }
 
         UserDetailsImpl userDetails = UserDetailsImpl.build(user);
         String token = jwtService.generateToken(userDetails);
         String refreshToken = refreshTokenService.createRefreshToken(user.getId()).getToken();
 
-        String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
+        return UriComponentsBuilder.fromUriString(redirectUri)
                 .queryParam("token", token)
                 .queryParam("refreshToken", refreshToken)
                 .queryParam("id", user.getId().toString())
@@ -61,7 +66,10 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 .queryParam("avatarUrl", user.getAvatarUrl() != null ? user.getAvatarUrl() : "")
                 .queryParam("roles", String.join(",", user.getRoles().stream().map(r -> r.getName()).toList()))
                 .build().toUriString();
+    }
 
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    protected void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
+        super.clearAuthenticationAttributes(request);
+        httpCookieOAuth2AuthorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
     }
 }

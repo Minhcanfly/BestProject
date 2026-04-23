@@ -1,0 +1,20 @@
+package com.sakuralearn.sakuralearn_backend.dto.request;
+
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.UUID;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class PersonalNoteRequest {
+    private UUID lessonBlockId;
+    
+    @NotBlank(message = "Nội dung ghi chú không được để trống")
+    private String content;
+}

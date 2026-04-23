@@ -146,7 +146,7 @@ const CourseForm = () => {
               <div className="form-row">
                 <div className="form-group">
                   <label>Tiêu đề (Tiếng Nhật)</label>
-                  <input type="text" name="titleJa" value={formData.titleJa} onChange={handleInputChange} placeholder="日本語 N5" />
+                  <input type="text" name="titleJa" value={formData.titleJa} onChange={handleInputChange} placeholder="Ví dụ: 日本語 N5" />
                 </div>
                 <div className="form-group">
                   <label>Cấp độ JLPT</label>
@@ -161,13 +161,14 @@ const CourseForm = () => {
               </div>
 
               <div className="form-group">
-                <label>Mô tả chi tiết</label>
+                <label>Mô tả chi tiết *</label>
                 <textarea
                   name="descriptionVi"
                   value={formData.descriptionVi}
                   onChange={handleInputChange}
                   rows="6"
-                  placeholder="Mô tả nội dung học tập..."
+                  required
+                  placeholder="Mô tả nội dung học tập bằng Tiếng Việt..."
                 ></textarea>
               </div>
 

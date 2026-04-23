@@ -3,12 +3,15 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
+import ForgotPassword from '../pages/ForgotPassword';
+import ResetPassword from '../pages/ResetPassword';
 import Profile from '../pages/Profile';
 import UserManagement from '../pages/admin/UserManagement';
 import CourseList from '../pages/courses/CourseList';
 import CourseDetail from '../pages/courses/CourseDetail';
 import LearningView from '../pages/courses/LearningView';
 import TeacherDashboard from '../pages/courses/TeacherDashboard';
+import MyCourses from '../pages/courses/MyCourses';
 import CourseForm from '../pages/courses/CourseForm';
 import SyllabusManager from '../pages/courses/SyllabusManager';
 import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler';
@@ -39,21 +42,30 @@ const TeacherRoute = ({ children }) => {
   return children;
 };
 
+// Automatic Redirection based on Role
+const RoleBasedRedirect = () => {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="loading-screen">Loading...</div>;
+  if (!user) return <Navigate to={ROUTES.LOGIN} />;
+  
+  return (
+    <MainLayout title="Dashboard">
+      <Dashboard />
+    </MainLayout>
+  );
+};
+
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path={ROUTES.LOGIN} element={<AuthLayout><Login /></AuthLayout>} />
       <Route path="/register" element={<AuthLayout><Register /></AuthLayout>} />
+      <Route path={ROUTES.FORGOT_PASSWORD} element={<AuthLayout><ForgotPassword /></AuthLayout>} />
+      <Route path={ROUTES.RESET_PASSWORD} element={<AuthLayout><ResetPassword /></AuthLayout>} />
       <Route path={ROUTES.OAUTH2_REDIRECT} element={<OAuth2RedirectHandler />} />
 
       {/* Main App Routes */}
-      <Route path={ROUTES.HOME} element={
-        <ProtectedRoute>
-          <MainLayout title="Dashboard">
-             <Dashboard />
-          </MainLayout>
-        </ProtectedRoute>
-      } />
+      <Route path={ROUTES.HOME} element={<RoleBasedRedirect />} />
 
       <Route path={ROUTES.PROFILE} element={
         <ProtectedRoute>
@@ -87,6 +99,14 @@ const AppRoutes = () => {
         <ProtectedRoute>
           <MainLayout title="Chi tiết khóa học">
              <CourseDetail />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path={ROUTES.MY_COURSES} element={
+        <ProtectedRoute>
+          <MainLayout title="Khóa học của tôi">
+             <MyCourses />
           </MainLayout>
         </ProtectedRoute>
       } />

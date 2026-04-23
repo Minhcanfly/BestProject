@@ -8,9 +8,10 @@ import java.util.UUID;
 
 public interface CourseService {
     CourseResponse createCourse(CourseRequest request, UUID teacherId, MultipartFile thumbnail);
-    CourseResponse updateCourse(UUID id, CourseRequest request, MultipartFile thumbnail);
-    void deleteCourse(UUID id);
-    CourseResponse publishCourse(UUID id, boolean publish);
+    CourseResponse updateCourse(UUID id, CourseRequest request, MultipartFile thumbnail, UUID userId, boolean isAdmin);
+    void deleteCourse(UUID id, UUID userId, boolean isAdmin);
+    CourseResponse publishCourse(UUID id, boolean publish, UUID userId, boolean isAdmin);
     List<CourseResponse> getCoursesByLevel(String jlptLevel);
+    List<CourseResponse> getManagedCourses(UUID userId, boolean isAdmin);
     CourseResponse getCourseById(UUID id);
 }

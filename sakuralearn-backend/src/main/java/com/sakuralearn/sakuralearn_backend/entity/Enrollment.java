@@ -43,4 +43,7 @@ public class Enrollment {
 
     @Column(name = "last_accessed_at")
     private ZonedDateTime lastAccessedAt;
+
+    @Column(name = "last_lesson_id")
+    private UUID lastLessonId;
 }

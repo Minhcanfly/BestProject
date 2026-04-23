@@ -12,6 +12,9 @@ import java.util.List;
 public interface EnrollmentMapper {
     @Mapping(target = "courseId", source = "course.id")
     @Mapping(target = "courseTitle", source = "course.titleVi")
+    @Mapping(target = "thumbnailUrl", source = "course.thumbnailUrl")
+    @Mapping(target = "jlptLevel", source = "course.jlptLevel")
+    @Mapping(target = "lessonCount", source = "course.lessonCount")
     EnrollmentResponse toResponse(Enrollment enrollment);
     
     List<EnrollmentResponse> toResponseList(List<Enrollment> enrollments);

@@ -48,13 +48,19 @@ public class CourseServiceImpl implements CourseService {
             course.setThumbnailUrl(thumbnailUrl);
         }
 
-        return courseMapper.toResponse(courseRepository.save(course));
+        Course saved = courseRepository.save(course);
+        CourseResponse response = courseMapper.toResponse(saved);
+        response.setTeacherName(teacher.getFullName());
+        response.setLessonCount(0); // New course has 0 lessons
+        return response;
     }
 
     @Override
     @Transactional
-    public CourseResponse updateCourse(UUID id, CourseRequest request, MultipartFile thumbnail) {
+    public CourseResponse updateCourse(UUID id, CourseRequest request, MultipartFile thumbnail, UUID userId, boolean isAdmin) {
         Course course = findCourseById(id);
+        checkCourseOwnership(course, userId, isAdmin);
+        
         courseMapper.updateEntity(request, course);
 
         if (thumbnail != null && !thumbnail.isEmpty()) {
@@ -62,26 +68,48 @@ public class CourseServiceImpl implements CourseService {
             course.setThumbnailUrl(thumbnailUrl);
         }
 
-        return courseMapper.toResponse(courseRepository.save(course));
+        Course saved = courseRepository.save(course);
+        CourseResponse response = courseMapper.toResponse(saved);
+        if (saved.getTeacher() != null) {
+            response.setTeacherName(saved.getTeacher().getFullName());
+        }
+        response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(id));
+        return response;
     }
 
     @Override
     @Transactional
-    public void deleteCourse(UUID id) {
+    public void deleteCourse(UUID id, UUID userId, boolean isAdmin) {
         Course course = findCourseById(id);
+        checkCourseOwnership(course, userId, isAdmin);
+        
         course.setIsDeleted(true);
         courseRepository.save(course);
     }
 
     @Override
     @Transactional
-    public CourseResponse publishCourse(UUID id, boolean publish) {
+    public CourseResponse publishCourse(UUID id, boolean publish, UUID userId, boolean isAdmin) {
         Course course = findCourseById(id);
+        checkCourseOwnership(course, userId, isAdmin);
+
         if (publish && lessonRepository.countByCourseIdAndIsDeletedFalse(id) == 0) {
             throw new BadRequestException("Course must have at least one lesson before publishing");
         }
         course.setIsPublished(publish);
-        return courseMapper.toResponse(courseRepository.save(course));
+        Course saved = courseRepository.save(course);
+        CourseResponse response = courseMapper.toResponse(saved);
+        if (saved.getTeacher() != null) {
+            response.setTeacherName(saved.getTeacher().getFullName());
+        }
+        response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(id));
+        return response;
+    }
+
+    private void checkCourseOwnership(Course course, UUID userId, boolean isAdmin) {
+        if (!isAdmin && !course.getTeacher().getId().equals(userId)) {
+            throw new BadRequestException("You do not have permission to modify this course");
+        }
     }
 
     @Override
@@ -92,12 +120,57 @@ public class CourseServiceImpl implements CourseService {
         } else {
             courses = courseRepository.findByJlptLevelAndIsDeletedFalse(jlptLevel);
         }
-        return courseMapper.toResponseList(courses);
+        
+        return courses.stream().map(course -> {
+            CourseResponse response = courseMapper.toResponse(course);
+            // Manually set teacher name and lesson count to ensure they are populated
+            if (course.getTeacher() != null) {
+                response.setTeacherName(course.getTeacher().getFullName());
+            }
+            
+            // Fallback: if @Formula fails, count manually (safer)
+            if (response.getLessonCount() == null || response.getLessonCount() == 0) {
+                int count = (int) lessonRepository.countByCourseIdAndIsDeletedFalse(course.getId());
+                response.setLessonCount(count);
+            }
+            
+            return response;
+        }).toList();
+    }
+
+    @Override
+    public List<CourseResponse> getManagedCourses(UUID userId, boolean isAdmin) {
+        List<Course> courses;
+        if (isAdmin) {
+            courses = courseRepository.findByIsDeletedFalse();
+        } else {
+            courses = courseRepository.findByTeacherIdAndIsDeletedFalse(userId);
+        }
+        
+        return courses.stream().map(course -> {
+            CourseResponse response = courseMapper.toResponse(course);
+            if (course.getTeacher() != null) {
+                response.setTeacherName(course.getTeacher().getFullName());
+            }
+            response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(course.getId()));
+            return response;
+        }).toList();
     }
 
     @Override
     public CourseResponse getCourseById(UUID id) {
-        return courseMapper.toResponse(findCourseById(id));
+        Course course = findCourseById(id);
+        CourseResponse response = courseMapper.toResponse(course);
+        
+        if (course.getTeacher() != null) {
+            response.setTeacherName(course.getTeacher().getFullName());
+        }
+        
+        if (response.getLessonCount() == null || response.getLessonCount() == 0) {
+            response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(id));
+        }
+        
+        return response;
     }
 
     private Course findCourseById(UUID id) {

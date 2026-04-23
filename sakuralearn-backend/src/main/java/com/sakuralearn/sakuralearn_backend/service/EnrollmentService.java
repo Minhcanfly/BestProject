@@ -9,5 +9,6 @@ public interface EnrollmentService {
     EnrollmentResponse enrollInCourse(UUID userId, UUID courseId);
     List<EnrollmentResponse> getMyEnrollments(UUID userId);
     boolean isEnrolled(UUID userId, UUID courseId);
+    EnrollmentResponse getEnrollmentStatus(UUID userId, UUID courseId);
     void unenroll(UUID userId, UUID courseId);
 }

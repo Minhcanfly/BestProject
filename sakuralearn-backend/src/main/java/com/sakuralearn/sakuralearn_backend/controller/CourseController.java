@@ -26,6 +26,14 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getCoursesByLevel(jlptLevel));
     }
 
+    @GetMapping("/managed")
+    @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+    public ResponseEntity<?> getManagedCourses(@AuthenticationPrincipal UserDetailsImpl userDetails) {
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return ResponseEntity.ok(courseService.getManagedCourses(userDetails.getId(), isAdmin));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getCourseById(@PathVariable UUID id) {
         return ResponseEntity.ok(courseService.getCourseById(id));
@@ -44,22 +52,34 @@ public class CourseController {
     @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
     public ResponseEntity<?> updateCourse(
             @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
             @Valid @ModelAttribute CourseRequest request,
             @RequestPart(value = "thumbnail", required = false) MultipartFile thumbnail) {
-        return ResponseEntity.ok(courseService.updateCourse(id, request, thumbnail));
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return ResponseEntity.ok(courseService.updateCourse(id, request, thumbnail, userDetails.getId(), isAdmin));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
-    public ResponseEntity<?> deleteCourse(@PathVariable UUID id) {
-        courseService.deleteCourse(id);
+    public ResponseEntity<?> deleteCourse(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        courseService.deleteCourse(id, userDetails.getId(), isAdmin);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{id}/publish")
     @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
-    public ResponseEntity<?> publishCourse(@PathVariable UUID id, @RequestParam boolean publish) {
-        return ResponseEntity.ok(courseService.publishCourse(id, publish));
+    public ResponseEntity<?> publishCourse(
+            @PathVariable UUID id, 
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @RequestParam boolean publish) {
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return ResponseEntity.ok(courseService.publishCourse(id, publish, userDetails.getId(), isAdmin));
     }
 
     @PostMapping("/{id}/generate-syllabus")

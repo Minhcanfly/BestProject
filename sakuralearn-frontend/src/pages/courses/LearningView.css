@@ -409,3 +409,206 @@
 .sidebar-lessons-scroll::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
 }
+
+/* Block Unit & Notes */
+.block-unit-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeIn 0.8s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Resume Prompt */
+.resume-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 24px;
+}
+
+.resume-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(20px);
+  padding: 30px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  max-width: 400px;
+}
+
+.resume-card p {
+  margin-bottom: 24px;
+  font-size: 1.1rem;
+}
+
+.resume-btns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-resume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.btn-resume.primary {
+  background: var(--primary);
+  color: white;
+}
+
+.btn-resume.secondary {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.btn-resume:hover {
+  transform: scale(1.05);
+}
+
+/* Personal Notes */
+.personal-notes-container {
+  padding: 24px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.notes-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.notes-header h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.add-note-btn-small {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--primary);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.note-edit-area {
+  margin-bottom: 20px;
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.note-edit-area textarea {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: white;
+  resize: vertical;
+  font-size: 0.95rem;
+  outline: none;
+  line-height: 1.5;
+}
+
+.note-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.btn-save-note {
+  background: var(--primary);
+  padding: 6px 16px;
+  border-radius: 8px;
+  color: white;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.btn-cancel-note {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+}
+
+.notes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.note-item {
+  padding: 16px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.note-content {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 8px;
+  white-space: pre-wrap;
+}
+
+.note-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.note-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.note-actions button {
+  color: rgba(255, 255, 255, 0.3);
+  transition: 0.3s;
+}
+
+.note-actions button:hover {
+  color: var(--primary);
+}
+
+.mark-done-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 20px;
+  padding: 8px 16px;
+  background: rgba(46, 213, 115, 0.1);
+  color: #2ed573;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.mark-done-btn:hover {
+  background: rgba(46, 213, 115, 0.2);
+}

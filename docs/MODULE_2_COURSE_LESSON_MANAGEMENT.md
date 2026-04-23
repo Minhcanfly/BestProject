@@ -1,6 +1,6 @@
 🌸 PHÂN TÍCH SÂU MODULE 2: Course & Lesson Management Phiên bản phân tích: 1.0 Deep Dive Mục đích: Giúp bạn hiểu rõ toàn bộ logic nghiệp vụ, quy tắc kinh doanh, quyết định then chốt và cách triển khai tối ưu trước khi code.
 
-## 1. Mục tiêu cốt lõi của Module 2
+## 1. Mục tiêu cốt lõi của Module 2 - nên tham khảo thêm Riki, DungMori,JapanesePod101
 
 Xây dựng lộ trình học có cấu trúc theo chuẩn JLPT N5 → N1.
 
@@ -16,37 +16,37 @@ Là nền tảng để tất cả các module sau (Progress, Quiz, SRS, Gamifica
 
 ### A. Teacher / Admin Journey (Tạo nội dung)
 
-Truy cập Course Management Dashboard.
+Truy cập Course Management Dashboard. - xong
 
-Tạo mới Course → điền title, description (vi/ja/en), JLPT level, giá (free/paid), thumbnail.
+Tạo mới Course → điền title, description (vi/ja/en), JLPT level, giá (free/paid), thumbnail. - xong
 
-Thêm Lesson vào Course (có order_index).
+Thêm Lesson vào Course (có order_index). - xong
 
-Trong mỗi Lesson → thêm nhiều LessonBlock (Video, Text, Audio, Quiz…) với order_index.
+Trong mỗi Lesson → thêm nhiều LessonBlock (Video, Text, Audio, Quiz…) với order_index. - cân đối mở rộng thêm
 
-Upload media (thumbnail, video, audio) → MinIO.
+Upload media (thumbnail, video, audio) → MinIO. - xong
 
-Preview Course → Publish (hoặc Unpublish).
+Preview Course → Publish (hoặc Unpublish). - xong
 
-(Nếu có workflow) Gửi duyệt cho Admin.
+(Nếu có workflow) Gửi duyệt cho Admin. - phát triển sau
 
 ### B. Student Journey
 
-Vào trang Courses → Filter: JLPT level, Free/Paid, Tên khóa học.
+Vào trang Courses → Filter: JLPT level, Free/Paid, Tên khóa học. - xong
 
-Xem chi tiết Course (mô tả, số lesson, tiến độ nếu đã enroll, thumbnail).
+Xem chi tiết Course (mô tả, số lesson, tiến độ nếu đã enroll, thumbnail). - xong
 
 Nhấn Enroll:
 
-Free course → enroll ngay.
+Free course → enroll ngay. - xong
 
-Paid course → chuyển sang Module 6 (Payment).
+Paid course → chuyển sang Module 6 (Payment). - chưa làm đến
 
-Sau enroll thành công → vào My Courses → bắt đầu học.
+Sau enroll thành công → vào My Courses → bắt đầu học. - xong
 
-Học theo thứ tự Lesson (hoặc tự do nếu được phép) → hoàn thành LessonBlock → tiến độ tự động cập nhật (Module 3).
+Học tự do Lesson → hoàn thành LessonBlock → tiến độ tự động cập nhật (Module 3). - tạm ổn - xong phần LessonBlock và Audio, Text. còn Quiz chưa biết làm
 
-## 3. Chức năng chính (chi tiết)
+## 3. Chức năng chính (chi tiết) - Đã xong gần hết
 
 Chức năng
 
@@ -106,86 +106,85 @@ Teacher + Student
 
 Thứ tự hiển thị:
 
-Course → Lessons (order_index).
+Course → Lessons (order_index). - xong
 
-Lesson → LessonBlocks (order_index).
+Lesson → LessonBlocks (order_index). - xong
 
-Mặc định: Student phải học theo thứ tự (khóa Lesson sau nếu Lesson trước chưa completed). Có thể mở tùy chọn “Allow free navigation” sau.
+Mặc định: Student học tự do. - xong
 
 Trạng thái Course:
 
-Draft → chỉ Teacher/Admin thấy.
+Draft → chỉ Teacher/Admin thấy. - xong
 
-Published → hiển thị công khai.
+Published → hiển thị công khai. - xong
 
-Unpublished → ẩn nhưng người đã enroll vẫn học được.
+Unpublished → ẩn nhưng người đã enroll vẫn học được. - xong
 
 Enrollments:
 
-Một user chỉ có tối đa 1 enrollment cho 1 course (trừ khi reset tiến độ).
+Một user chỉ có tối đa 1 enrollment cho 1 course (trừ khi reset tiến độ). - xong
 
-Enrollment chỉ tạo khi: Free course hoặc Payment SUCCESS.
+Enrollment chỉ tạo khi: Free course hoặc Payment SUCCESS. - chưa làm Payment
 
 Multi-language:
 
-Title và description nên hỗ trợ vi/ja/en (dùng JSONB column hoặc bảng translation riêng).
+Title và description nên hỗ trợ vi/ja/en (dùng JSONB column hoặc bảng translation riêng). - tính sau
 
 Media Logic:
 
-Tất cả file upload qua MinIO → trả về presigned URL (thời hạn 1–7 ngày hoặc permanent nếu public bucket).
+Tất cả file upload qua MinIO → trả về presigned URL (thời hạn 1–7 ngày hoặc permanent nếu public bucket). - xong
 
-Không lưu file trực tiếp vào DB hoặc local filesystem.
+Không lưu file trực tiếp vào DB hoặc local filesystem. - xong
 
 ### B. Dashboard Role-based (Cập nhật từ Module 1)
-- Hệ thống cần tách biệt Dashboard hiển thị cho từng Role: Student, Teacher, Admin ngay từ đầu để đảm bảo UX/UI phù hợp.
+- Hệ thống cần tách biệt Dashboard hiển thị cho từng Role: Student, Teacher, Admin ngay từ đầu để đảm bảo UX/UI phù hợp. - xong
 
 ## 5. Các điểm dễ nhầm lẫn / Quyết định then chốt (Decision Points)
 
 💡 Chiến lược nội dung khi thiếu nguồn Giáo viên:
-- **Seed Content:** Sử dụng dữ liệu mở chuẩn JLPT (KanjiDic, JMdict) và AI (Gemini/GPT) để tự động hóa việc tạo cấu trúc bài học (Syllabus) và ví dụ. Bạn đóng vai trò là người phê duyệt (Curator) thay vì người viết nội dung từ đầu.
+- **Seed Content:** Sử dụng dữ liệu mở chuẩn JLPT (KanjiDic, JMdict) và AI (Gemini/GPT) để tự động hóa việc tạo cấu trúc bài học (Syllabus) và ví dụ. Bạn đóng vai trò là người phê duyệt (Curator) thay vì người viết nội dung từ đầu. - nâng cao
 
-1. LessonBlock là đơn vị linh hoạt nhất (bạn đã thiết kế rất tốt). Quyết định: LessonBlock type nào cần “completion rule” khác nhau? (Video tự động, Quiz yêu cầu điểm, Text thủ công).
+1. LessonBlock là đơn vị linh hoạt nhất (bạn đã thiết kế rất tốt). Quyết định: LessonBlock type nào cần “completion rule” khác nhau? (Video tự động, Quiz yêu cầu điểm, Text thủ công). - đã xong
 
-Tính tiến độ (liên kết Module 3): Nên tính theo LessonBlock hay chỉ theo Lesson? → Khuyến nghị: Tính theo LessonBlock (chính xác hơn).
+Tính tiến độ (liên kết Module 3): Theo LessonBlock
 
 Free vs Paid content: Paid course nên cho preview một số LessonBlock đầu tiên (teaser) để tăng chuyển đổi.
 
-Versioning nội dung: Khi Teacher chỉnh sửa LessonBlock sau khi Student đã học → có cần thông báo hay giữ phiên bản cũ cho người đã enroll không? (MVP: đơn giản, cho phép chỉnh sửa trực tiếp).
+Versioning nội dung: Khi Teacher chỉnh sửa LessonBlock sau khi Student đã học → có cần thông báo hay giữ phiên bản cũ cho người đã enroll không? (MVP: đơn giản, cho phép chỉnh sửa trực tiếp). - cho phép chỉnh sửa trực tiếp và thông báo cho các user đã enroll (sẽ làm sau)
 
-Soft Delete: Course/Lesson/LessonBlock nên soft delete (is_deleted = true) thay vì xóa thật.
+Soft Delete: Course/Lesson/LessonBlock nên soft delete (is_deleted = true) thay vì xóa thật. - xong
 
 ## 6. Edge Cases & Xử lý ngoại lệ cần chú ý
 
-User cố enroll lại course đã enroll → trả lỗi “Bạn đã tham gia khóa học này”.
+User cố enroll lại course đã enroll → trả lỗi “Bạn đã tham gia khóa học này”. - xong
 
-Teacher xóa Lesson giữa chừng → ảnh hưởng đến tiến độ của Student đã enroll (cần thông báo hoặc giữ LessonBlock cũ).
+Teacher xóa Lesson giữa chừng → ảnh hưởng đến tiến độ của Student đã enroll (cần thông báo hoặc giữ LessonBlock cũ). - chưa làm
 
-Upload video lớn → cần xử lý chunk upload hoặc giới hạn kích thước.
+Upload video lớn → cần xử lý chunk upload hoặc giới hạn kích thước. - tính sau
 
-Course có 0 Lesson → không cho Publish.
-
-Student chưa enroll mà cố truy cập lesson → redirect về trang Course detail với nút Enroll.
+Course có 0 Lesson → không cho Publish. - xong
+Student chưa enroll mà cố truy cập lesson → redirect về trang Course detail với nút Enroll. - chưa làm
 
 ## 7. Gợi ý cách làm phù hợp với người Việt học JLPT
 
-Title và mô tả Course mặc định tiếng Việt + hỗ trợ tiếng Nhật (furigana nếu cần).
+Title và mô tả Course mặc định tiếng Việt + hỗ trợ tiếng Nhật (furigana nếu cần). - tính sau
 
-Thêm tag phổ biến: “N5 Kanji Focus”, “Nghe – Nói JLPT”, “Grammar N4”, “Từ vựng theo chủ đề”.
+Thêm tag phổ biến: “N5 Kanji Focus”, “Nghe – Nói JLPT”, “Grammar N4”, “Từ vựng theo chủ đề”. - chưa làm
 
-Cho phép Teacher thêm “Mục tiêu bài học” rõ ràng (ví dụ: “Sau bài này bạn sẽ nắm 50 từ vựng N5”).
+Cho phép Teacher thêm “Mục tiêu bài học” rõ ràng (ví dụ: “Sau bài này bạn sẽ nắm 50 từ vựng N5”). - chưa làm
 
-Thumbnail nên có thiết kế dễ nhìn, màu sắc nổi bật (hình ảnh hoa anh đào, JLPT badge).
+Thumbnail nên có thiết kế dễ nhìn, màu sắc nổi bật (hình ảnh hoa anh đào, JLPT badge). - chưa cần
 
-Hỗ trợ preview 1–2 LessonBlock miễn phí cho paid course → tăng tỷ lệ mua.
+Hỗ trợ preview 1–2 LessonBlock miễn phí cho paid course → tăng tỷ lệ mua. - tính sau
 
 ## 8. Liên kết với các Module khác
 
-Module 3: Cung cấp dữ liệu để tính progress và lesson_progress.
+Module 3: Cung cấp dữ liệu để tính progress và lesson_progress. - xong
 
-Module 4: Có thể link LessonBlock với Kanji/Vocab/Grammar cụ thể.
+Module 4: Có thể link LessonBlock với Kanji/Vocab/Grammar cụ thể. - tính sau
 
-Module 5: LessonBlock Quiz có thể tự động tạo flashcard cho SRS.
+Module 5: LessonBlock Quiz có thể tự động tạo flashcard cho SRS. - tính sau
 
-Module 6: Enroll paid course → trigger Payment.
+Module 6: Enroll paid course → trigger Payment. - tính sau
 
-Module 8: Hoàn thành Lesson/LessonBlock → +XP, update streak.
+Module 8: Hoàn thành Lesson/LessonBlock → +XP, update streak. - tính sau

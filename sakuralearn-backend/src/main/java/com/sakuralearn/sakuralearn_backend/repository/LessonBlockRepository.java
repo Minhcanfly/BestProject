@@ -15,4 +15,6 @@ public interface LessonBlockRepository extends JpaRepository<LessonBlock, UUID> 
     int countByLessonIdAndIdIn(UUID lessonId, List<UUID> ids);
     boolean existsByLessonIdAndOrderIndex(UUID lessonId, Integer orderIndex);
     boolean existsByLessonIdAndOrderIndexAndIdNot(UUID lessonId, Integer orderIndex, UUID id);
+    
+    long countByLessonCourseId(UUID courseId);
 }

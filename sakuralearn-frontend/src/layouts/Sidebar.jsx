@@ -22,6 +22,7 @@ const Sidebar = () => {
   const menuItems = [
     { name: 'Dashboard', icon: Home, path: '/' },
     { name: 'Khóa học', icon: BookOpen, path: '/courses' },
+    { name: 'Khóa học của tôi', icon: Layers, path: '/my-courses' },
     { name: 'Sổ tay', icon: Notebook, path: '/notebook' },
     { name: 'Trang cá nhân', icon: User, path: '/profile' },
   ];

@@ -10,5 +10,8 @@ export const ROUTES = {
   TEACHER_SYLLABUS: (courseId = ':id') => `/teacher/courses/syllabus/${courseId}`,
   ADMIN_USERS: '/admin/users',
   PROFILE: '/profile',
+  MY_COURSES: '/my-courses',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password',
   OAUTH2_REDIRECT: '/oauth2/redirect',
 };

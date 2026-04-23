@@ -38,7 +38,7 @@ const TeacherDashboard = () => {
     setErrorMessage('');
     setSuccessMessage('');
     try {
-      const response = await courseService.getAllCourses({});
+      const response = await courseService.getManagedCourses();
       setCourses(response.data);
     } catch (error) {
       console.error('Lỗi khi tải danh sách khóa học:', error);

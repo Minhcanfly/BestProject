@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
 import { lessonService, lessonBlockService } from '../../services/lessonService';
+import { fileService } from '../../services/fileService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { ROUTES } from '../../constants/routes';
 import StatusMessage from '../../components/common/StatusMessage';
@@ -16,7 +17,9 @@ import {
   Music, 
   Image as ImageIcon,
   Check,
-  X
+  X,
+  UploadCloud,
+  Zap
 } from 'lucide-react';
 import {
   DndContext, 
@@ -154,6 +157,7 @@ const SyllabusManager = () => {
   // Block Form State
   const [showBlockForm, setShowBlockForm] = useState(false);
   const [blockEditing, setBlockEditing] = useState(null);
+  const [uploading, setUploading] = useState(false);
   const [blockData, setBlockData] = useState({
     blockType: 'TEXT',
     contentVi: '',
@@ -162,6 +166,23 @@ const SyllabusManager = () => {
     imageUrl: '',
     orderIndex: 1
   });
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const response = await fileService.uploadFile(file);
+      const url = response.data.url;
+      const field = blockData.blockType === 'VIDEO' ? 'videoUrl' : blockData.blockType === 'AUDIO' ? 'audioUrl' : 'imageUrl';
+      setBlockData(prev => ({ ...prev, [field]: url }));
+    } catch (err) {
+      setErrorMessage('Lỗi khi tải tệp lên: ' + getApiErrorMessage(err));
+    } finally {
+      setUploading(false);
+    }
+  };
 
   useEffect(() => {
     fetchInitialData();
@@ -438,22 +459,42 @@ const SyllabusManager = () => {
                            <option value="VIDEO">Video</option>
                            <option value="AUDIO">Âm thanh</option>
                            <option value="IMAGE">Hình ảnh</option>
+                           <option value="QUIZ">Trắc nghiệm</option>
                         </select>
                       </div>
                    </div>
 
-                   {(blockData.blockType === 'VIDEO' || blockData.blockType === 'AUDIO' || blockData.blockType === 'IMAGE') && (
+                   {blockData.blockType !== 'TEXT' && blockData.blockType !== 'QUIZ' && (
                      <div className="editor-group">
-                        <label>Đường dẫn URL ({blockData.blockType})</label>
-                        <input 
-                          type="text" 
-                          placeholder="https://..." 
-                          value={blockData.blockType === 'VIDEO' ? blockData.videoUrl : blockData.blockType === 'AUDIO' ? blockData.audioUrl : blockData.imageUrl}
-                          onChange={(e) => {
-                            const field = blockData.blockType === 'VIDEO' ? 'videoUrl' : blockData.blockType === 'AUDIO' ? 'audioUrl' : 'imageUrl';
-                            setBlockData({...blockData, [field]: e.target.value});
-                          }}
-                        />
+                        <label>Tải lên tệp hoặc Nhập URL</label>
+                        <div className="upload-input-group">
+                          <input 
+                            type="text" 
+                            placeholder="https://..." 
+                            value={blockData.blockType === 'VIDEO' ? blockData.videoUrl || '' : blockData.blockType === 'AUDIO' ? blockData.audioUrl || '' : blockData.imageUrl || ''}
+                            onChange={(e) => {
+                              const field = blockData.blockType === 'VIDEO' ? 'videoUrl' : blockData.blockType === 'AUDIO' ? 'audioUrl' : 'imageUrl';
+                              setBlockData({...blockData, [field]: e.target.value});
+                            }}
+                          />
+                          <label className="upload-btn-mini">
+                            <UploadCloud size={16} /> Tải lên
+                            <input 
+                              type="file" 
+                              hidden 
+                              onChange={handleFileUpload} 
+                              accept={blockData.blockType === 'VIDEO' ? 'video/*' : blockData.blockType === 'AUDIO' ? 'audio/*' : 'image/*'} 
+                            />
+                          </label>
+                        </div>
+                        {uploading && <div className="upload-progress-mini">Đang tải lên...</div>}
+                     </div>
+                   )}
+
+                   {blockData.blockType === 'QUIZ' && (
+                     <div className="quiz-editor-stub glass-effect-light">
+                        <p><Zap size={16} /> Chế độ Trắc nghiệm đang được kích hoạt cho khối này.</p>
+                        <small>Bạn có thể thiết lập câu hỏi sau khi lưu khối nội dung này.</small>
                      </div>
                    )}
 
@@ -461,14 +502,14 @@ const SyllabusManager = () => {
                       <label>Nội dung / Mô tả</label>
                       <textarea 
                         rows="4" 
-                        value={blockData.contentVi} 
+                        value={blockData.contentVi || ''} 
                         onChange={(e) => setBlockData({...blockData, contentVi: e.target.value})}
                         placeholder="Nhập nội dung bài học hoặc mô tả media..."
                       ></textarea>
                    </div>
 
                    <div className="editor-actions">
-                      <button className="save-block-btn" onClick={handleSaveBlock}>Lưu nội dung</button>
+                      <button className="save-block-btn" disabled={uploading} onClick={handleSaveBlock}>Lưu nội dung</button>
                       <button className="cancel-block-btn" onClick={() => setShowBlockForm(false)}>Hủy</button>
                    </div>
                 </div>

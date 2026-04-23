@@ -1,5 +1,5 @@
--- V1.0__Create_Base_Tables.sql
--- SakuraLearn - Phase 1 MVP - Full Base Schema (UUID Edition)
+-- V1__Phase_1_MVP_Foundation.sql
+-- SakuraLearn - Phase 1 MVP - Full Base Schema (Consolidated)
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
@@ -7,11 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 -- =============================================
 -- 1. ENUM TYPES
 -- =============================================
-CREATE TYPE item_type AS ENUM ('KANJI', 'VOCAB', 'GRAMMAR');
 CREATE TYPE quiz_type AS ENUM ('MULTIPLE_CHOICE', 'FILL_IN_BLANK', 'MATCHING', 'LISTENING', 'REAL_TIME');
-CREATE TYPE payment_status AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED');
-CREATE TYPE notification_type AS ENUM ('LESSON_COMPLETE', 'PAYMENT_SUCCESS', 'REMINDER', 'STREAK', 'ACHIEVEMENT', 'ADMIN_ALERT');
--- CREATE TYPE lesson_block_type AS ENUM ('TEXT', 'VIDEO', 'AUDIO', 'IMAGE', 'QUIZ', 'PRACTICE'); -- Replaced with VARCHAR for JPA compatibility
 
 -- =============================================
 -- 2. ROLES & USERS (Module 1)
@@ -142,6 +138,7 @@ CREATE TABLE enrollments (
     completed_at TIMESTAMPTZ,
     progress_percentage DOUBLE PRECISION DEFAULT 0 CHECK (progress_percentage BETWEEN 0 AND 100),
     last_accessed_at TIMESTAMPTZ,
+    last_lesson_id UUID, -- Added from V1.5
     UNIQUE(user_id, course_id)
 );
 
@@ -154,6 +151,29 @@ CREATE TABLE lesson_progress (
     last_accessed_at TIMESTAMPTZ,
     score DOUBLE PRECISION,
     UNIQUE(user_id, lesson_id)
+);
+
+-- Progress Tracking for Lesson Blocks (Added from V1.4)
+CREATE TABLE lesson_block_progress (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_block_id UUID NOT NULL REFERENCES lesson_blocks(id) ON DELETE CASCADE,
+    is_completed BOOLEAN DEFAULT false,
+    completed_at TIMESTAMPTZ,
+    last_accessed_at TIMESTAMPTZ DEFAULT NOW(),
+    last_timestamp DOUBLE PRECISION,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, lesson_block_id)
+);
+
+-- Personal Notes per Block (Added from V1.4)
+CREATE TABLE personal_notes (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    lesson_block_id UUID NOT NULL REFERENCES lesson_blocks(id) ON DELETE CASCADE,
+    content TEXT NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- =============================================
@@ -220,49 +240,12 @@ CREATE TABLE grammar_points (
 );
 
 -- =============================================
--- 6. SRS & REVIEW (Module 5)
--- =============================================
-CREATE TABLE user_notebook (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    item_type item_type NOT NULL,
-    item_id UUID NOT NULL,
-    note TEXT,
-    added_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, item_type, item_id)
-);
-
-CREATE TABLE flashcards (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    item_type item_type NOT NULL,
-    item_id UUID NOT NULL,
-    due_date TIMESTAMPTZ,
-    interval_days INT DEFAULT 1,
-    ease_factor DOUBLE PRECISION DEFAULT 2.5,
-    reps INT DEFAULT 0,
-    last_reviewed_at TIMESTAMPTZ,
-    UNIQUE(user_id, item_type, item_id)
-);
-
-CREATE TABLE flashcard_reviews (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    flashcard_id UUID REFERENCES flashcards(id) ON DELETE CASCADE,
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    reviewed_at TIMESTAMPTZ DEFAULT NOW(),
-    rating INT CHECK (rating BETWEEN 1 AND 5),
-    interval_before INT,
-    ease_factor_before DOUBLE PRECISION,
-    new_interval INT,
-    new_ease_factor DOUBLE PRECISION
-);
-
--- =============================================
--- 7. QUIZ (Module 3)
+-- 6. QUIZ (Module 3)
 -- =============================================
 CREATE TABLE quizzes (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     lesson_id UUID REFERENCES lessons(id) ON DELETE SET NULL,
+    lesson_block_id UUID REFERENCES lesson_blocks(id) ON DELETE CASCADE, -- Added from V1.6
     title TEXT NOT NULL,
     type quiz_type NOT NULL,
     time_limit_seconds INT,
@@ -302,78 +285,7 @@ CREATE TABLE user_answers (
 );
 
 -- =============================================
--- 8. PAYMENT & NOTIFICATION (Module 6)
--- =============================================
-CREATE TABLE payments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    course_id UUID REFERENCES courses(id),
-    amount DECIMAL(10,2) NOT NULL,
-    vnpay_transaction_id VARCHAR(100),
-    status payment_status DEFAULT 'PENDING',
-    paid_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE notifications (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    type notification_type NOT NULL,
-    title TEXT,
-    message TEXT,
-    data JSONB,
-    is_read BOOLEAN DEFAULT false,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- =============================================
--- 9. GAMIFICATION (Module 8)
--- =============================================
-CREATE TABLE badges (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name_vi TEXT NOT NULL,
-    name_ja TEXT,
-    name_en TEXT,
-    description_vi TEXT,
-    icon_url TEXT,
-    condition TEXT,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE user_badges (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    badge_id UUID REFERENCES badges(id),
-    earned_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, badge_id)
-);
-
-CREATE TABLE xp_transactions (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    amount INT NOT NULL,
-    reason VARCHAR(50) NOT NULL,
-    reference_id UUID,
-    reference_type VARCHAR(30),
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
-CREATE TABLE comments (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    target_type VARCHAR(20) NOT NULL CHECK (target_type IN ('COURSE','LESSON','KANJI','VOCAB','GRAMMAR')),
-    target_id UUID NOT NULL,
-    parent_id UUID REFERENCES comments(id),
-    content TEXT NOT NULL,
-    likes_count INT DEFAULT 0,
-    is_deleted BOOLEAN DEFAULT false,
-    created_at TIMESTAMPTZ DEFAULT NOW(),
-    updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- =============================================
--- 10. AUDIT LOG
+-- 7. AUDIT LOG
 -- =============================================
 CREATE TABLE audit_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -384,7 +296,7 @@ CREATE TABLE audit_log (
     new_values JSONB,
     changed_by UUID REFERENCES users(id),
     changed_at TIMESTAMPTZ DEFAULT NOW(),
-    ip_address INET,
+    ip_address VARCHAR(45), -- Fixed from V1.3
     user_agent TEXT
 );
 
@@ -395,12 +307,10 @@ CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_courses_jlpt_level ON courses(jlpt_level);
 CREATE INDEX idx_kanji_jlpt_level ON kanji(jlpt_level);
 CREATE INDEX idx_vocabulary_jlpt_level ON vocabulary(jlpt_level);
-CREATE INDEX idx_flashcards_due_user ON flashcards(user_id, due_date);
-CREATE INDEX idx_notifications_user_read ON notifications(user_id, is_read);
-CREATE INDEX idx_comments_target ON comments(target_type, target_id);
 CREATE INDEX idx_kanji_onyomi ON kanji USING GIN (onyomi);
 CREATE INDEX idx_kanji_kunyomi ON kanji USING GIN (kunyomi);
-CREATE INDEX idx_xp_transactions_user ON xp_transactions(user_id);
+CREATE INDEX idx_lb_progress_user ON lesson_block_progress(user_id);
+CREATE INDEX idx_personal_notes_user_block ON personal_notes(user_id, lesson_block_id);
 
 -- =============================================
 -- TRIGGER: Auto update updated_at
@@ -419,7 +329,7 @@ CREATE TRIGGER trg_lessons_update BEFORE UPDATE ON lessons FOR EACH ROW EXECUTE 
 CREATE TRIGGER trg_kanji_update BEFORE UPDATE ON kanji FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 CREATE TRIGGER trg_vocab_update BEFORE UPDATE ON vocabulary FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 CREATE TRIGGER trg_grammar_update BEFORE UPDATE ON grammar_points FOR EACH ROW EXECUTE FUNCTION update_timestamp();
-CREATE TRIGGER trg_comments_update BEFORE UPDATE ON comments FOR EACH ROW EXECUTE FUNCTION update_timestamp();
+CREATE TRIGGER trg_personal_notes_update BEFORE UPDATE ON personal_notes FOR EACH ROW EXECUTE FUNCTION update_timestamp();
 
 -- =============================================
 -- SEED DATA: Default Roles

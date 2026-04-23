@@ -25,5 +25,6 @@ public class CourseResponse {
     private String teacherName;
     private Boolean isPublished;
     private String thumbnailUrl;
+    private Integer lessonCount;
     private ZonedDateTime createdAt;
 }

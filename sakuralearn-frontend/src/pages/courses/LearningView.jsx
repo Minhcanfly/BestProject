@@ -3,10 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { courseService } from '../../services/courseService';
 import { lessonService } from '../../services/lessonService';
 import { progressService } from '../../services/progressService';
+import { enrollmentService } from '../../services/enrollmentService';
 import { getApiErrorMessage } from '../../utils/apiError';
 import { ROUTES } from '../../constants/routes';
 import StatusMessage from '../../components/common/StatusMessage';
 import BlockRenderer from '../../components/courses/BlockRenderer';
+import NoteComponent from '../../components/courses/NoteComponent';
 import { 
   ChevronRight, 
   ChevronLeft, 
@@ -30,6 +32,7 @@ const LearningView = () => {
   const [blocks, setBlocks] = useState([]);
   const [progress, setProgress] = useState(0);
   const [completedLessons, setCompletedLessons] = useState([]);
+  const [blockProgressMap, setBlockProgressMap] = useState({});
   
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState('');
@@ -59,24 +62,37 @@ const LearningView = () => {
     setLoading(true);
     setError(null);
     try {
-      const [courseRes, lessonsRes, progressRes] = await Promise.all([
+      const [courseRes, lessonsRes, enrollmentCheck, completedRes] = await Promise.all([
         courseService.getCourseById(courseId),
         lessonService.getLessonsByCourse(courseId),
-        progressService.getCourseProgress(courseId).catch(() => ({ data: 0 }))
+        enrollmentService.checkEnrollment(courseId),
+        progressService.getCompletedLessons(courseId)
       ]);
       
       if (!courseRes.data) throw new Error('Không tìm thấy khóa học');
       
+      // Strict access control: Must be enrolled to learn
+      if (!enrollmentCheck.data) {
+        setError('Bạn cần ghi danh vào khóa học này để xem nội dung.');
+        setTimeout(() => navigate(ROUTES.COURSE_DETAIL(courseId)), 3000);
+        return;
+      }
+
       setCourse(courseRes.data);
       const lessonsData = (lessonsRes.data || []).sort((a, b) => a.orderIndex - b.orderIndex);
       setLessons(lessonsData);
+      setCompletedLessons(completedRes.data || []);
       
-      // Handle progress data structure
+      // Fetch progress
+      const progressRes = await progressService.getCourseProgress(courseId).catch(() => ({ data: 0 }));
       const progVal = typeof progressRes.data === 'number' ? progressRes.data : (progressRes.data?.progressPercentage || 0);
       setProgress(progVal);
+
+      // Find last accessed lesson or default to first
+      const lastAccessedLesson = lessonsData.find(l => l.id === enrollmentCheck.data.lastLessonId) || lessonsData[0];
       
-      if (lessonsData.length > 0) {
-        setCurrentLesson(lessonsData[0]);
+      if (lastAccessedLesson) {
+        setCurrentLesson(lastAccessedLesson);
       }
     } catch (err) {
       console.error('Error fetching learning data:', err);
@@ -88,9 +104,20 @@ const LearningView = () => {
 
   const fetchLessonContent = async (lessonId) => {
     try {
-      const response = await lessonService.getBlocksByLesson(lessonId);
-      const sortedBlocks = (response.data || []).sort((a, b) => a.orderIndex - b.orderIndex);
+      const [blocksRes, progressRes] = await Promise.all([
+        lessonService.getBlocksByLesson(lessonId),
+        progressService.getLessonBlocksProgress(lessonId)
+      ]);
+
+      const sortedBlocks = (blocksRes.data || []).sort((a, b) => a.orderIndex - b.orderIndex);
       setBlocks(sortedBlocks);
+      
+      // Create a map of blockId -> progress object
+      const progMap = {};
+      (progressRes.data || []).forEach(p => {
+        progMap[p.blockId] = p;
+      });
+      setBlockProgressMap(progMap);
       
       // Mark as last accessed (Fire and forget)
       progressService.updateLastAccessed(lessonId).catch(() => {});
@@ -99,31 +126,87 @@ const LearningView = () => {
     }
   };
 
-  const handleLessonComplete = async () => {
-    if (!currentLesson) return;
-    
+  const handleUpdateBlockProgress = async (blockId, data) => {
     try {
-      await progressService.completeLesson(currentLesson.id);
-      
-      // Update local state
-      if (!completedLessons.includes(currentLesson.id)) {
-        setCompletedLessons([...completedLessons, currentLesson.id]);
-      }
-      
-      // Refresh progress
+      const response = await progressService.updateBlockProgress(blockId, data);
+      setBlockProgressMap(prev => ({
+        ...prev,
+        [blockId]: response.data
+      }));
+    } catch (error) {
+      console.error('Error updating block progress:', error);
+    }
+  };
+
+  const handleBlockComplete = async (blockId) => {
+    try {
+      const response = await progressService.updateBlockProgress(blockId, { isCompleted: true });
+      setBlockProgressMap(prev => ({
+        ...prev,
+        [blockId]: response.data
+      }));
+
+      // Refresh overall course progress
       const progressRes = await progressService.getCourseProgress(courseId);
       const progVal = typeof progressRes.data === 'number' ? progressRes.data : (progressRes.data?.progressPercentage || 0);
       setProgress(progVal);
-      
-      // Move to next or show success
-      if (currentLessonIndex < lessons.length - 1) {
-        setCurrentLesson(lessons[currentLessonIndex + 1]);
+
+      // Auto-scroll to next block
+      const currentIndex = blocks.findIndex(b => b.id === blockId);
+      if (currentIndex < blocks.length - 1) {
+        const nextBlockId = blocks[currentIndex + 1].id;
+        // Wait for state update and re-render
+        setTimeout(() => {
+          const nextBlockElement = document.getElementById(`block-${nextBlockId}`);
+          if (nextBlockElement) {
+            nextBlockElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
+        }, 100);
       } else {
+        // If it's the last block, scroll to the "Finish Lesson" button
+        setTimeout(() => {
+          const footerBtn = document.querySelector('.nav-btn-premium.primary');
+          if (footerBtn) {
+            footerBtn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
+      }
+    } catch (error) {
+      console.error('Error completing block:', error);
+    }
+  };
+
+  const handleLessonComplete = async () => {
+    if (!currentLesson) return;
+    
+    setLoading(true);
+    try {
+      // Call new API to mark all blocks in this lesson as completed
+      await progressService.completeLesson(currentLesson.id);
+      
+      // Add to completed list locally for UI updates
+      if (!completedLessons.includes(currentLesson.id)) {
+        setCompletedLessons(prev => [...prev, currentLesson.id]);
+      }
+
+      // Refresh overall progress display
+      const progressRes = await progressService.getCourseProgress(courseId);
+      const progVal = typeof progressRes.data === 'number' ? progressRes.data : (progressRes.data?.progressPercentage || 0);
+      setProgress(progVal);
+
+      // Check if this was the last lesson
+      if (currentLessonIndex === lessons.length - 1) {
         setSuccessMessage('Chúc mừng! Bạn đã hoàn thành toàn bộ bài học trong khóa học này! 🎉');
         setTimeout(() => setSuccessMessage(''), 5000);
+      } else {
+        // Move to next lesson
+        setCurrentLesson(lessons[currentLessonIndex + 1]);
       }
     } catch (error) {
       console.error('Error completing lesson:', error);
+      setError('Lỗi khi lưu tiến trình bài học. Vui lòng thử lại.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -146,6 +229,9 @@ const LearningView = () => {
             <button className="icon-btn-circle" onClick={() => navigate(ROUTES.HOME)} title="Về trang chủ">
               <Home size={20} />
             </button>
+            <button className="icon-btn-circle" onClick={() => navigate(ROUTES.COURSE_DETAIL(courseId))} title="Về trang khóa học">
+              <ArrowLeft size={20} />
+            </button>
             <div className="breadcrumb">
               <span className="b-course">{course?.titleVi}</span>
               <ChevronRight size={16} className="b-sep" />
@@ -166,10 +252,24 @@ const LearningView = () => {
 
         <div className="learning-scroll-container">
           <div className="content-inner-max">
+            {currentLesson && completedLessons.includes(currentLesson.id) && (
+              <div className="lesson-status-alert info glass-effect-light">
+                <CheckCircle size={18} /> Bạn đã hoàn thành bài học này. Bạn có thể xem lại hoặc chuyển sang bài tiếp theo.
+              </div>
+            )}
+            
             {blocks.length > 0 ? (
               <div className="blocks-presentation">
                 {blocks.map(block => (
-                  <BlockRenderer key={block.id} block={block} />
+                   <div key={block.id} id={`block-${block.id}`} className="block-unit-container">
+                      <BlockRenderer 
+                        block={block} 
+                        progress={blockProgressMap[block.id]}
+                        onUpdateProgress={handleUpdateBlockProgress}
+                        onComplete={handleBlockComplete}
+                      />
+                      <NoteComponent blockId={block.id} />
+                   </div>
                 ))}
               </div>
             ) : (
@@ -189,12 +289,28 @@ const LearningView = () => {
                   >
                     <ArrowLeft size={20} /> Bài trước
                   </button>
-                  <button 
-                    className="nav-btn-premium primary"
-                    onClick={handleLessonComplete}
-                  >
-                    {isLastLesson ? 'Hoàn thành khóa học' : 'Hoàn thành & Tiếp theo'} <CheckCircle size={20} style={{ marginLeft: '8px' }} />
-                  </button>
+
+                  {blocks.some(b => !blockProgressMap[b.id]?.isCompleted) ? (
+                    <button 
+                      className="nav-btn-premium primary"
+                      onClick={() => {
+                        const firstIncomplete = blocks.find(b => !blockProgressMap[b.id]?.isCompleted);
+                        if (firstIncomplete) {
+                          document.getElementById(`block-${firstIncomplete.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                      }}
+                    >
+                      Tiếp tục học <PlayCircle size={20} style={{ marginLeft: '8px' }} />
+                    </button>
+                  ) : (
+                    <button 
+                      className="nav-btn-premium primary"
+                      onClick={handleLessonComplete}
+                    >
+                      {isLastLesson ? 'Hoàn thành khóa học' : 'Bài tiếp theo'} <ArrowRight size={20} style={{ marginLeft: '8px' }} />
+                    </button>
+                  )}
+                  
                   <button 
                     className="nav-btn-premium"
                     disabled={isLastLesson}

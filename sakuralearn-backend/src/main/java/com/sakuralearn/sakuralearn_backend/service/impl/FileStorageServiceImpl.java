@@ -46,9 +46,21 @@ public class FileStorageServiceImpl implements FileStorageService {
             boolean isExist = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucketName).build());
             if (!isExist) {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucketName).build());
-                // Setting bucket policy to public readable is usually needed here, 
-                // but omitted for simplicity. We assume bucket is already configured.
             }
+
+            // Always ensure bucket policy is set to public readable for avatars and course media
+            String config = "{\n" +
+                    "  \"Version\": \"2012-10-17\",\n" +
+                    "  \"Statement\": [\n" +
+                    "    {\n" +
+                    "      \"Effect\": \"Allow\",\n" +
+                    "      \"Principal\": \"*\",\n" +
+                    "      \"Action\": \"s3:GetObject\",\n" +
+                    "      \"Resource\": \"arn:aws:s3:::" + bucketName + "/*\"\n" +
+                    "    }\n" +
+                    "  ]\n" +
+                    "}";
+            minioClient.setBucketPolicy(SetBucketPolicyArgs.builder().bucket(bucketName).config(config).build());
 
             String objectName = (folder != null && !folder.isEmpty()) ? folder + "/" + fileName : fileName;
 
@@ -59,7 +71,7 @@ public class FileStorageServiceImpl implements FileStorageService {
                     .contentType(contentType)
                     .build());
 
-            return minioUrl + "/" + bucketName + "/" + objectName;
+            return "http://localhost:8080/api/v1/media/" + objectName;
         } catch (Exception e) {
             log.error("Error uploading to MinIO", e);
             throw new RuntimeException("Error uploading file: " + e.getMessage());
@@ -80,6 +92,47 @@ public class FileStorageServiceImpl implements FileStorageService {
                     .build());
         } catch (Exception e) {
             log.error("Error deleting file from MinIO", e);
+        }
+    }
+
+    @Override
+    public InputStream getFileStream(String objectName) {
+        try {
+            return minioClient.getObject(GetObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectName)
+                    .build());
+        } catch (Exception e) {
+            log.error("Error getting file stream from MinIO", e);
+            return null;
+        }
+    }
+
+    @Override
+    public InputStream getFileStream(String objectName, long offset, long length) {
+        try {
+            return minioClient.getObject(GetObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectName)
+                    .offset(offset)
+                    .length(length)
+                    .build());
+        } catch (Exception e) {
+            log.error("Error getting file range stream from MinIO", e);
+            return null;
+        }
+    }
+
+    @Override
+    public StatObjectResponse getFileStat(String objectName) {
+        try {
+            return minioClient.statObject(StatObjectArgs.builder()
+                    .bucket(bucketName)
+                    .object(objectName)
+                    .build());
+        } catch (Exception e) {
+            log.error("Error getting file stat from MinIO", e);
+            return null;
         }
     }
 }

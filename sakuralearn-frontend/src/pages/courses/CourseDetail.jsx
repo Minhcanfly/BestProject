@@ -13,10 +13,12 @@ const CourseDetail = () => {
   const navigate = useNavigate();
   const [course, setCourse] = useState(null);
   const [lessons, setLessons] = useState([]);
-  const [isEnrolled, setIsEnrolled] = useState(false);
+  const [enrollment, setEnrollment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+
+  const isEnrolled = !!enrollment;
 
   useEffect(() => {
     fetchData();
@@ -29,11 +31,11 @@ const CourseDetail = () => {
       const [courseRes, lessonsRes, enrollRes] = await Promise.all([
         courseService.getCourseById(id),
         lessonService.getLessonsByCourse(id),
-        enrollmentService.checkEnrollment(id)
+        enrollmentService.checkEnrollment(id).catch(() => ({ data: null }))
       ]);
       setCourse(courseRes.data);
       setLessons(lessonsRes.data);
-      setIsEnrolled(enrollRes.data);
+      setEnrollment(enrollRes.data);
     } catch (error) {
       console.error('Error fetching course details:', error);
       setErrorMessage(getApiErrorMessage(error, 'Không thể tải thông tin khóa học.'));
@@ -78,7 +80,7 @@ const CourseDetail = () => {
           <div className="hero-text">
             <span className="jlpt-badge-large">{course.jlptLevel}</span>
             <h1 className="hero-title">{course.titleVi}</h1>
-            <p className="hero-title-ja">{course.titleJa}</p>
+            {course.titleJa && <p className="hero-title-ja">{course.titleJa}</p>}
             <div className="hero-meta">
               <span>👤 Giảng viên: {course.teacherName || 'Hệ thống'}</span>
               <span>🕒 Thời lượng: {course.durationMinutes} phút</span>
@@ -93,12 +95,25 @@ const CourseDetail = () => {
                   <span className="free-large">Miễn phí</span>
                 )}
               </div>
+              
+              {isEnrolled && (
+                <div className="detail-progress-mini">
+                  <div className="progress-text-mini">
+                    <span>Tiến độ học tập:</span>
+                    <span>{Math.round(enrollment.progressPercentage || 0)}%</span>
+                  </div>
+                  <div className="progress-bar-mini">
+                    <div className="bar-fill-mini" style={{ width: `${enrollment.progressPercentage || 0}%` }}></div>
+                  </div>
+                </div>
+              )}
+
               <button 
                 className={`enroll-btn-large ${isEnrolled ? 'enrolled' : ''}`}
                 onClick={handleEnroll}
                 disabled={enrolling}
               >
-                {enrolling ? 'Đang xử lý...' : isEnrolled ? 'Vào học ngay' : 'Đăng ký ngay'}
+                {enrolling ? 'Đang xử lý...' : isEnrolled ? 'Tiếp tục học' : 'Đăng ký ngay'}
               </button>
             </div>
           </div>

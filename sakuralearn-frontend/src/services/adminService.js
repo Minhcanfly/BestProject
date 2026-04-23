@@ -14,5 +14,8 @@ export const adminService = {
 
   // Update user roles
   updateUserRoles: (userId, roles) => 
-    API.patch(`/admin/users/${userId}/roles`, roles)
+    API.patch(`/admin/users/${userId}/roles`, roles),
+
+  // Get summary statistics for dashboard
+  getDashboardStats: () => API.get('/admin/statistics/summary')
 }

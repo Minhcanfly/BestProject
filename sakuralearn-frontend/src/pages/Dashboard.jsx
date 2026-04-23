@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { 
   Trophy, 
@@ -7,29 +7,257 @@ import {
   ArrowRight,
   Zap,
   Flame,
-  Star
+  Star,
+  Users,
+  BookOpen,
+  DollarSign,
+  ClipboardList,
+  PlusCircle,
+  BarChart3,
+  LayoutDashboard
 } from 'lucide-react';
+import { enrollmentService } from '../services/enrollmentService';
+import { adminService } from '../services/adminService';
+import { courseService } from '../services/courseService';
+import { ROUTES } from '../constants/routes';
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
 const Dashboard = () => {
-  const { user } = useAuth();
+  const { user, hasRole } = useAuth();
+  const navigate = useNavigate();
+  
+  if (hasRole('ADMIN')) return <AdminDashboard user={user} navigate={navigate} />;
+  if (hasRole('TEACHER')) return <TeacherDashboard user={user} navigate={navigate} />;
+  return <StudentDashboard user={user} navigate={navigate} />;
+};
+
+const AdminDashboard = ({ user, navigate }) => {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await adminService.getDashboardStats();
+        setStats(response.data);
+      } catch (err) {
+        console.error('Error fetching admin stats:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  const adminStats = [
+    { label: 'Tổng người dùng', value: stats?.totalUsers || 0, icon: Users, color: '#48dbfb' },
+    { label: 'Khóa học active', value: stats?.totalCourses || 0, icon: BookOpen, color: '#1dd1a1' },
+    { label: 'Doanh thu (VNĐ)', value: stats?.totalRevenue?.toLocaleString() || 0, icon: DollarSign, color: '#ff9f43' },
+    { label: 'Chờ duyệt', value: stats?.pendingReviews || 0, icon: ClipboardList, color: '#feca57' },
+  ];
+
+  return (
+    <div className="dashboard-container admin-theme">
+      <header className="dashboard-header">
+        <div className="header-text">
+          <h1>Hệ thống quản trị 🛠️</h1>
+          <p>Chào mừng trở lại, {user?.fullName}. Dưới đây là tổng quan hệ thống hôm nay.</p>
+        </div>
+      </header>
+
+      <div className="stats-grid">
+        {adminStats.map((stat, index) => (
+          <div key={index} className="stat-card glass-effect">
+            <div className="stat-icon" style={{ backgroundColor: `${stat.color}15`, color: stat.color }}>
+              <stat.icon size={24} />
+            </div>
+            <div className="stat-details">
+              <h3>{loading ? '...' : stat.value}</h3>
+              <p>{stat.label}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="dashboard-sections">
+        <section className="quick-actions-section glass-effect">
+          <div className="section-header">
+            <h2>Thao tác nhanh</h2>
+            <LayoutDashboard size={20} className="text-muted" />
+          </div>
+          <div className="actions-grid">
+            <button className="action-card glass-effect-light" onClick={() => navigate('/admin/users')}>
+              <Users size={32} />
+              <span>Quản lý User</span>
+            </button>
+            <button className="action-card glass-effect-light" onClick={() => navigate('/courses')}>
+              <BookOpen size={32} />
+              <span>Quản lý Khóa học</span>
+            </button>
+            <button className="action-card glass-effect-light">
+              <BarChart3 size={32} />
+              <span>Báo cáo doanh thu</span>
+            </button>
+          </div>
+        </section>
+
+        <section className="system-status glass-effect">
+           <div className="section-header">
+              <h2>Trạng thái hệ thống</h2>
+              <Zap size={20} className="text-success" />
+           </div>
+           <div className="status-list">
+              <div className="status-item">
+                <span>API Server</span>
+                <span className="status-badge online">Online</span>
+              </div>
+              <div className="status-item">
+                <span>Database</span>
+                <span className="status-badge online">Online</span>
+              </div>
+              <div className="status-item">
+                <span>Storage (MinIO)</span>
+                <span className="status-badge online">Online</span>
+              </div>
+           </div>
+        </section>
+      </div>
+    </div>
+  );
+};
+
+const TeacherDashboard = ({ user, navigate }) => {
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMyCourses = async () => {
+      try {
+        const response = await courseService.getManagedCourses();
+        setCourses(response.data || []);
+      } catch (err) {
+        console.error('Error fetching teacher courses:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchMyCourses();
+  }, []);
+
+  return (
+    <div className="dashboard-container teacher-theme">
+      <header className="dashboard-header">
+        <div className="header-text">
+          <h1>Góc giảng viên 👨‍🏫</h1>
+          <p>Chào mừng thầy/cô {user?.fullName}. Chúc thầy/cô một ngày giảng dạy hiệu quả!</p>
+        </div>
+        <button className="cta-btn" onClick={() => navigate('/courses/new')}>
+          <PlusCircle size={18} /> Tạo khóa học mới
+        </button>
+      </header>
+
+      <div className="stats-grid">
+        <div className="stat-card glass-effect">
+          <div className="stat-icon" style={{ backgroundColor: '#48dbfb15', color: '#48dbfb' }}>
+            <BookOpen size={24} />
+          </div>
+          <div className="stat-details">
+            <h3>{courses.length}</h3>
+            <p>Khóa học của tôi</p>
+          </div>
+        </div>
+        <div className="stat-card glass-effect">
+          <div className="stat-icon" style={{ backgroundColor: '#1dd1a115', color: '#1dd1a1' }}>
+            <Users size={24} />
+          </div>
+          <div className="stat-details">
+            <h3>--</h3>
+            <p>Tổng học viên</p>
+          </div>
+        </div>
+        <div className="stat-card glass-effect">
+          <div className="stat-icon" style={{ backgroundColor: '#feca5715', color: '#feca57' }}>
+            <Star size={24} />
+          </div>
+          <div className="stat-details">
+            <h3>5.0</h3>
+            <p>Đánh giá trung bình</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="dashboard-sections">
+        <section className="my-courses-section glass-effect">
+          <div className="section-header">
+            <h2>Khóa học đang quản lý</h2>
+            <button className="text-link" onClick={() => navigate('/teacher/courses')}>Quản lý bài giảng</button>
+          </div>
+          <div className="teacher-courses-list">
+             {loading ? (
+               <div className="loader-small"></div>
+             ) : courses.length > 0 ? (
+               courses.slice(0, 3).map(course => (
+                 <div key={course.id} className="course-item-horizontal glass-effect-light">
+                   <div className="course-main">
+                      <h4>{course.titleVi}</h4>
+                      <span className="course-badge">{course.jlptLevel}</span>
+                   </div>
+                   <button className="edit-btn" onClick={() => navigate(`/courses/${course.id}/edit`)}>Chỉnh sửa</button>
+                 </div>
+               ))
+             ) : (
+               <p className="empty-msg">Thầy/cô chưa có khóa học nào.</p>
+             )}
+          </div>
+        </section>
+      </div>
+    </div>
+  );
+};
+
+const StudentDashboard = ({ user, navigate }) => {
+  const [enrollments, setEnrollments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEnrollments = async () => {
+      try {
+        const response = await enrollmentService.getMyEnrollments();
+        setEnrollments(response.data || []);
+      } catch (err) {
+        console.error('Error fetching enrollments:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEnrollments();
+  }, []);
 
   const stats = [
     { label: 'Ngày học liên tục', value: user?.currentStreak || 0, icon: Flame, color: '#ff9f43' },
     { label: 'Tổng số XP', value: user?.xp || 0, icon: Zap, color: '#48dbfb' },
-    { label: 'Cấp độ hiện tại', value: 'N5', icon: Trophy, color: '#feca57' },
-    { label: 'Giờ học đã dùng', value: '12h', icon: Clock, color: '#1dd1a1' },
+    { label: 'Cấp độ hiện tại', value: user?.jlptGoal || 'N5', icon: Trophy, color: '#feca57' },
+    { label: 'Ngôn ngữ', value: user?.preferredLanguage === 'vi' ? 'Tiếng Việt' : 'English', icon: Clock, color: '#1dd1a1' },
   ];
+
+  const firstEnrollment = enrollments.length > 0 ? enrollments[0] : null;
 
   return (
     <div className="dashboard-container">
       <section className="welcome-banner glass-effect">
         <div className="banner-content">
           <h1>Chào mừng trở lại, {user?.fullName}! 👋</h1>
-          <p>Bạn đã hoàn thành 80% mục tiêu học tập của tuần này. Tiếp tục phát huy nhé!</p>
-          <button className="cta-btn">
-            Học tiếp bài 14 <ArrowRight size={18} />
-          </button>
+          <p>
+            {firstEnrollment 
+              ? `Bạn đã hoàn thành ${Math.round(firstEnrollment.progressPercentage)}% khóa học ${firstEnrollment.courseTitle}. Tiếp tục phát huy nhé!` 
+              : 'Hãy bắt đầu hành trình chinh phục tiếng Nhật ngay hôm nay!'}
+          </p>
+          {firstEnrollment && (
+            <button className="cta-btn" onClick={() => navigate(ROUTES.LEARNING(firstEnrollment.courseId))}>
+              Tiếp tục học ngay <ArrowRight size={18} />
+            </button>
+          )}
         </div>
         <div className="banner-illustration">
           <div className="blobs">
@@ -58,27 +286,37 @@ const Dashboard = () => {
         <section className="recent-activity glass-effect">
           <div className="section-header">
             <h2>Tiến độ học tập</h2>
-            <button className="text-link">Xem tất cả</button>
+            <button className="text-link" onClick={() => navigate(ROUTES.MY_COURSES)}>Xem tất cả</button>
           </div>
           <div className="learning-progress">
-             <div className="course-progress-card">
-                <div className="course-info">
-                   <span className="course-badge">N5</span>
-                   <div>
-                     <h4>Tiếng Nhật Sơ Cấp 1</h4>
-                     <p>Bài 14: Thể Te và các ứng dụng</p>
-                   </div>
-                </div>
-                <div className="progress-bar-container">
-                   <div className="progress-label">
-                      <span>45/100 Bài học</span>
-                      <span>45%</span>
-                   </div>
-                   <div className="progress-bar-bg">
-                      <div className="progress-bar-fill" style={{ width: '45%' }}></div>
-                   </div>
-                </div>
-             </div>
+             {loading ? (
+               <div className="loader-small"></div>
+             ) : enrollments.length > 0 ? (
+               enrollments.slice(0, 3).map(enrollment => (
+                 <div key={enrollment.id} className="course-progress-card" onClick={() => navigate(ROUTES.LEARNING(enrollment.courseId))}>
+                    <div className="course-info">
+                       <span className="course-badge">{enrollment.jlptLevel || 'ALL'}</span>
+                       <div>
+                         <h4>{enrollment.courseTitle}</h4>
+                         <p>Tiến độ học tập</p>
+                       </div>
+                    </div>
+                    <div className="progress-bar-container">
+                       <div className="progress-label">
+                          <span>{Math.round(enrollment.progressPercentage)}%</span>
+                       </div>
+                       <div className="progress-bar-bg">
+                          <div className="progress-bar-fill" style={{ width: `${enrollment.progressPercentage}%` }}></div>
+                       </div>
+                    </div>
+                 </div>
+               ))
+             ) : (
+               <div className="no-enrollments glass-effect-light">
+                 <p>Bạn chưa tham gia khóa học nào.</p>
+                 <button onClick={() => navigate(ROUTES.COURSES)}>Khám phá khóa học</button>
+               </div>
+             )}
           </div>
         </section>
 

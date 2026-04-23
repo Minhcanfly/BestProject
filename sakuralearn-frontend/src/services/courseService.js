@@ -15,5 +15,6 @@ export const courseService = {
   }),
   deleteCourse: (id) => API.delete(`/courses/${id}`),
   publishCourse: (id, publish) => API.patch(`/courses/${id}/publish?publish=${publish}`),
+  getManagedCourses: () => API.get('/courses/managed'),
   generateSyllabus: (id, model = 'GPT_4O') => API.post(`/courses/${id}/generate-syllabus?model=${model}`),
 }

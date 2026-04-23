@@ -7,6 +7,7 @@ import com.sakuralearn.sakuralearn_backend.entity.User;
 import com.sakuralearn.sakuralearn_backend.mapper.EnrollmentMapper;
 import com.sakuralearn.sakuralearn_backend.repository.CourseRepository;
 import com.sakuralearn.sakuralearn_backend.repository.EnrollmentRepository;
+import com.sakuralearn.sakuralearn_backend.repository.LessonRepository;
 import com.sakuralearn.sakuralearn_backend.repository.UserRepository;
 import com.sakuralearn.sakuralearn_backend.service.EnrollmentService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final EnrollmentRepository enrollmentRepository;
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
+    private final LessonRepository lessonRepository;
     private final EnrollmentMapper enrollmentMapper;
 
     @Override
@@ -51,12 +53,28 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     public List<EnrollmentResponse> getMyEnrollments(UUID userId) {
         List<Enrollment> enrollments = enrollmentRepository.findByUserId(userId);
-        return enrollmentMapper.toResponseList(enrollments);
+        return enrollments.stream().map(enrollment -> {
+            EnrollmentResponse response = enrollmentMapper.toResponse(enrollment);
+            // Manually populate lessonCount
+            response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(enrollment.getCourse().getId()));
+            return response;
+        }).toList();
     }
 
     @Override
     public boolean isEnrolled(UUID userId, UUID courseId) {
         return enrollmentRepository.existsByUserIdAndCourseId(userId, courseId);
+    }
+
+    @Override
+    public EnrollmentResponse getEnrollmentStatus(UUID userId, UUID courseId) {
+        return enrollmentRepository.findByUserIdAndCourseId(userId, courseId)
+                .map(enrollment -> {
+                    EnrollmentResponse response = enrollmentMapper.toResponse(enrollment);
+                    response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(courseId));
+                    return response;
+                })
+                .orElse(null);
     }
 
     @Override

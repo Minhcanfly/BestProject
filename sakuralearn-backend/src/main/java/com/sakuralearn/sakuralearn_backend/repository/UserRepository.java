@@ -13,6 +13,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
     Optional<User> findByUsernameAndIsDeletedFalse(String username);
     Boolean existsByEmail(String email);
     Boolean existsByUsername(String username);
+    long countByIsActiveTrue();
 
     @org.springframework.data.jpa.repository.Query("SELECT u FROM User u WHERE (LOWER(u.email) LIKE LOWER(CONCAT('%', :keyword, '%')) OR LOWER(u.username) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND u.isDeleted = false")
     org.springframework.data.domain.Page<User> searchUsers(@org.springframework.data.repository.query.Param("keyword") String keyword, org.springframework.data.domain.Pageable pageable);

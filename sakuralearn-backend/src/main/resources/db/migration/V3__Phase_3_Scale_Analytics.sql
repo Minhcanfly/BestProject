@@ -1,7 +1,9 @@
--- V1.2__Scale_Analytics.sql
--- SakuraLearn - Phase 3 - Scale & Analytics
+-- V3__Phase_3_Scale_Analytics.sql
+-- SakuraLearn - Phase 3 - Scale & Analytics (Consolidated)
 
--- Event Log (Kafka support)
+-- =============================================
+-- 1. EVENT LOG (Kafka support)
+-- =============================================
 CREATE TABLE event_log (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     event_type VARCHAR(100) NOT NULL,
@@ -11,7 +13,9 @@ CREATE TABLE event_log (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Daily Stats
+-- =============================================
+-- 2. DAILY STATS
+-- =============================================
 CREATE TABLE daily_user_stats (
     date DATE PRIMARY KEY,
     active_users INT DEFAULT 0,
@@ -21,4 +25,7 @@ CREATE TABLE daily_user_stats (
     retention_rate DECIMAL(5,2)
 );
 
+-- =============================================
+-- 3. INDEXES
+-- =============================================
 CREATE INDEX idx_event_log_type ON event_log(event_type, created_at);

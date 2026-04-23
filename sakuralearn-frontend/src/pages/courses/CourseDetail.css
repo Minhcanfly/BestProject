@@ -101,6 +101,37 @@
   box-shadow: 0 10px 20px rgba(29, 209, 161, 0.3);
 }
 
+.detail-progress-mini {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 5px;
+}
+
+.progress-text-mini {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  margin-bottom: 8px;
+  color: var(--text-main);
+  font-weight: 500;
+}
+
+.progress-bar-mini {
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.bar-fill-mini {
+  height: 100%;
+  background: var(--success);
+  border-radius: 10px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 .hero-image {
   flex: 0 0 400px;
 }

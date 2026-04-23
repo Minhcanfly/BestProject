@@ -38,9 +38,9 @@ public class EnrollmentController {
 
     @GetMapping("/check/{courseId}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<Boolean> checkEnrollment(
+    public ResponseEntity<EnrollmentResponse> checkEnrollment(
             @PathVariable UUID courseId,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
-        return ResponseEntity.ok(enrollmentService.isEnrolled(userDetails.getId(), courseId));
+        return ResponseEntity.ok(enrollmentService.getEnrollmentStatus(userDetails.getId(), courseId));
     }
 }

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Formula;
 
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
@@ -60,6 +61,9 @@ public class Course {
 
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
+
+    @Formula("(SELECT COUNT(*) FROM lessons l WHERE l.course_id = id AND l.is_deleted = false)")
+    private Integer lessonCount;
 
     @Column(name = "is_deleted")
     @Builder.Default

@@ -13,5 +13,6 @@ public interface CourseRepository extends JpaRepository<Course, UUID> {
     List<Course> findByIsDeletedFalse();
     List<Course> findByJlptLevel(String jlptLevel);
     List<Course> findByJlptLevelAndIsDeletedFalse(String jlptLevel);
+    List<Course> findByTeacherIdAndIsDeletedFalse(UUID teacherId);
     Optional<Course> findByIdAndIsDeletedFalse(UUID id);
 }

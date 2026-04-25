@@ -11,6 +11,14 @@ Thumbs.db
 *.sublime-project
 *.sublime-workspace
 
+# Module 4 Data Pipeline
+data/raw/
+data/processed/
+data/scripts/node_modules/
+*.apkg
+*.xml.gz
+*.zip
+
 # Build & Dependencies
 target/
 node_modules/

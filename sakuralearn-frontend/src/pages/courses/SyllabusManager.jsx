@@ -19,8 +19,11 @@ import {
   Check,
   X,
   UploadCloud,
-  Zap
+  Zap,
+  HelpCircle
 } from 'lucide-react';
+import QuizEditor from '../../components/courses/QuizEditor';
+import { quizService } from '../../services/quizService';
 import {
   DndContext, 
   closestCenter,
@@ -159,13 +162,9 @@ const SyllabusManager = () => {
   const [blockEditing, setBlockEditing] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [blockData, setBlockData] = useState({
-    blockType: 'TEXT',
-    contentVi: '',
-    videoUrl: '',
-    audioUrl: '',
-    imageUrl: '',
     orderIndex: 1
   });
+  const [quizQuestions, setQuizQuestions] = useState([]);
 
   const handleFileUpload = async (e) => {
     const file = e.target.files[0];
@@ -319,17 +318,38 @@ const SyllabusManager = () => {
   const handleSaveBlock = async () => {
     try {
       setErrorMessage('');
+      let savedBlockId = blockEditing?.id;
+      
       if (blockEditing) {
         await lessonBlockService.updateBlock(selectedLesson.id, blockEditing.id, blockData);
       } else {
-        await lessonBlockService.createBlock(selectedLesson.id, {
+        const response = await lessonBlockService.createBlock(selectedLesson.id, {
           ...blockData,
           orderIndex: blocks.length + 1
         });
+        savedBlockId = response.data.id;
       }
+
+      // If it's a QUIZ, save questions
+      if (blockData.blockType === 'QUIZ' && quizQuestions.length > 0) {
+        // Map questions to match backend DTO (stringify options array)
+        const formattedQuestions = quizQuestions.map(q => ({
+          ...q,
+          options: JSON.stringify(q.options)
+        }));
+
+        await quizService.createOrUpdateQuiz({
+          lessonBlockId: savedBlockId,
+          title: selectedLesson.titleVi + ' Quiz',
+          type: 'MULTIPLE_CHOICE',
+          questions: formattedQuestions
+        });
+      }
+
       fetchBlocks(selectedLesson.id);
       setShowBlockForm(false);
       setBlockEditing(null);
+      setQuizQuestions([]);
     } catch (err) {
       setErrorMessage(getApiErrorMessage(err, 'Lỗi khi lưu nội dung.'));
     }
@@ -351,6 +371,7 @@ const SyllabusManager = () => {
       case 'TEXT': return <Type size={18} />;
       case 'VIDEO': return <Video size={18} />;
       case 'AUDIO': return <Music size={18} />;
+      case 'QUIZ': return <HelpCircle size={18} />;
       default: return <ImageIcon size={18} />;
     }
   };
@@ -492,10 +513,10 @@ const SyllabusManager = () => {
                    )}
 
                    {blockData.blockType === 'QUIZ' && (
-                     <div className="quiz-editor-stub glass-effect-light">
-                        <p><Zap size={16} /> Chế độ Trắc nghiệm đang được kích hoạt cho khối này.</p>
-                        <small>Bạn có thể thiết lập câu hỏi sau khi lưu khối nội dung này.</small>
-                     </div>
+                      <QuizEditor 
+                        questions={quizQuestions} 
+                        setQuestions={setQuizQuestions} 
+                      />
                    )}
 
                    <div className="editor-group">
@@ -532,10 +553,27 @@ const SyllabusManager = () => {
                           block={block}
                           index={idx}
                           getBlockIcon={getBlockIcon}
-                          onEdit={(b) => {
+                          onEdit={async (b) => {
                             setBlockEditing(b);
                             setBlockData(b);
                             setShowBlockForm(true);
+                            if (b.blockType === 'QUIZ') {
+                              try {
+                                const qRes = await quizService.getQuizByBlock(b.id);
+                                if (qRes.data && qRes.data.questions) {
+                                  const parsedQuestions = qRes.data.questions.map(q => ({
+                                    ...q,
+                                    options: typeof q.options === 'string' ? JSON.parse(q.options) : q.options
+                                  }));
+                                  setQuizQuestions(parsedQuestions);
+                                }
+                              } catch (err) {
+                                console.error('Error fetching quiz for edit:', err);
+                                setQuizQuestions([]);
+                              }
+                            } else {
+                              setQuizQuestions([]);
+                            }
                           }}
                           onDelete={handleDeleteBlock}
                         />

@@ -11,6 +11,7 @@ import com.sakuralearn.sakuralearn_backend.mapper.LessonBlockMapper;
 import com.sakuralearn.sakuralearn_backend.repository.LessonBlockRepository;
 import com.sakuralearn.sakuralearn_backend.repository.LessonRepository;
 import com.sakuralearn.sakuralearn_backend.service.LessonBlockService;
+import com.sakuralearn.sakuralearn_backend.service.ProgressService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +25,7 @@ public class LessonBlockServiceImpl implements LessonBlockService {
 
     private final LessonBlockRepository lessonBlockRepository;
     private final LessonRepository lessonRepository;
+    private final ProgressService progressService;
     private final LessonBlockMapper lessonBlockMapper;
 
     @Override
@@ -43,9 +45,12 @@ public class LessonBlockServiceImpl implements LessonBlockService {
                 .audioUrl(request.getAudioUrl())
                 .imageUrl(request.getImageUrl())
                 .metadata(request.getMetadata())
+                .isDeleted(false)
                 .build();
 
-        return lessonBlockMapper.toResponse(lessonBlockRepository.save(block));
+        LessonBlock saved = lessonBlockRepository.save(block);
+        progressService.recalculateCourseProgressForAllUsers(lesson.getCourse().getId());
+        return lessonBlockMapper.toResponse(saved);
     }
 
     @Override
@@ -65,21 +70,25 @@ public class LessonBlockServiceImpl implements LessonBlockService {
         block.setImageUrl(request.getImageUrl());
         block.setMetadata(request.getMetadata());
 
-        return lessonBlockMapper.toResponse(lessonBlockRepository.save(block));
+        LessonBlock saved = lessonBlockRepository.save(block);
+        progressService.recalculateCourseProgressForAllUsers(block.getLesson().getCourse().getId());
+        return lessonBlockMapper.toResponse(saved);
     }
 
     @Override
     @Transactional
     public void deleteBlock(UUID lessonId, UUID blockId) {
-        findLesson(lessonId);
+        Lesson lesson = findLesson(lessonId);
         LessonBlock block = findBlockInLesson(lessonId, blockId);
-        lessonBlockRepository.delete(block);
+        block.setIsDeleted(true);
+        lessonBlockRepository.save(block);
+        progressService.recalculateCourseProgressForAllUsers(lesson.getCourse().getId());
     }
 
     @Override
     public List<LessonBlockResponse> getBlocksByLesson(UUID lessonId) {
         findLesson(lessonId);
-        List<LessonBlock> blocks = lessonBlockRepository.findByLessonIdOrderByOrderIndexAsc(lessonId);
+        List<LessonBlock> blocks = lessonBlockRepository.findByLessonIdAndIsDeletedFalseOrderByOrderIndexAsc(lessonId);
         return lessonBlockMapper.toResponseList(blocks);
     }
 
@@ -90,7 +99,7 @@ public class LessonBlockServiceImpl implements LessonBlockService {
         if (blockIds == null || blockIds.isEmpty()) {
             throw new BadRequestException("Block order cannot be empty");
         }
-        int existingCount = lessonBlockRepository.countByLessonIdAndIdIn(lessonId, blockIds);
+        int existingCount = lessonBlockRepository.countByLessonIdAndIdInAndIsDeletedFalse(lessonId, blockIds);
         if (existingCount != blockIds.size()) {
             throw new BadRequestException("Block reorder request contains invalid block IDs");
         }
@@ -109,18 +118,18 @@ public class LessonBlockServiceImpl implements LessonBlockService {
     }
 
     private LessonBlock findBlockInLesson(UUID lessonId, UUID blockId) {
-        return lessonBlockRepository.findByIdAndLessonId(blockId, lessonId)
+        return lessonBlockRepository.findByIdAndLessonIdAndIsDeletedFalse(blockId, lessonId)
                 .orElseThrow(() -> new ResourceNotFoundException("Lesson block not found in lesson"));
     }
 
     private void validateBlockOrderForCreate(UUID lessonId, Integer orderIndex) {
-        if (lessonBlockRepository.existsByLessonIdAndOrderIndex(lessonId, orderIndex)) {
+        if (lessonBlockRepository.existsByLessonIdAndOrderIndexAndIsDeletedFalse(lessonId, orderIndex)) {
             throw new ConflictException("orderIndex already exists in this lesson");
         }
     }
 
     private void validateBlockOrderForUpdate(UUID lessonId, UUID blockId, Integer orderIndex) {
-        if (lessonBlockRepository.existsByLessonIdAndOrderIndexAndIdNot(lessonId, orderIndex, blockId)) {
+        if (lessonBlockRepository.existsByLessonIdAndOrderIndexAndIdNotAndIsDeletedFalse(lessonId, orderIndex, blockId)) {
             throw new ConflictException("orderIndex already exists in this lesson");
         }
     }

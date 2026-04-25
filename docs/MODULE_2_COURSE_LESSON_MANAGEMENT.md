@@ -44,8 +44,7 @@ Paid course → chuyển sang Module 6 (Payment). - chưa làm đến
 
 Sau enroll thành công → vào My Courses → bắt đầu học. - xong
 
-Học tự do Lesson → hoàn thành LessonBlock → tiến độ tự động cập nhật (Module 3). - tạm ổn - xong phần LessonBlock và Audio, Text. còn Quiz chưa biết làm
-
+Học tự do Lesson → hoàn thành LessonBlock → tiến độ tự động cập nhật (Module 3). - tạm ổn
 ## 3. Chức năng chính (chi tiết) - Đã xong gần hết
 
 Chức năng
@@ -163,7 +162,7 @@ Teacher xóa Lesson giữa chừng → ảnh hưởng đến tiến độ của 
 Upload video lớn → cần xử lý chunk upload hoặc giới hạn kích thước. - tính sau
 
 Course có 0 Lesson → không cho Publish. - xong
-Student chưa enroll mà cố truy cập lesson → redirect về trang Course detail với nút Enroll. - chưa làm
+Student chưa enroll mà cố truy cập lesson → redirect về trang Course detail với nút Enroll. - xong
 
 ## 7. Gợi ý cách làm phù hợp với người Việt học JLPT
 

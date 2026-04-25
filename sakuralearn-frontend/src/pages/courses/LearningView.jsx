@@ -20,7 +20,16 @@ import {
   ArrowRight,
   ArrowLeft
 } from 'lucide-react';
+import confetti from 'canvas-confetti';
 import './LearningView.css';
+
+const MOTIVATIONAL_MESSAGES = [
+  "Tuyệt vời! Bạn đang tiến bộ rất nhanh! 🚀",
+  "Xuất sắc! Kiên trì chính là chìa khóa của thành công. 🔑",
+  "Bạn làm tốt lắm! Hãy tiếp tục giữ vững phong độ này nhé. ✨",
+  "Thêm một bước nữa gần hơn với mục tiêu của bạn rồi! 🎯",
+  "Cố gắng lên! Mỗi bài học là một viên gạch xây dựng tương lai. 🏗️"
+];
 
 const LearningView = () => {
   const { courseId } = useParams();
@@ -138,6 +147,15 @@ const LearningView = () => {
     }
   };
 
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#ee5253', '#feca57', '#ff9f43', '#2ed573']
+    });
+  };
+
   const handleBlockComplete = async (blockId) => {
     try {
       const response = await progressService.updateBlockProgress(blockId, { isCompleted: true });
@@ -194,13 +212,23 @@ const LearningView = () => {
       const progVal = typeof progressRes.data === 'number' ? progressRes.data : (progressRes.data?.progressPercentage || 0);
       setProgress(progVal);
 
+      // Trigger WOW effect
+      triggerConfetti();
+      
+      // Random motivational message
+      const randomMsg = MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)];
+
       // Check if this was the last lesson
       if (currentLessonIndex === lessons.length - 1) {
-        setSuccessMessage('Chúc mừng! Bạn đã hoàn thành toàn bộ bài học trong khóa học này! 🎉');
-        setTimeout(() => setSuccessMessage(''), 5000);
+        setSuccessMessage(`Chúc mừng! Bạn đã hoàn thành toàn bộ khóa học! 🎉 \n ${randomMsg}`);
+        setTimeout(() => setSuccessMessage(''), 8000);
       } else {
-        // Move to next lesson
-        setCurrentLesson(lessons[currentLessonIndex + 1]);
+        setSuccessMessage(randomMsg);
+        setTimeout(() => setSuccessMessage(''), 4000);
+        // Move to next lesson after a short delay to let user see success
+        setTimeout(() => {
+           setCurrentLesson(lessons[currentLessonIndex + 1]);
+        }, 2000);
       }
     } catch (error) {
       console.error('Error completing lesson:', error);

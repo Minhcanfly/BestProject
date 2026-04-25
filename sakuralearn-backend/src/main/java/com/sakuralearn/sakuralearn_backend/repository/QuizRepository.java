@@ -1,6 +1,7 @@
 package com.sakuralearn.sakuralearn_backend.repository;
 
 import com.sakuralearn.sakuralearn_backend.entity.Quiz;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,5 +10,6 @@ import java.util.UUID;
 
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, UUID> {
+    @EntityGraph(attributePaths = {"questions"})
     Optional<Quiz> findByLessonBlockId(UUID lessonBlockId);
 }

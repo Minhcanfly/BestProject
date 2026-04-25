@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface LessonBlockProgressRepository extends JpaRepository<LessonBlockProgress, UUID> {
-    Optional<LessonBlockProgress> findByUserIdAndLessonBlockId(UUID userId, UUID lessonBlockId);
-    List<LessonBlockProgress> findByUserIdAndLessonBlockLessonId(UUID userId, UUID lessonId);
-    long countByUserIdAndLessonBlockLessonCourseIdAndIsCompletedTrue(UUID userId, UUID courseId);
+    Optional<LessonBlockProgress> findByUserIdAndLessonBlockIdAndLessonBlockIsDeletedFalse(UUID userId, UUID lessonBlockId);
+    List<LessonBlockProgress> findByUserIdAndLessonBlockLessonIdAndLessonBlockIsDeletedFalse(UUID userId, UUID lessonId);
+    long countByUserIdAndLessonBlockLessonCourseIdAndIsCompletedTrueAndLessonBlockIsDeletedFalse(UUID userId, UUID courseId);
 }

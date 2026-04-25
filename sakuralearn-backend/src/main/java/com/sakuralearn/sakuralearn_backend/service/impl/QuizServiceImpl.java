@@ -46,8 +46,9 @@ public class QuizServiceImpl implements QuizService {
 
         Quiz savedQuiz = quizRepository.save(quiz);
 
-        // Update questions
-        quizQuestionRepository.deleteAll(savedQuiz.getQuestions());
+        // Update questions safely for orphanRemoval
+        savedQuiz.getQuestions().clear();
+        
         List<QuizQuestion> questions = request.getQuestions().stream()
                 .map(q -> QuizQuestion.builder()
                         .quiz(savedQuiz)
@@ -59,10 +60,8 @@ public class QuizServiceImpl implements QuizService {
                         .build())
                 .toList();
         
-        quizQuestionRepository.saveAll(questions);
-        savedQuiz.setQuestions(questions);
-
-        return savedQuiz;
+        savedQuiz.getQuestions().addAll(questions);
+        return quizRepository.save(savedQuiz);
     }
 
     @Override

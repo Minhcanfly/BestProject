@@ -2,6 +2,7 @@
 .DS_Store
 Thumbs.db
 *.OSX
+desktop.ini
 
 # IDEs & Editors
 .idea/
@@ -10,6 +11,10 @@ Thumbs.db
 *.swo
 *.sublime-project
 *.sublime-workspace
+.classpath
+.project
+.settings/
+bin/
 
 # Module 4 Data Pipeline
 data/raw/
@@ -18,22 +23,24 @@ data/scripts/node_modules/
 *.apkg
 *.xml.gz
 *.zip
+*.sqlite
 
 # Build & Dependencies
 target/
 node_modules/
 dist/
 build/
-*.log
-*.class
-*.jar
-*.war
-*.ear
+out/
+.gradle/
 
-# Environment variables
+# Environment variables (CRITICAL)
 .env
-.env.local
+.env.*
+!.env.example
+*.local
 
 # Logs
 logs/
 *.log
+npm-debug.log*
+yarn-debug.log*

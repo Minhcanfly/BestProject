@@ -28,7 +28,7 @@ TEXT / READING → đọc nội dung + có thể highlight hoặc ghi note - xon
 
 AUDIO → nghe và repeat - có giao diện chưa có logic
 
-QUIZ → làm bài kiểm tra - chưa biết cách làm
+QUIZ → làm bài kiểm tra - xong
 
 Hoàn thành LessonBlock → hệ thống tự động hoặc thủ công mark COMPLETED. - xong
 
@@ -56,7 +56,7 @@ Lesson Free Navigation - xong
 
 LessonBlock Player - xong
 
-Video player, Text reader, Audio player, Quiz interface - còn audio và quiz chưa xong
+Video player, Text reader, Audio player, Quiz interface - tạm ổn
 
 Tích hợp MinIO URL - xong
 
@@ -80,9 +80,9 @@ Continue Learning - tạm ổn
 
 Nút “Tiếp tục học” trên Dashboard - tạm ổn
 
-Personal Note - hơi xấu (tham khảo thêm Riki)
+Personal Note - tạm ổn (tham khảo thêm Riki)
 
-Ghi chú cá nhân trong LessonBlock - xấu
+Ghi chú cá nhân trong LessonBlock - tạm ổn
 
 Rất hữu ích cho người Việt
 
@@ -92,21 +92,21 @@ Rất hữu ích cho người Việt
 
 NOT_STARTED → IN_PROGRESS → COMPLETED
 
-Mỗi LessonBlock có quy tắc hoàn thành riêng:- đồng ý
+Mỗi LessonBlock có quy tắc hoàn thành riêng:- xong
 
-VIDEO: Tự động khi xem ≥ 85% thời lượng (khuyến nghị). - tạm ổn
+VIDEO: Tự động khi xem ≥ 85% thời lượng (khuyến nghị). - xong
 
 AUDIO: Tự động khi nghe ≥ 80% hoặc có nút “Đã nghe xong”. - chưa kiểm tra được
 
-TEXT / READING: Có nút “Mark as Completed” (hoặc tự động khi scroll hết). - xong nhưng nhìn xấu
+TEXT / READING: Có nút “Mark as Completed” (hoặc tự động khi scroll hết). - tạm ổn
 
-QUIZ: Hoàn thành khi nộp bài và đạt điểm tối thiểu (ví dụ ≥ 70%). Nếu không đạt có thể làm lại. - có logic rồi nhưng chưa biết cách tạo quiz - nên có giao diện cho phép tạo quiz, test quiz dễ dàng tham khảo Quizlet, Duolingo, Lingodeer
+QUIZ: Hoàn thành khi nộp bài và đạt điểm tối thiểu (ví dụ ≥ 70%). Nếu không đạt có thể làm lại. - tạm ổn tham khảo thêm Quizlet, Duolingo, Lingodeer
 
 ### B. Tiến độ Calculation (Quan trọng nhất) Khuyến nghị dùng công thức sau (chính xác và hợp lý với thiết kế LessonBlock):
 
-Lesson Progress % = (Số LessonBlock đã COMPLETED / Tổng số LessonBlock trong Lesson) × 100 - hiện tại nếu tạo chay thì ổn, nhấn Generate content thì khi xóa đi không tự động cập nhật % của mỗi bài (vẫn bị lấy tổng % từ lúc tạo ban đầu)
+Lesson Progress % = (Số LessonBlock đã COMPLETED / Tổng số LessonBlock trong Lesson) × 100 - tạm ổn
 
-Course Progress % = (Tổng số LessonBlock đã COMPLETED trong toàn Course / Tổng số LessonBlock của Course) × 100 - hiện tại nếu tạo chay thì ổn, nhấn Generate content thì khi xóa đi không tự động cập nhật % của toàn khóa (vẫn bị lấy tổng % từ lúc tạo ban đầu)
+Course Progress % = (Tổng số LessonBlock đã COMPLETED trong toàn Course / Tổng số LessonBlock của Course) × 100 - tạm ổn
 
 → Cách này chính xác hơn so với chỉ đếm số Lesson.
 
@@ -122,13 +122,13 @@ Cách tính tiến độ Bạn đang có LessonBlock. - tạm ổn
 
 Tự động hoàn thành Video Quyết định: Dùng YouTube embed hay tự host video trên MinIO? → Nếu tự host MinIO thì dễ track phần trăm xem hơn (dùng video.js hoặc HLS). - tạm ổn
 
-Quiz trong Lesson - chưa có ý tưởng hay, tham khảo quiz của Riki, Duolingo
+Quiz trong Lesson - tạm ổn
 
 MVP: Giữ đơn giản (không lưu lịch sử attempt chi tiết).
 
-Chỉ cần lưu kết quả lần làm gần nhất và điểm số. - chưa làm
+Chỉ cần lưu kết quả lần làm gần nhất và điểm số. - tạm
 
-Có cho phép làm lại quiz không? (Khuyến nghị: Có) - tôi nghĩ nên có
+Có cho phép làm lại quiz không? (Khuyến nghị: Có) - xong
 
 Thứ tự học
 
@@ -152,11 +152,11 @@ User hoàn thành LessonBlock nhưng sau đó Teacher xóa Block → cần xử 
 
 Giải thích đáp án Quiz phải bằng tiếng Việt rõ ràng, dễ hiểu. - chưa làm
 
-Cho phép ghi chú cá nhân bằng tiếng Việt ngay trong LessonBlock (rất cần thiết khi học Kanji/Grammar). - có nhưng giao diện hiện tại xấu
+Cho phép ghi chú cá nhân bằng tiếng Việt ngay trong LessonBlock (rất cần thiết khi học Kanji/Grammar). - tạm ổn
 
-Hiển thị “Mốc đạt được” rõ ràng: “Bạn đã hoàn thành 60% N5 – chỉ còn 8 bài nữa là xong phần Kanji”. - chưa cần
+Hiển thị “Mốc đạt được” rõ ràng: “Bạn đã hoàn thành 60% N5 – chỉ còn 8 bài nữa là xong phần Kanji”. - tạm ổn
 
-Thêm motivational message khi hoàn thành Lesson (ví dụ: “Tuyệt vời! Bạn vừa nắm vững 20 từ vựng mới.”). - chưa làm
+Thêm motivational message khi hoàn thành Lesson (ví dụ: “Tuyệt vời! Bạn vừa nắm vững 20 từ vựng mới.”). - tạm ổn
 
 Dark mode nên mặc định hỗ trợ tốt vì nhiều người học buổi tối. - chưa làm
 

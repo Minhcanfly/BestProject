@@ -59,11 +59,12 @@ public class ProgressServiceImpl implements ProgressService {
     @Transactional
     public LessonBlockProgressResponse updateBlockProgress(UUID userId, UUID blockId, LessonBlockProgressRequest request) {
         LessonBlock block = lessonBlockRepository.findById(blockId)
-                .orElseThrow(() -> new RuntimeException("Lesson block not found"));
+                .filter(b -> !Boolean.TRUE.equals(b.getIsDeleted()))
+                .orElseThrow(() -> new RuntimeException("Lesson block not found or deleted"));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        LessonBlockProgress progress = lessonBlockProgressRepository.findByUserIdAndLessonBlockId(userId, blockId)
+        LessonBlockProgress progress = lessonBlockProgressRepository.findByUserIdAndLessonBlockIdAndLessonBlockIsDeletedFalse(userId, blockId)
                 .orElse(LessonBlockProgress.builder()
                         .user(user)
                         .lessonBlock(block)
@@ -92,7 +93,7 @@ public class ProgressServiceImpl implements ProgressService {
     @Override
     public List<LessonBlockProgressResponse> getLessonBlocksProgress(UUID userId, UUID lessonId) {
         return lessonBlockProgressMapper.toResponseList(
-                lessonBlockProgressRepository.findByUserIdAndLessonBlockLessonId(userId, lessonId)
+                lessonBlockProgressRepository.findByUserIdAndLessonBlockLessonIdAndLessonBlockIsDeletedFalse(userId, lessonId)
         );
     }
 
@@ -103,9 +104,9 @@ public class ProgressServiceImpl implements ProgressService {
                 .orElseThrow(() -> new RuntimeException("Lesson not found"));
         User user = userRepository.findById(userId).orElseThrow();
 
-        List<LessonBlock> blocks = lessonBlockRepository.findByLessonIdOrderByOrderIndexAsc(lessonId);
+        List<LessonBlock> blocks = lessonBlockRepository.findByLessonIdAndIsDeletedFalseOrderByOrderIndexAsc(lessonId);
         for (LessonBlock block : blocks) {
-            LessonBlockProgress progress = lessonBlockProgressRepository.findByUserIdAndLessonBlockId(userId, block.getId())
+            LessonBlockProgress progress = lessonBlockProgressRepository.findByUserIdAndLessonBlockIdAndLessonBlockIsDeletedFalse(userId, block.getId())
                     .orElse(LessonBlockProgress.builder().user(user).lessonBlock(block).build());
             
             if (!Boolean.TRUE.equals(progress.getIsCompleted())) {
@@ -128,10 +129,10 @@ public class ProgressServiceImpl implements ProgressService {
 
     private void updateLessonAndCourseProgress(UUID userId, Lesson lesson) {
         // 1. Check/Update Lesson Progress
-        List<LessonBlock> blocks = lessonBlockRepository.findByLessonIdOrderByOrderIndexAsc(lesson.getId());
+        List<LessonBlock> blocks = lessonBlockRepository.findByLessonIdAndIsDeletedFalseOrderByOrderIndexAsc(lesson.getId());
         if (blocks.isEmpty()) return;
 
-        List<LessonBlockProgress> blockProgresses = lessonBlockProgressRepository.findByUserIdAndLessonBlockLessonId(userId, lesson.getId());
+        List<LessonBlockProgress> blockProgresses = lessonBlockProgressRepository.findByUserIdAndLessonBlockLessonIdAndLessonBlockIsDeletedFalse(userId, lesson.getId());
         long completedBlocks = blockProgresses.stream().filter(LessonBlockProgress::getIsCompleted).count();
 
         if (completedBlocks == blocks.size()) {
@@ -149,11 +150,20 @@ public class ProgressServiceImpl implements ProgressService {
         updateCourseProgress(userId, lesson.getCourse().getId());
     }
 
+    @Override
+    @Transactional
+    public void recalculateCourseProgressForAllUsers(UUID courseId) {
+        List<Enrollment> enrollments = enrollmentRepository.findByCourseId(courseId);
+        for (Enrollment enrollment : enrollments) {
+            updateCourseProgress(enrollment.getUser().getId(), courseId);
+        }
+    }
+
     private void updateCourseProgress(UUID userId, UUID courseId) {
-        long totalBlocks = lessonBlockRepository.countByLessonCourseId(courseId);
+        long totalBlocks = lessonBlockRepository.countByLessonCourseIdAndIsDeletedFalse(courseId);
         if (totalBlocks == 0) return;
 
-        long completedBlocks = lessonBlockProgressRepository.countByUserIdAndLessonBlockLessonCourseIdAndIsCompletedTrue(userId, courseId);
+        long completedBlocks = lessonBlockProgressRepository.countByUserIdAndLessonBlockLessonCourseIdAndIsCompletedTrueAndLessonBlockIsDeletedFalse(userId, courseId);
         double percentage = (double) completedBlocks / totalBlocks * 100;
 
         enrollmentRepository.findByUserIdAndCourseId(userId, courseId).ifPresent(enrollment -> {

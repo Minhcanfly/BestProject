@@ -15,4 +15,5 @@ public interface ProgressService {
     List<LessonBlockProgressResponse> getLessonBlocksProgress(UUID userId, UUID lessonId);
     void completeLesson(UUID userId, UUID lessonId);
     List<UUID> getCompletedLessonIds(UUID userId, UUID courseId);
+    void recalculateCourseProgressForAllUsers(UUID courseId);
 }

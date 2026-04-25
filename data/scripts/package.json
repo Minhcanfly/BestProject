@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "adm-zip": "^0.5.17",
+    "fast-xml-parser": "^5.7.1",
+    "fzstd": "^0.1.1",
+    "sql.js": "^1.14.1",
+    "uuid": "^14.0.0"
+  },
+  "name": "scripts",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}

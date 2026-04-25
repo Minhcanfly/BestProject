@@ -4,7 +4,9 @@ import com.sakuralearn.sakuralearn_backend.entity.enums.QuizType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -36,7 +38,8 @@ public class Quiz {
     private String title;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @JdbcTypeCode(SqlTypes.NAMED_ENUM)
+    @Column(name = "type", nullable = false)
     private QuizType type;
 
     @Column(name = "time_limit_seconds")

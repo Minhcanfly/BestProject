@@ -1,4 +1,6 @@
 -- Seed data for Grammar Points
+ALTER TABLE grammar_points ALTER COLUMN jlpt_level TYPE VARCHAR(20);
+
 INSERT INTO grammar_points (pattern_ja, jlpt_level, explanation_vi) 
                 VALUES ('1.  だ  /  です  (Da / Desu) Là', 'Common', '     <b>Công thức:</b>
 <br>Danh từ / Tính từ đuôi  な +  だ (Thể thông thường)

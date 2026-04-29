@@ -1,226 +1,98 @@
-🌸 PHÂN TÍCH SÂU MODULE 4: Knowledge Base (Dictionary) Phiên bản: 1.0 Deep Dive Mục tiêu: Làm rõ toàn bộ logic của kho kiến thức tra cứu – đây là một trong những điểm mạnh nhất của SakuraLearn so với các app JLPT khác.
+# 🌸 PHÂN TÍCH SÂU MODULE 4: KNOWLEDGE BASE (DICTIONARY)
 
-## 1. Mục tiêu cốt lõi của Module 4
+**Phiên bản phân tích:** 1.0 Deep Dive  
+**Mục đích:** Xây dựng hệ sinh thái dữ liệu học thuật tiếng Nhật đồ sộ, liên kết chặt chẽ và cá nhân hóa tối đa cho người dùng Việt.
 
-Xây dựng một từ điển JLPT chuyên sâu, dễ tra cứu, dành riêng cho người Việt.
+---
 
-Dữ liệu phải chính xác, đầy đủ và có tổ chức tốt (Kanji, Vocabulary, Grammar).
+## 🎯 1. Mục tiêu cốt lõi của Module 4
+Module này không chỉ là một trình tra cứu, mà là trung tâm kiến thức của SakuraLearn:
+- **Hệ thống liên kết (Knowledge Graph):** Kết nối chặt chẽ giữa Hán tự (Kanji), Từ vựng (Vocabulary) và Ngữ pháp (Grammar).
+- **Trải nghiệm tra cứu:** Tìm kiếm nhanh chóng bằng Tiếng Việt, Tiếng Nhật (Hiragana/Kanji) hoặc Romaji.
+- **Cá nhân hóa (Notebook):** Cho phép người dùng tự xây dựng kho tàng từ vựng riêng biệt thông qua hệ thống Sổ tay (My Notebook).
+- **Dữ liệu chất lượng:** Tổng hợp từ các nguồn uy tín, được chuẩn hóa theo trình độ JLPT N5-N1.
 
-Cho phép tra cứu độc lập, không phụ thuộc vào Course.
+---
 
-Làm “cầu nối” mạnh mẽ với SRS (Module 5) và Lesson (Module 2 & 3).
+## 🔄 2. Các thành phần chính trong hệ thống
 
-Tạo giá trị lâu dài: User có thể tra cứu bất cứ lúc nào trong quá trình học.
+### 🏮 Kanji (Hán tự)
+Dữ liệu chi tiết bao gồm:
+- **Cơ bản:** Mặt chữ, Bộ thủ (Radical), Cấp độ JLPT.
+- **Cách đọc:** Âm Onyomi (âm Hán), Kunyomi (âm Nhật).
+- **Chi tiết:** Số nét (Stroke count), Ý nghĩa Tiếng Việt, Ý nghĩa Tiếng Anh.
+- **Diễn họa:** Hình ảnh/SVG mô tả thứ tự nét viết (Stroke Order).
+- **Mở rộng:** Danh sách các ví dụ và từ vựng chứa chữ Kanji đó.
 
-## 2. Luồng nghiệp vụ chính (User Journey)
+### 🍱 Vocabulary (Từ vựng)
+Dữ liệu chi tiết bao gồm:
+- **Cơ bản:** Chữ Nhật (Kanji/Kana), Cách đọc (Reading), Cấp độ JLPT.
+- **Nghĩa:** Giải thích bằng Tiếng Việt và Tiếng Anh.
+- **Loại từ:** Danh từ, Động từ, Tính từ... (Part of speech).
+- **Âm thanh:** Tích hợp Text-To-Speech (TTS) hoặc tệp âm thanh mẫu.
+- **Ví dụ:** Các câu mẫu kèm theo Furigana (phiên âm) để dễ học.
 
-Luồng tra cứu điển hình:
+### 🎋 Grammar (Ngữ pháp)
+Dữ liệu chi tiết bao gồm:
+- **Cấu trúc:** Mẫu ngữ pháp chuẩn.
+- **Giải thích:** Ý nghĩa và cách dùng bằng Tiếng Việt chi tiết.
+- **Ví dụ:** Các câu mẫu thực tế, lưu ý cách chia động từ/tính từ đi kèm.
 
-User vào trang Dictionary
+---
 
-Tìm kiếm bằng từ khóa (Kanji, Hiragana, Romaji, nghĩa tiếng Việt, hoặc kết hợp).
+## 📚 3. Hệ thống Sổ tay & Custom Items (My Notebook)
 
-Áp dụng filter: JLPT level (N5–N1), Loại nội dung (Kanji / Vocab / Grammar).
+### 📂 Tổ chức Sổ tay
+- Hệ thống quản lý theo Thư mục (Folder) giúp người dùng phân loại từ vựng theo chủ đề hoặc cấp độ bài học.
+- Giao diện thân thiện (tương tự quản lý folder của Facebook/Google Drive).
 
-Xem danh sách kết quả → click vào item để xem chi tiết.
+### ✍️ Custom Item
+- Người dùng có thể tự thêm từ vựng, ngữ pháp không có trong thư viện gốc.
+- Hỗ trợ lưu ghi chú cá nhân (Note) cho từng mục từ.
 
-Trong trang chi tiết:
+### 🧠 Tích hợp SRS
+- Mọi từ vựng được lưu vào Notebook sẽ tự động được hệ thống đưa vào hàng chờ ôn tập (Module 5).
 
-Kanji: Xem radical, onyomi/kunyomi, số nét, thứ tự nét, ví dụ câu, audio, các từ vựng chứa kanji này, các từ đồng nghĩa với kanji này, cấu tạo bởi các bộ thủ nào. - tạm thời thế này đã
+---
 
-Vocab: Từ, reading, nghĩa (vi + en), loại từ, ví dụ câu, audio.
+## ⚖️ 4. Quy tắc & Kỹ thuật quản lý dữ liệu
 
-Grammar: Pattern, giải thích chi tiết bằng tiếng Việt, cấu trúc, ví dụ, các ngữ pháp tương tự.
+### 🔍 Chiến lược Tìm kiếm
+- Sử dụng **tsvector** và GIN index trong PostgreSQL để tối ưu hóa tìm kiếm toàn văn bản (Full-text search).
+- Hỗ trợ chuyển đổi tự động từ Romaji sang Hiragana để tra cứu thuận tiện.
 
-User có thể:
+### 🌍 Đa ngôn ngữ (i18n)
+- Dữ liệu nghĩa từ được lưu dưới dạng `JSONB` hoặc các cột riêng biệt (`meaning_vi`, `meaning_en`) để dễ dàng mở rộng và tối ưu hiệu suất truy vấn.
 
-Nghe audio phát âm.
+### 🖼️ Xử lý Hình ảnh & Âm thanh
+- Sử dụng **MinIO** để lưu trữ và phân phối các tệp media một cách chuyên nghiệp.
+- Diễn họa chữ Hán sử dụng định dạng SVG (KanjiVG) để đảm bảo độ sắc nét trên mọi thiết bị.
 
-Thêm vào My Notebook.
+---
 
-Thêm trực tiếp vào SRS (tạo flashcard).
+## 💡 5. Quyết định & Logic nghiệp vụ quan trọng
 
-Xem các mục liên quan (Knowledge Graph).
+- **Data as Code:** Toàn bộ dữ liệu Master (gần 300,000 bản ghi) được quản lý và cập nhật thông qua Flyway, đảm bảo tính nhất quán trên mọi môi trường.
+- **Knowledge Graph Logic:** Khi người dùng xem một chữ Kanji, hệ thống phải truy vấn và hiển thị ngay lập tức top các từ vựng thông dụng chứa Kanji đó.
+- **Cơ chế duyệt (Review):** (Phát triển sau) Các "Custom Item" do người dùng thêm vào có thể được Admin duyệt để đưa vào cơ sở dữ liệu chung (Master Data).
 
-Luồng Teacher/Admin: - phần này cần làm kỹ vì tôi chỉ nghĩ ra cách gõ vào DB
+---
 
-Import dữ liệu ban đầu (KanjiDic, JMdict…). - cần hướng dẫn
+## 🇻🇳 6. Tối ưu hóa cho người Việt học tiếng Nhật
+- **Ưu tiên nghĩa Hán Việt:** Đối với Kanji, nghĩa Hán Việt là yếu tố sống còn giúp người Việt học nhanh hơn.
+- **Tham chiếu giáo trình:** Phân loại từ vựng theo các giáo trình quốc dân tại Việt Nam như Minna no Nihongo, Sou Matome, Shinkanzen Master.
+- **Mẹo nhớ (Mnemonics):** Tích hợp các câu chuyện chiết tự chữ Hán để tăng hiệu quả ghi nhớ.
 
-Chỉnh sửa / bổ sung nội dung (rất hạn chế, vì dữ liệu nên ổn định). - nội dung này đã được kiểm chứng
+---
 
-Xem thống kê tra cứu phổ biến. - tính sau
+## ⚠️ 7. Xử lý Edge Cases
+- **Từ đồng âm khác nghĩa:** Hiển thị rõ ràng các thẻ từ khác nhau cho cùng một cách đọc.
+- **Dữ liệu lớn:** Sử dụng Pagination và Caching (Redis) để đảm bảo tốc độ tải trang dưới 500ms dù dữ liệu tra cứu cực lớn.
+- **Lỗi hiển thị:** Xử lý fallback khi một từ thiếu âm thanh hoặc hình ảnh stroke order.
 
-## 3. Chức năng chính
+---
 
-Chức năng
-
-Mô tả chi tiết
-
-Độ quan trọng
-
-Global Search
-
-Tìm theo từ khóa, romaji, kanji, nghĩa tiếng Việt
-
-★★★★★
-
-Advanced Filter
-
-JLPT Level, Type (Kanji/Vocab/Grammar), Part of Speech
-
-★★★★
-
-Kanji Detail Page
-
-Character, Radical, Onyomi/Kunyomi, Stroke count, Stroke order animation, Examples, Audio - phải đầy đủ như trên ( tham khảo Mazii, TFlat)
-
-★★★★★
-
-Vocabulary Detail Page
-
-Word, Reading, Meaning (vi/en), POS, Examples, Audio - phải đầy đủ như trên ( tham khảo Mazii, TFlat)
-
-★★★★★
-
-Grammar Detail Page - phải đầy đủ như trên ( tham khảo Mazii, TFlat)
-
-Pattern, Explanation (vi), Structure, Examples
-
-★★★★
-
-Knowledge Graph - phải đầy đủ như trên ( tham khảo Mazii, TFlat)
-
-Liên kết: Kanji → Vocab chứa nó, Vocab → Kanji thành phần
-
-★★★★
-
-Add to Notebook / SRS - chưa làm
-
-Nút nhanh từ trang chi tiết
-
-★★★★★
-
-Audio Playback - chưa làm
-
-Phát âm chuẩn (native hoặc TTS). **Lưu ý: Phải có phát âm cho mọi item.**
-
-★★★★
-
-
-### B. Các tính năng mở rộng (User Request)
-- **Notebook "Facebook style":** Cho phép đặt tên thư mục lưu (Notebook) linh hoạt, phân loại và lưu trữ theo chủ đề giống như cách lưu bài viết trên Facebook. - tôi muốn cái này, người dùng sẽ tự tạo các notebook theo chủ đề mình muốn.
-- **Kanji Quick Preview:** Hiển thị số nét và phiên âm của Kanji ngay ở danh sách hiển thị (bên ngoài), không cần đợi click vào chi tiết mới thấy. - tính sau
-- **Smart Dictionary UI:** Khi nhấn vào Dictionary, màn hình mặc định trống/sạch. Chỉ hiển thị kết quả sau khi người dùng chọn Level và hạng mục muốn học. - tôi muốn cái này
-- **Ghi âm & Chấm điểm (AI):** Chức năng ghi âm giọng đọc của user, chấm điểm phát âm và cho phép tự đặt câu với từ đang học (AI hỗ trợ). - tính sau, tôi nghĩ có thể cho người dùng nói tiếng Việt xong hệ thống dịch ra tiếng Nhật hoặc cho người dùng nói tiếng Nhật và hệ thống dịch ra tiếng Việt. Chấm điểm để sau
-- **Worksheet Printing:** Cho phép xuất file (PDF/Image) để In ra giấy luyện viết/luyện tập tay. - tính sau - hay nhưng để sau
-- **Handwriting Search:** Tìm kiếm bằng cách vẽ Kanji (giống Google Dịch hoặc Mazii). - tính sau
-
-## 4. Quy tắc & Logic nghiệp vụ quan trọng
-
-Dữ liệu là toàn cục (Global): Kanji, Vocab, Grammar không thuộc về user. Chỉ Notebook và Flashcard thuộc về user. - đúng 
-
-Multi-language Support:
-
-Nghĩa và giải thích ưu tiên tiếng Việt (rất quan trọng với người Việt). - đúng
-
-Hỗ trợ thêm tiếng Anh và tiếng Nhật (cột riêng hoặc JSONB). - làm sau, có thể làm giải nghĩa bằng tiếng Anh hoặc Nhật
-
-Knowledge Graph (điểm mạnh):
-
-1 Kanji → nhiều Vocabulary chứa nó. - nên làm
-
-1 Vocabulary → nhiều Kanji thành phần. - nên làm
-
-Dùng để hiển thị “Từ liên quan”, “Kanji liên quan”. - nên làm
-
-JLPT Level: Mỗi item (Kanji/Vocab/Grammar) đều có mức JLPT rõ ràng để filter và sắp xếp. - nên làm
-
-Search Logic:
-
-Hỗ trợ tìm gần đúng (fuzzy search). - làm sau
-
-Tìm Romaji → chuyển thành Hiragana/Katakana để tra. - làm sau
-
-Tìm nghĩa tiếng Việt. - search từ tiếng Việt thì ra tiếng Nhật, ngược lại search tiếng Nhật thì ra tiếng Việt, ngoài ra có thể tìm kiếm các từ đồng nghĩa của từ đang tìm kiếm.
-
-## 5. Các điểm dễ nhầm lẫn / Quyết định then chốt
-
-Cách lưu dữ liệu đa ngôn ngữ - cách nào tối ưu
-
-Option A: Dùng nhiều cột (meaning_vi, meaning_en, explanation_vi…)
-
-Option B: Dùng JSONB cho trường meaning và examples (khuyến nghị cho tính mở rộng). → Tôi nghiêng về JSONB vì sau này dễ thêm ngôn ngữ mới.
-
-Stroke Order
-
-Nên lưu SVG hoặc dùng thư viện KanjiVG để vẽ animation động (không lưu ảnh tĩnh). - đúng
-
-Audio
-
-Nguồn: Import từ Forvo, Tofugu, hoặc tự ghi âm. - tôi chưa biết
-
-Hoặc dùng TTS chất lượng cao (Google TTS hoặc Azure) cho MVP. - chưa có kinh phí
-
-Import dữ liệu ban đầu
-
-Kanji: KanjiDic2 + KanjiVG - xem có thêm nguồn nào không, tham khảo cách làm các bên khác
-
-Vocab: JMdict (EDRDG) - xem có thêm nguồn nào không, tham khảo cách làm các bên khác
-
-Grammar: Cần tự curate hoặc lấy từ nguồn JLPT uy tín (Tae Kim, Bunpro, JLPT Study…). → Đây là công việc tốn thời gian nhất ở Module 4. - có thể tham khảo cách làm các bên khác, tôi nghĩ là có nguồn sẵn rồi
-
-Add to SRS
-
-Khi user thêm một Vocab vào SRS → hệ thống tự động tạo Flashcard với mặt trước/sau phù hợp (ví dụ: Japanese → Meaning hoặc Meaning → Japanese). - cần nhưng chưa làm
-
-## 6. Edge Cases cần xử lý
-
-User tìm từ không tồn tại → gợi ý từ gần giống hoặc “Không tìm thấy, bạn có muốn thêm vào Notebook không?”. - chưa làm
-
-Một Vocab có nhiều cách viết (Kanji khác nhau) → cần xử lý duplicate tốt. - Tôi cần tìm hiểu thêm
-
-Kanji hiếm không có trong JLPT nhưng user vẫn muốn tra cứu. - tính sau vì mình cũng đi lấy từ nguồn
-
-Audio không tồn tại → fallback về TTS hoặc hiển thị “Đang cập nhật”. - tính sau
-
-Dữ liệu thay đổi (sửa nghĩa) → không được làm ảnh hưởng đến Flashcard đã tạo của user. - cái này khó xảy ra, tính sau
-
-## 7. Gợi ý phù hợp với người Việt học JLPT
-
-Giải thích Grammar và ví dụ phải cực kỳ dễ hiểu bằng tiếng Việt. - nên làm
-
-Thêm “Mẹo nhớ” (mnemonics) cho Kanji và Vocab (rất được người Việt yêu thích). - nên làm
-
-Hiển thị furigana trên tất cả ví dụ câu. - nên ẩn, người nào cần thì bật
-
-Có phần “Thường hay nhầm lẫn” cho Grammar và Vocab (ví dụ: は vs が). - tính sau
-
-Cho phép user đánh dấu “Yêu thích” riêng ngoài Notebook. - hay, để sau
-
-Tích hợp search bằng giọng nói (speech-to-text) ở Phase 2. - tính sau
-
-Giao diện tra cứu nên sạch, font chữ dễ đọc, có Dark mode. - làm sau
-
-## 8. Liên kết với các Module khác
-
-Module 2 & 3: Trong LessonBlock có thể gắn link đến Kanji/Vocab/Grammar cụ thể.
-
-Module 5 (SRS): Nút “Add to SRS” từ Dictionary là nguồn chính tạo Flashcard.
-
-Module 8 (Gamification): Tra cứu nhiều → cộng XP nhỏ, hoặc badge “Dictionary Master”.
-
-Module 7: Admin xem từ nào được tra cứu nhiều nhất để bổ sung nội dung.
-
-
-
-Tóm tắt các quyết định quan trọng cho Module 4:
-
-Sử dụng JSONB hay cột riêng cho multi-language? - tôi chưa biết
-
-Stroke order sẽ dùng animation SVG hay ảnh tĩnh? - SVG
-
-Nguồn audio chính thức là gì? (import hay TTS) - TTS (cần hướng dẫn)
-
-Có cho phép user đóng góp / báo lỗi nội dung không? (Phase 2) - tính sau
-
-Search engine sẽ dùng PostgreSQL full-text hay Elasticsearch sau? - hiện tại làm free
+## 🔗 8. Liên kết hệ thống
+- **Module 2/3**: Cho phép người dùng click tra từ ngay từ trong bài học.
+- **Module 5**: Cung cấp dữ liệu đầu vào cho quy trình ôn tập Spaced Repetition.
+- **Module 8**: Tặng huy hiệu "Dictionary Master" khi đạt mốc tra cứu hoặc lưu trữ từ vựng nhất định.

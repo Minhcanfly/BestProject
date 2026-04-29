@@ -8,9 +8,11 @@ import {
   Layers,
   Settings, 
   ShieldAlert,
-  LogOut
+  LogOut,
+  Library
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { ROUTES } from '../constants/routes';
 import './Sidebar.css';
 
 const Sidebar = () => {
@@ -21,8 +23,9 @@ const Sidebar = () => {
 
   const menuItems = [
     { name: 'Dashboard', icon: Home, path: '/' },
-    { name: 'Khóa học', icon: BookOpen, path: '/courses' },
-    { name: 'Khóa học của tôi', icon: Layers, path: '/my-courses' },
+    { name: 'Khóa học', icon: BookOpen, path: ROUTES.COURSES },
+    { name: 'Thư viện', icon: Library, path: ROUTES.LIBRARY },
+    { name: 'Khóa học của tôi', icon: Layers, path: ROUTES.MY_COURSES },
     { name: 'Sổ tay', icon: Notebook, path: '/notebook' },
     { name: 'Trang cá nhân', icon: User, path: '/profile' },
   ];

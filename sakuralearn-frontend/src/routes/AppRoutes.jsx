@@ -14,6 +14,11 @@ import TeacherDashboard from '../pages/courses/TeacherDashboard';
 import MyCourses from '../pages/courses/MyCourses';
 import CourseForm from '../pages/courses/CourseForm';
 import SyllabusManager from '../pages/courses/SyllabusManager';
+import Library from '../pages/dictionary/Library';
+import DictionaryList from '../pages/dictionary/DictionaryList';
+import MyNotebook from '../pages/dictionary/MyNotebook';
+import FolderDetail from '../pages/dictionary/FolderDetail';
+import PracticeSession from '../pages/dictionary/PracticeSession';
 import OAuth2RedirectHandler from '../pages/OAuth2RedirectHandler';
 import MainLayout from '../layouts/MainLayout';
 import AuthLayout from '../layouts/AuthLayout';
@@ -158,7 +163,45 @@ const AppRoutes = () => {
         </ProtectedRoute>
       } />
 
-      {/* Fallback */}
+      {/* Module 4: Dictionary */}
+      <Route path={ROUTES.LIBRARY} element={
+        <ProtectedRoute>
+          <MainLayout title="Thư viện kiến thức">
+             <Library />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path={ROUTES.DICTIONARY_LIST()} element={
+        <ProtectedRoute>
+          <MainLayout title="Danh sách kiến thức">
+             <DictionaryList />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path={ROUTES.REVIEW} element={
+        <ProtectedRoute>
+           <PracticeSession />
+        </ProtectedRoute>
+      } />
+
+      <Route path={ROUTES.NOTEBOOK} element={
+        <ProtectedRoute>
+          <MainLayout title="Sổ tay cá nhân">
+             <MyNotebook />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
+      <Route path="/notebook/folder/:id" element={
+        <ProtectedRoute>
+          <MainLayout title="Chi tiết sổ tay">
+             <FolderDetail />
+          </MainLayout>
+        </ProtectedRoute>
+      } />
+
       <Route path="*" element={<Navigate to={ROUTES.HOME} />} />
     </Routes>
   );

@@ -14,4 +14,11 @@ export const ROUTES = {
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
   OAUTH2_REDIRECT: '/oauth2/redirect',
+  // Module 4: Dictionary
+  LIBRARY: '/library',
+  DICTIONARY_LIST: (category = ':category', level = ':level') => `/dictionary/${category}/${level}`,
+  
+  // Module 5: SRS
+  REVIEW: '/practice',
+  NOTEBOOK: '/notebook',
 };

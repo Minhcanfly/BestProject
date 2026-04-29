@@ -14,11 +14,13 @@ import {
   ClipboardList,
   PlusCircle,
   BarChart3,
-  LayoutDashboard
+  LayoutDashboard,
+  Brain
 } from 'lucide-react';
 import { enrollmentService } from '../services/enrollmentService';
 import { adminService } from '../services/adminService';
 import { courseService } from '../services/courseService';
+import { srsService } from '../services/srsService';
 import { ROUTES } from '../constants/routes';
 import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
@@ -152,7 +154,7 @@ const TeacherDashboard = ({ user, navigate }) => {
           <h1>Góc giảng viên 👨‍🏫</h1>
           <p>Chào mừng thầy/cô {user?.fullName}. Chúc thầy/cô một ngày giảng dạy hiệu quả!</p>
         </div>
-        <button className="cta-btn" onClick={() => navigate('/courses/new')}>
+        <button className="cta-btn" onClick={() => navigate('/teacher/courses/new')}>
           <PlusCircle size={18} /> Tạo khóa học mới
         </button>
       </header>
@@ -203,7 +205,7 @@ const TeacherDashboard = ({ user, navigate }) => {
                       <h4>{course.titleVi}</h4>
                       <span className="course-badge">{course.jlptLevel}</span>
                    </div>
-                   <button className="edit-btn" onClick={() => navigate(`/courses/${course.id}/edit`)}>Chỉnh sửa</button>
+                   <button className="edit-btn" onClick={() => navigate(`/teacher/courses/edit/${course.id}`)}>Chỉnh sửa</button>
                  </div>
                ))
              ) : (
@@ -218,26 +220,31 @@ const TeacherDashboard = ({ user, navigate }) => {
 
 const StudentDashboard = ({ user, navigate }) => {
   const [enrollments, setEnrollments] = useState([]);
+  const [dueCount, setDueCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchEnrollments = async () => {
+    const fetchData = async () => {
       try {
-        const response = await enrollmentService.getMyEnrollments();
-        setEnrollments(response.data || []);
+        const [enrollRes, srsRes] = await Promise.all([
+          enrollmentService.getMyEnrollments(),
+          srsService.getDueCards(0, 1) // Just to get totalElements
+        ]);
+        setEnrollments(enrollRes.data || []);
+        setDueCount(srsRes.data.totalElements || 0);
       } catch (err) {
-        console.error('Error fetching enrollments:', err);
+        console.error('Error fetching dashboard data:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchEnrollments();
+    fetchData();
   }, []);
 
   const stats = [
     { label: 'Ngày học liên tục', value: user?.currentStreak || 0, icon: Flame, color: '#ff9f43' },
     { label: 'Tổng số XP', value: user?.xp || 0, icon: Zap, color: '#48dbfb' },
-    { label: 'Cấp độ hiện tại', value: user?.jlptGoal || 'N5', icon: Trophy, color: '#feca57' },
+    { label: 'Thẻ cần ôn (SRS)', value: dueCount, icon: Brain, color: '#9b59b6' },
     { label: 'Ngôn ngữ', value: user?.preferredLanguage === 'vi' ? 'Tiếng Việt' : 'English', icon: Clock, color: '#1dd1a1' },
   ];
 
@@ -249,15 +256,24 @@ const StudentDashboard = ({ user, navigate }) => {
         <div className="banner-content">
           <h1>Chào mừng trở lại, {user?.fullName}! 👋</h1>
           <p>
-            {firstEnrollment 
-              ? `Bạn đã hoàn thành ${Math.round(firstEnrollment.progressPercentage)}% khóa học ${firstEnrollment.courseTitle}. Tiếp tục phát huy nhé!` 
-              : 'Hãy bắt đầu hành trình chinh phục tiếng Nhật ngay hôm nay!'}
+            {dueCount > 0 
+              ? `Hôm nay bạn có ${dueCount} thẻ cần ôn tập. Hãy dành ít phút để ghi nhớ nhé!` 
+              : firstEnrollment 
+                ? `Bạn đã hoàn thành ${Math.round(firstEnrollment.progressPercentage)}% khóa học ${firstEnrollment.courseTitle}. Tiếp tục phát huy nhé!` 
+                : 'Hãy bắt đầu hành trình chinh phục tiếng Nhật ngay hôm nay!'}
           </p>
-          {firstEnrollment && (
-            <button className="cta-btn" onClick={() => navigate(ROUTES.LEARNING(firstEnrollment.courseId))}>
-              Tiếp tục học ngay <ArrowRight size={18} />
-            </button>
-          )}
+          <div className="banner-actions">
+            {dueCount > 0 && (
+                <button className="cta-btn srs-btn" onClick={() => navigate(ROUTES.REVIEW)}>
+                  Ôn tập ngay ({dueCount}) <Zap size={18} />
+                </button>
+            )}
+            {firstEnrollment && (
+              <button className={`cta-btn ${dueCount > 0 ? 'secondary' : ''}`} onClick={() => navigate(ROUTES.LEARNING(firstEnrollment.courseId))}>
+                {dueCount > 0 ? 'Học tiếp' : 'Tiếp tục học ngay'} <ArrowRight size={18} />
+              </button>
+            )}
+          </div>
         </div>
         <div className="banner-illustration">
           <div className="blobs">

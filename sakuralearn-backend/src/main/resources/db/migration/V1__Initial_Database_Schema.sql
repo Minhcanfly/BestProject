@@ -124,8 +124,11 @@ CREATE TABLE lesson_blocks (
     audio_url TEXT,
     image_url TEXT,
     metadata JSONB,
+    is_deleted BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+CREATE INDEX idx_lesson_blocks_is_deleted ON lesson_blocks(is_deleted);
 
 -- =============================================
 -- 4. ENROLLMENT & PROGRESS (Module 3)
@@ -185,22 +188,27 @@ CREATE TABLE radicals (
     meaning_vi TEXT,
     meaning_en TEXT,
     stroke_count INT,
+    image_path VARCHAR(500),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE kanji (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     character VARCHAR(10) UNIQUE NOT NULL,
-    jlpt_level VARCHAR(5),
+    jlpt_level VARCHAR(20),
     meaning_vi TEXT,
     meaning_en TEXT,
     onyomi TEXT[],
     kunyomi TEXT[],
     stroke_count INT,
-    radical_id UUID REFERENCES radicals(id),
+    radical_id UUID REFERENCES radicals(id), -- Main radical
     stroke_order_image_url TEXT,
+    stroke_data TEXT, -- SVG/KanjiVG data
+    frequency INT,
+    mnemonic_vi TEXT,
     audio_url TEXT,
     example_sentences JSONB,
+    synonyms TEXT[],
     is_deleted BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -208,16 +216,26 @@ CREATE TABLE kanji (
     updated_by UUID REFERENCES users(id)
 );
 
+-- Link Kanji to multiple components (Module 4)
+CREATE TABLE kanji_components (
+    kanji_id UUID REFERENCES kanji(id) ON DELETE CASCADE,
+    radical_id UUID REFERENCES radicals(id) ON DELETE CASCADE,
+    PRIMARY KEY (kanji_id, radical_id)
+);
+
 CREATE TABLE vocabulary (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     word_ja TEXT NOT NULL,
     reading TEXT NOT NULL,
-    jlpt_level VARCHAR(5),
-    meaning_vi TEXT NOT NULL,
+    jlpt_level VARCHAR(20),
+    meaning_vi TEXT,
     meaning_en TEXT,
     part_of_speech VARCHAR(50),
     audio_url TEXT,
     example_sentences JSONB,
+    synonyms TEXT[],
+    antonyms TEXT[],
+    mnemonic_vi TEXT,
     is_deleted BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
@@ -228,15 +246,26 @@ CREATE TABLE vocabulary (
 CREATE TABLE grammar_points (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     pattern_ja TEXT NOT NULL,
-    jlpt_level VARCHAR(5),
+    jlpt_level VARCHAR(20),
     explanation_vi TEXT,
     explanation_en TEXT,
+    structure_vi TEXT, -- Grammar formation (vi)
+    structure_ja TEXT, -- Grammar formation (ja)
+    structure_en TEXT, -- Grammar formation (en)
     example_sentences JSONB,
     is_deleted BOOLEAN DEFAULT false,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW(),
     created_by UUID REFERENCES users(id),
     updated_by UUID REFERENCES users(id)
+);
+
+-- Link similar grammar points (Module 4)
+CREATE TABLE grammar_links (
+    source_grammar_id UUID REFERENCES grammar_points(id) ON DELETE CASCADE,
+    target_grammar_id UUID REFERENCES grammar_points(id) ON DELETE CASCADE,
+    link_type VARCHAR(50) DEFAULT 'SIMILAR',
+    PRIMARY KEY (source_grammar_id, target_grammar_id)
 );
 
 -- =============================================
@@ -347,21 +376,33 @@ ON CONFLICT (name) DO NOTHING;
 -- =============================================
 -- 1. ENUM TYPES
 -- =============================================
-CREATE TYPE item_type AS ENUM ('KANJI', 'VOCAB', 'GRAMMAR');
+CREATE TYPE item_type AS ENUM ('KANJI', 'VOCAB', 'GRAMMAR', 'CUSTOM');
 CREATE TYPE payment_status AS ENUM ('PENDING', 'SUCCESS', 'FAILED', 'REFUNDED');
 CREATE TYPE notification_type AS ENUM ('LESSON_COMPLETE', 'PAYMENT_SUCCESS', 'REMINDER', 'STREAK', 'ACHIEVEMENT', 'ADMIN_ALERT');
 
 -- =============================================
 -- 2. SRS & REVIEW (Module 5)
 -- =============================================
+CREATE TABLE notebook_folders (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 CREATE TABLE user_notebook (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    folder_id UUID REFERENCES notebook_folders(id) ON DELETE SET NULL,
     item_type item_type NOT NULL,
-    item_id UUID NOT NULL,
+    item_id UUID, -- Cho phép NULL cho các item do người dùng tự tạo (CUSTOM)
+    custom_word TEXT,
+    custom_reading TEXT,
+    custom_meaning TEXT,
     note TEXT,
-    added_at TIMESTAMPTZ DEFAULT NOW(),
-    UNIQUE(user_id, item_type, item_id)
+    added_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 CREATE TABLE flashcards (
@@ -589,8 +630,4 @@ CREATE TABLE daily_user_stats (
 -- =============================================
 CREATE INDEX idx_event_log_type ON event_log(event_type, created_at);
 
--- V4__Add_IsDeleted_To_LessonBlocks.sql
--- Add is_deleted column to lesson_blocks table for soft delete support
-
-ALTER TABLE lesson_blocks ADD COLUMN is_deleted BOOLEAN DEFAULT false;
-CREATE INDEX idx_lesson_blocks_is_deleted ON lesson_blocks(is_deleted);
+-- End of Schema Consolidation

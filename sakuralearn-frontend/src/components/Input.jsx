@@ -1,7 +1,7 @@
 import React from 'react';
 import './Input.css';
 
-const Input = ({ label, icon: Icon, type = 'text', value, onChange, placeholder, name, error, required = false }) => {
+const Input = ({ label, icon: Icon, type = 'text', value, onChange, placeholder, name, error, required = false, className = '', ...props }) => {
   return (
     <div className="input-group">
       {label && <label className="input-label">{label}</label>}
@@ -14,7 +14,8 @@ const Input = ({ label, icon: Icon, type = 'text', value, onChange, placeholder,
           onChange={onChange}
           placeholder={placeholder}
           required={required}
-          className="input-field"
+          className={`input-field ${className}`}
+          {...props}
         />
       </div>
       {error && <span className="error-message">{error}</span>}

@@ -1,177 +1,88 @@
-﻿🌸 PHÂN TÍCH SÂU MODULE 3: Learning Experience & Progress Phiên bản: 1.0 Deep Dive Mục tiêu phân tích: Làm rõ toàn bộ logic trải nghiệm học và theo dõi tiến độ – module này quyết định người dùng có “cảm giác đang học thật” hay không.
+# 🌸 PHÂN TÍCH SÂU MODULE 3: LEARNING EXPERIENCE & PROGRESS
 
-## 1. Mục tiêu cốt lõi của Module 3 - nên tham khảo thêm Riki, DungMori,JapanesePod101
+**Phiên bản phân tích:** 1.0 Deep Dive  
+**Mục đích:** Đảm bảo trải nghiệm học tập liền mạch, theo dõi tiến độ chính xác và tạo động lực cho học viên thông qua các chỉ số trực quan.
 
-Cung cấp trải nghiệm học mượt mà, dễ chịu cho người Việt học JLPT.
+---
 
-Theo dõi tiến độ thực tế một cách chính xác và minh bạch.
+## 🎯 1. Mục tiêu cốt lõi của Module 3
+Module này tập trung vào "Trái tim" của trải nghiệm người dùng:
+- **Tương tác đa phương tiện:** Hỗ trợ trình phát Video, Audio, Text và Quiz mượt mà.
+- **Tính toán tiến độ:** Theo dõi chi tiết mức độ hoàn thành bài học đến từng khối nội dung (LessonBlock).
+- **Trải nghiệm cá nhân hóa:** Lưu trữ vị trí học cuối cùng, ghi chú cá nhân và tạo luồng học tập thông minh.
+- **Tối ưu hóa UI/UX:** Giao diện học tập (Learning View) phải chuyên nghiệp, giảm thiểu xao nhãng.
 
-Làm cầu nối giữa Module 2 (nội dung) và Module 5 (SRS), Module 8 (Gamification).
+---
 
-Tạo cảm giác tiến bộ rõ ràng để tăng retention.
+## 🔄 2. Luồng trải nghiệm người dùng (UX Flow)
 
-## 2. Luồng nghiệp vụ chính (User Journey)
+### 👨‍🎓 Hành trình của Học viên
+1. **Lối vào**: Từ Dashboard, người dùng nhấn "Học tiếp" (Continue Learning) hoặc chọn khóa học từ danh sách "My Courses".
+2. **Giao diện học tập (Learning View)**:
+   - **Thanh Syllabus**: Hiển thị danh sách bài học bên cạnh để dễ dàng chuyển đổi.
+   - **Vùng nội dung chính**: Tự động hiển thị trình phát tương ứng với loại Block (Video Player, Audio Player, Text Reader, hoặc Quiz UI).
+3. **Tương tác trong bài học**:
+   - Ghi chú cá nhân (Personal Note) ngay dưới nội dung bài học.
+   - Hệ thống tự động đánh dấu hoàn thành hoặc người dùng nhấn nút thủ công.
+4. **Cập nhật tiến độ**: Ngay sau mỗi hành động hoàn thành, thanh tiến độ của bài học và toàn khóa học sẽ được cập nhật realtime.
 
-Luồng học điển hình của Student:
+---
 
-Vào My Courses → chọn một Course đã enroll. - xong
+## 🛠️ 3. Đặc tả Chức năng chi tiết
+| Chức năng | Mô tả chi tiết nghiệp vụ | Trạng thái |
+| :--- | :--- | :--- |
+| **LessonBlock Player** | Tích hợp trình phát đa phương tiện (Video MinIO, Audio, Markdown Text) | ✅ Hoàn thiện |
+| **Progress Tracking** | Ghi nhận trạng thái hoàn thành cho từng `LessonBlockProgress` | ✅ Hoàn thiện |
+| **Automatic Progress** | Tự động tính toán % hoàn thành của Lesson và Course | ✅ Hoàn thiện |
+| **Last Accessed** | Tự động lưu và cập nhật `last_accessed_at` trong bảng Enrollment | ✅ Hoàn thiện |
+| **Manual Completion** | Nút đánh dấu hoàn thành thủ công cho các khối Text/Reading | ✅ Hoàn thiện |
+| **Personal Notes** | Hệ thống ghi chú cá nhân (Private) cho từng bài học | ✅ Hoàn thiện |
+| **Continue Learning** | Nút gợi ý bài học đang dang dở ngay tại màn hình chính | ✅ Hoàn thiện |
 
-Xem danh sách Lesson (theo thứ tự hoặc tự do tùy cấu hình). - xong
+---
 
-Chọn một Lesson → Hệ thống hiển thị danh sách LessonBlock theo thứ tự. - xong
+## ⚖️ 4. Quy tắc & Logic tính toán tiến độ (Core Logic)
 
-Học theo LessonBlock: - xong
+### ✅ Quy tắc Hoàn thành (Completion Rules)
+Hệ thống áp dụng các quy tắc khác nhau tùy theo loại nội dung:
+- **VIDEO**: Tự động đánh dấu hoàn thành khi học viên xem đạt mức ≥ 85% tổng thời lượng video.
+- **AUDIO**: Tự động khi nghe đạt mức ≥ 80% thời lượng hoặc người dùng nhấn nút xác nhận.
+- **TEXT / READING**: Học viên phải chủ động nhấn nút "Đã hoàn thành" sau khi đọc xong.
+- **QUIZ**: Phải đạt số câu đúng tối thiểu (mặc định là 70%) mới được tính là hoàn thành khối nội dung này.
 
-VIDEO → mở video player - xong
+### 📊 Công thức tính phần trăm (%)
+- **Lesson Progress**: `(Số Block đã hoàn thành trong bài / Tổng số Block của bài đó) * 100`.
+- **Course Progress**: `(Tổng số Block đã hoàn thành toàn khóa / Tổng số Block của toàn khóa học) * 100`.
 
-TEXT / READING → đọc nội dung + có thể highlight hoặc ghi note - xong
+> [!IMPORTANT]
+> **Lưu ý về dữ liệu:** Logic tính toán phải loại trừ các bản ghi đã bị xóa (`is_deleted = true`) để đảm bảo tiến độ có thể đạt mốc 100%.
 
-AUDIO → nghe và repeat - có giao diện chưa có logic
+---
 
-QUIZ → làm bài kiểm tra - xong
+## 💡 5. Quyết định & Logic nghiệp vụ quan trọng
 
-Hoàn thành LessonBlock → hệ thống tự động hoặc thủ công mark COMPLETED. - xong
+- **Optimistic UI:** Khi học viên nhấn hoàn thành, giao diện Frontend sẽ cập nhật thanh tiến độ ngay lập tức trước khi nhận phản hồi từ Backend để tạo cảm giác phản hồi cực nhanh.
+- **Resume State:** Hệ thống cần lưu trữ timestamp (vị trí thời gian) cuối cùng của Video/Audio để học viên có thể học tiếp đúng vị trí đó ở lần sau.
+- **Tính nhất quán:** Khi giáo viên thay đổi số lượng LessonBlock trong Course, hệ thống phải tự động tính toán lại % tiến độ cho tất cả học viên đã đăng ký.
+- **Múi giờ:** Toàn bộ lịch sử `last_accessed` phải được chuẩn hóa theo múi giờ `Asia/Ho_Chi_Minh`.
 
-Khi hoàn thành đủ LessonBlock trong một Lesson → Lesson được đánh dấu hoàn thành. - xong
+---
 
-Tiến độ toàn Course được cập nhật realtime hoặc gần realtime. - xong
+## 🌑 6. Trải nghiệm người dùng nâng cao (Enhancement)
+- **Dark Mode chuyên sâu:** Giao diện học tập cần tối ưu chế độ tối để bảo vệ mắt học viên khi học vào ban đêm.
+- **Motivational UI:** Hiển thị popup hoặc hiệu ứng Confetti chúc mừng khi học viên hoàn thành các mốc quan trọng (25%, 50%, 75%, 100%).
+- **Syllabus Navigation:** Cho phép học viên chuyển bài nhanh ngay trong trình phát mà không cần quay lại trang danh sách.
 
-Hệ thống ghi nhận last_accessed → dùng cho Streak (Module 8) và gợi ý tiếp tục học. - có logic rồi nhưng chưa mượt
+---
 
-Luồng Teacher/Admin:
+## ⚠️ 7. Xử lý Edge Cases
+- **Mạng yếu:** Xử lý cơ chế Retry hoặc lưu tạm (Local Storage) khi hành động lưu tiến độ bị lỗi do kết nối mạng.
+- **Thay đổi cấu trúc:** Nếu học viên đã hoàn thành 100%, nhưng sau đó giáo viên thêm bài học mới, trạng thái hoàn thành sẽ được cập nhật lại theo tỉ lệ mới.
+- **Truy cập đồng thời:** Đảm bảo tiến độ đồng bộ chính xác khi người dùng học trên cả trình duyệt web và thiết bị di động.
 
-Xem preview LessonBlock khi tạo nội dung (Module 2). - xong
+---
 
-Xem báo cáo tiến độ học của học viên (trong Module 7). - chưa làm
-
-## 3. Chức năng chính
-
-Chức năng
-
-Mô tả chi tiết
-
-Ghi chú quan trọng
-
-Lesson Free Navigation - xong
-
-LessonBlock Player - xong
-
-Video player, Text reader, Audio player, Quiz interface - tạm ổn
-
-Tích hợp MinIO URL - xong
-
-Completion Tracking - xong
-
-Mark as Completed (thủ công / tự động) - xong nhưng hơi xấu
-
-Theo từng Block - xong
-
-Progress Calculation - tạm ổn
-
-Tính % tiến độ của Lesson và toàn Course - tạm ổn
-
-Quiz in Lesson - chưa xong
-
-Multiple choice, Fill-in-blank, Matching, Listening - tính sau, ưu tiên Multiple choice
-
-MVP giữ đơn giản
-
-Continue Learning - tạm ổn
-
-Nút “Tiếp tục học” trên Dashboard - tạm ổn
-
-Personal Note - tạm ổn (tham khảo thêm Riki)
-
-Ghi chú cá nhân trong LessonBlock - tạm ổn
-
-Rất hữu ích cho người Việt
-
-## 4. Quy tắc & Logic nghiệp vụ quan trọng (Business Rules)
-
-### A. Trạng thái LessonBlock - có giao diện nhưng chưa hoàn thiện
-
-NOT_STARTED → IN_PROGRESS → COMPLETED
-
-Mỗi LessonBlock có quy tắc hoàn thành riêng:- xong
-
-VIDEO: Tự động khi xem ≥ 85% thời lượng (khuyến nghị). - xong
-
-AUDIO: Tự động khi nghe ≥ 80% hoặc có nút “Đã nghe xong”. - chưa kiểm tra được
-
-TEXT / READING: Có nút “Mark as Completed” (hoặc tự động khi scroll hết). - tạm ổn
-
-QUIZ: Hoàn thành khi nộp bài và đạt điểm tối thiểu (ví dụ ≥ 70%). Nếu không đạt có thể làm lại. - tạm ổn tham khảo thêm Quizlet, Duolingo, Lingodeer
-
-### B. Tiến độ Calculation (Quan trọng nhất) Khuyến nghị dùng công thức sau (chính xác và hợp lý với thiết kế LessonBlock):
-
-Lesson Progress % = (Số LessonBlock đã COMPLETED / Tổng số LessonBlock trong Lesson) × 100 - tạm ổn
-
-Course Progress % = (Tổng số LessonBlock đã COMPLETED trong toàn Course / Tổng số LessonBlock của Course) × 100 - tạm ổn
-
-→ Cách này chính xác hơn so với chỉ đếm số Lesson.
-
-### C. Last Accessed & Time Spent
-
-Cập nhật last_accessed mỗi khi user mở Lesson hoặc LessonBlock. - tạm ổn
-
-time_spent (tùy chọn): tích lũy thời gian học thực tế (dùng cho analytics sau). - tính sau
-
-## 5. Các điểm dễ nhầm lẫn / Quyết định then chốt
-
-Cách tính tiến độ Bạn đang có LessonBlock. - tạm ổn
-
-Tự động hoàn thành Video Quyết định: Dùng YouTube embed hay tự host video trên MinIO? → Nếu tự host MinIO thì dễ track phần trăm xem hơn (dùng video.js hoặc HLS). - tạm ổn
-
-Quiz trong Lesson - tạm ổn
-
-MVP: Giữ đơn giản (không lưu lịch sử attempt chi tiết).
-
-Chỉ cần lưu kết quả lần làm gần nhất và điểm số. - tạm
-
-Có cho phép làm lại quiz không? (Khuyến nghị: Có) - xong
-
-Thứ tự học
-
-Cho học tự do
-
-Tiến độ realtime Có cập nhật tiến độ ngay lập tức hay chỉ khi refresh trang? → Nên cập nhật ngay (dùng WebSocket hoặc gọi API sau mỗi completion). - tính sau, hiện tại là refresh
-
-## 6. Edge Cases cần xử lý
-
-User học dở LessonBlock → đóng app → lần sau vào lại phải tiếp tục từ vị trí cũ (đặc biệt với Video). - tạm ổn
-
-Quiz làm nửa chừng → có lưu tạm không? (MVP có thể không cần). - chưa làm
-
-Teacher chỉnh sửa LessonBlock sau khi Student đã học → tiến độ có bị reset không? (Khuyến nghị: Không reset, chỉ áp dụng cho user học sau). - chưa làm
-
-Course có LessonBlock = 0 → không cho phép tính tiến độ. - xong
-
-User hoàn thành LessonBlock nhưng sau đó Teacher xóa Block → cần xử lý graceful (không crash tiến độ). - chưa làm
-
-## 7. Gợi ý phù hợp với người Việt học JLPT
-
-Giải thích đáp án Quiz phải bằng tiếng Việt rõ ràng, dễ hiểu. - chưa làm
-
-Cho phép ghi chú cá nhân bằng tiếng Việt ngay trong LessonBlock (rất cần thiết khi học Kanji/Grammar). - tạm ổn
-
-Hiển thị “Mốc đạt được” rõ ràng: “Bạn đã hoàn thành 60% N5 – chỉ còn 8 bài nữa là xong phần Kanji”. - tạm ổn
-
-Thêm motivational message khi hoàn thành Lesson (ví dụ: “Tuyệt vời! Bạn vừa nắm vững 20 từ vựng mới.”). - tạm ổn
-
-Dark mode nên mặc định hỗ trợ tốt vì nhiều người học buổi tối. - chưa làm
-
-Nút “Tiếp tục học” nên rất nổi bật trên Dashboard. - xong
-
-## 8. Liên kết với các Module khác
-
-Module 2: Cung cấp dữ liệu LessonBlock.
-
-Module 4: Có thể link LessonBlock với từ vựng/kanji cụ thể để thêm vào SRS dễ dàng.
-
-Module 5 (SRS): Khi hoàn thành Quiz hoặc LessonBlock → gợi ý “Thêm các từ này vào SRS ngay”.
-
-Module 6: Không trực tiếp, nhưng tiến độ cao có thể dùng để khuyến mãi.
-
-Module 8 (Gamification): Hoàn thành LessonBlock/Lesson → cộng XP, kiểm tra Streak.
-
-Module 7: Admin xem báo cáo tiến độ trung bình của học viên.
+## 🔗 8. Liên kết hệ thống
+- **Module 2**: Nhận dữ liệu cấu trúc Syllabus để hiển thị.
+- **Module 5**: Gợi ý các từ vựng xuất hiện trong bài học vào SRS để ôn tập.
+- **Module 8**: Hoàn thành bài học/khóa học sẽ trigger cộng XP, cập nhật Streak và tặng huy hiệu (Badge).

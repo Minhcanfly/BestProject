@@ -10,7 +10,9 @@ const MainLayout = ({ children, title }) => {
       <div className="content-area">
         <Navbar title={title} />
         <main className="main-content">
-          {children}
+          <div className="main-content-inner">
+            {children}
+          </div>
         </main>
       </div>
     </div>

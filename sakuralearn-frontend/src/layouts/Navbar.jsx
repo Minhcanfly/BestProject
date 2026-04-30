@@ -1,21 +1,24 @@
-import React from 'react';
 import { 
   Bell, 
   Search, 
   Settings, 
   User as UserIcon,
   Zap,
-  Flame
+  Flame,
+  Menu
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import './Navbar.css';
 
-const Navbar = ({ title }) => {
+const Navbar = ({ title, onToggleSidebar }) => {
   const { user } = useAuth();
 
   return (
     <header className="navbar glass-effect">
       <div className="navbar-left">
+        <button className="mobile-menu-btn" onClick={onToggleSidebar}>
+          <Menu size={24} />
+        </button>
         <h2 className="page-title">{title || 'Chào buổi sáng!'}</h2>
       </div>
 

@@ -12,9 +12,11 @@
 
 .main-content {
   padding: 40px;
+  padding-bottom: 100px; /* Extra space at bottom to prevent UI freeze/clipping */
   flex: 1;
   margin-left: 260px; /* Standard sidebar width */
   animation: fadeIn 0.5s ease-out;
+  position: relative;
 }
 
 .main-content-inner {
@@ -32,5 +34,21 @@
   .main-content {
     margin-left: 0;
     padding: 20px;
+  }
+
+  .mobile-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 95;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .sidebar-open {
+    overflow: hidden;
   }
 }

@@ -102,9 +102,35 @@
   background: rgba(238, 82, 83, 0.05);
 }
 
-/* Mobile responsive - will implement toggle later */
+.mobile-close-btn {
+  display: none;
+  color: var(--text-muted);
+}
+
+/* Mobile responsive */
 @media (max-width: 768px) {
   .sidebar {
     transform: translateX(-100%);
+    visibility: hidden;
+    pointer-events: none;
+    background: var(--bg-main) !important;
+    backdrop-filter: none;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+    pointer-events: all;
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.8);
+  }
+
+  .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .mobile-close-btn {
+    display: block;
   }
 }

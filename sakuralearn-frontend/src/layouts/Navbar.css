@@ -12,6 +12,20 @@
   width: calc(100% - 260px);
 }
 
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  color: var(--text-main);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
 .page-title {
   font-size: 22px;
   font-weight: 600;
@@ -138,6 +152,10 @@
     margin-left: 0;
     width: 100%;
     padding: 0 20px;
+  }
+
+  .mobile-menu-btn {
+    display: block;
   }
   
   .user-info, .user-stats {

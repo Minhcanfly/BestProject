@@ -43,11 +43,35 @@ async function consolidateVocab() {
     const viMap = new Map(); // word -> meaningVi
     const ankiLevelMap = new Map(); // word -> JLPT level
 
+    // Helper to detect Japanese characters
+    const isJapanese = (text) => /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/.test(text);
+
     ankiRes[0].values.forEach(v => {
         const noteId = v[0];
         const fields = v[1].split('\x1f');
-        let rawWord = fields[1] || '';
-        const meaningVi = fields[0]?.replace(/'/g, "''").replace(/<[^>]*>/g, '').trim();
+        
+        const field0 = fields[0] || '';
+        const field1 = fields[1] || '';
+        
+        let rawWord = '';
+        let meaningVi = '';
+        
+        // Smart field detection: find which one is Japanese
+        if (isJapanese(field0) && !isJapanese(field1)) {
+            rawWord = field0;
+            meaningVi = field1;
+        } else if (isJapanese(field1) && !isJapanese(field0)) {
+            rawWord = field1;
+            meaningVi = field0;
+        } else {
+            // Fallback: assume field 1 is Japanese word (standard for most decks)
+            rawWord = field1;
+            meaningVi = field0;
+        }
+
+        // Clean meaningVi
+        meaningVi = meaningVi.replace(/'/g, "''").replace(/<[^>]*>/g, '').trim();
+
         const level = noteLevelMap[noteId] || null;
 
         if (rawWord && meaningVi) {

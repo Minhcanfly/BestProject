@@ -9,13 +9,14 @@ import {
   Settings, 
   ShieldAlert,
   LogOut,
-  Library
+  Library,
+  X
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { ROUTES } from '../constants/routes';
 import './Sidebar.css';
 
-const Sidebar = () => {
+const Sidebar = ({ isOpen, onClose }) => {
   const { user, logout, hasRole } = useAuth();
   
   const isAdmin = hasRole('ADMIN');
@@ -39,12 +40,15 @@ const Sidebar = () => {
   ];
 
   return (
-    <aside className="sidebar glass-effect">
+    <aside className={`sidebar glass-effect ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <div className="logo">
           <span className="logo-icon">🌸</span>
           <span className="logo-text">SakuraLearn</span>
         </div>
+        <button className="mobile-close-btn" onClick={onClose}>
+          <X size={24} />
+        </button>
       </div>
 
       <nav className="sidebar-nav">

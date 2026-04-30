@@ -56,7 +56,7 @@ const DictionaryList = () => {
   };
 
   const getItemSubText = (item) => {
-    if (category === 'vocab') return item.reading;
+    if (category === 'vocab') return item.meaningVi;
     if (category === 'kanji') return item.meaningVi;
     if (category === 'grammar') return item.explanationVi;
     return '';

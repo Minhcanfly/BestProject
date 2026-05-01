@@ -44,3 +44,7 @@ logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
+
+# Personal Documents
+docs/NGUYEN_QUANG_MINH_CV.*
+

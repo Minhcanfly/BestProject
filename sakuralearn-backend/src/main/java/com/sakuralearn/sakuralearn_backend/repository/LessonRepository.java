@@ -17,4 +17,8 @@ public interface LessonRepository extends JpaRepository<Lesson, UUID> {
     int countByCourseIdAndIdInAndIsDeletedFalse(UUID courseId, List<UUID> ids);
     boolean existsByCourseIdAndOrderIndexAndIsDeletedFalse(UUID courseId, Integer orderIndex);
     boolean existsByCourseIdAndOrderIndexAndIdNotAndIsDeletedFalse(UUID courseId, Integer orderIndex, UUID id);
+    
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("UPDATE Lesson l SET l.isDeleted = true WHERE l.course.id = :courseId")
+    void softDeleteByCourseId(UUID courseId);
 }

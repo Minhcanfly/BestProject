@@ -11,4 +11,7 @@ public class SrsStatsResponse {
     private int level3;
     private int level4;
     private int level5;
+    private int todayReviewedCount;
+    private int dailyLimit;
+    private int remainingToday;
 }

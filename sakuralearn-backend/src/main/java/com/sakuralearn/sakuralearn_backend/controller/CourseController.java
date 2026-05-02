@@ -22,8 +22,11 @@ public class CourseController {
     private final AiSyllabusService aiSyllabusService;
 
     @GetMapping
-    public ResponseEntity<?> getCourses(@RequestParam(value = "jlptLevel", required = false) String jlptLevel) {
-        return ResponseEntity.ok(courseService.getCoursesByLevel(jlptLevel));
+    public ResponseEntity<?> getCourses(
+            @RequestParam(value = "keyword", required = false) String keyword,
+            @RequestParam(value = "jlptLevel", required = false) String jlptLevel,
+            @RequestParam(value = "maxPrice", required = false) Double maxPrice) {
+        return ResponseEntity.ok(courseService.searchCourses(keyword, jlptLevel, maxPrice));
     }
 
     @GetMapping("/managed")

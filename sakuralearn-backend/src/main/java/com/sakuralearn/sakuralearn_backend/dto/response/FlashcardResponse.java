@@ -19,4 +19,5 @@ public class FlashcardResponse {
     private Integer intervalDays;
     private Integer reps;
     private Double easeFactor;
+    private String note;
 }

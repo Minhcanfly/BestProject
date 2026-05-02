@@ -61,8 +61,22 @@
   box-shadow: 0 5px 15px rgba(238, 82, 83, 0.3);
 }
 
+.search-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.price-filter {
+  width: 150px;
+}
+
+.price-input {
+  text-align: right;
+}
+
 .search-mini {
-  width: 300px;
+  width: 250px;
 }
 
 .search-input-mini {

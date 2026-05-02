@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Volume2, Bookmark, Share2, Info, ArrowRight, Brain, PlusCircle, CheckCircle2 } from 'lucide-react';
+import { X, Volume2, Bookmark, Share2, Info, ArrowRight, Brain, PlusCircle, CheckCircle2, BookOpen } from 'lucide-react';
 import { dictionaryService } from '../../services/dictionaryService';
 import { notebookService } from '../../services/notebookService';
 import SaveToNotebookPopup from './SaveToNotebookPopup';
@@ -8,6 +8,7 @@ import './DictionaryDetailPopup.css';
 const DictionaryDetailPopup = ({ type, id, onClose }) => {
   const [data, setData] = useState(null);
   const [relatedVocab, setRelatedVocab] = useState([]);
+  const [kanjiDetails, setKanjiDetails] = useState({});
   const [loading, setLoading] = useState(true);
   const [actionStatus, setActionStatus] = useState({ notebook: false });
   const [isSavePopupOpen, setIsSavePopupOpen] = useState(false);
@@ -17,16 +18,37 @@ const DictionaryDetailPopup = ({ type, id, onClose }) => {
       setLoading(true);
       try {
         let response;
-        if (type === 'vocab') response = await dictionaryService.getVocabDetail(id);
+        if (type === 'vocab') {
+            response = await dictionaryService.getVocabDetail(id);
+            const vocabData = response.data;
+            setData(vocabData);
+
+            // Fetch details for constituent kanji
+            const kanjiChars = vocabData.wordJa ? [...new Set(vocabData.wordJa.match(/[\u4e00-\u9faf]/g) || [])] : [];
+            if (kanjiChars.length > 0) {
+                const details = {};
+                await Promise.all(kanjiChars.map(async (char) => {
+                    try {
+                        const res = await dictionaryService.searchKanji(char);
+                        if (res.data.content && res.data.content.length > 0) {
+                            details[char] = res.data.content[0];
+                        }
+                    } catch (e) { console.error(`Err fetching kanji ${char}:`, e); }
+                }));
+                setKanjiDetails(details);
+            }
+        }
         else if (type === 'kanji') {
             response = await dictionaryService.getKanjiDetail(id);
+            setData(response.data);
             // Fetch related vocab for Kanji
             const relatedRes = await dictionaryService.getRelatedVocab(response.data.character);
             setRelatedVocab(relatedRes.data);
         }
-        else if (type === 'grammar') response = await dictionaryService.getGrammarDetail(id);
-        
-        setData(response.data);
+        else if (type === 'grammar') {
+            response = await dictionaryService.getGrammarDetail(id);
+            setData(response.data);
+        }
       } catch (err) {
         console.error('Error fetching detail:', err);
       } finally {
@@ -100,61 +122,112 @@ const DictionaryDetailPopup = ({ type, id, onClose }) => {
     if (!data) return <div className="popup-error">Không tìm thấy dữ liệu.</div>;
 
     if (type === 'vocab') {
+      const constituentKanji = data.wordJa ? [...new Set(data.wordJa.match(/[\u4e00-\u9faf]/g) || [])] : [];
+      
       return (
-        <div className="detail-content">
-          <div className="detail-header">
-            <div className="main-word">
-              <h1 className="japanese-text">{data.wordJa}</h1>
-              <button onClick={() => playAudio(data.wordJa)} className="audio-btn" title="Nghe phát âm">
-                <Volume2 size={24} />
-              </button>
-            </div>
-            <p className="reading-text">【{data.reading}】</p>
-            <div className="badge-row">
-              <span className="pos-badge">{getPosLabel(data.partOfSpeech)}</span>
-              <span className="level-badge">{data.jlptLevel}</span>
-            </div>
-          </div>
-          
-          <div className="info-card">
-            <h4 className="section-label">Nghĩa tiếng Việt</h4>
-            <p className="primary-meaning">{data.meaningVi || data.meaningEn || 'Chưa có bản dịch tiếng Việt'}</p>
-          </div>
-
-          {data.mnemonicVi && (
-            <div className="info-card mnemonic-card">
-              <h4 className="section-label">💡 Mẹo nhớ (Mnemonics)</h4>
-              <p className="mnemonic-text">{data.mnemonicVi}</p>
-            </div>
-          )}
-
-          <div className="info-card">
-            <h4 className="section-label">Ví dụ minh họa</h4>
-            <div className="examples-list">
-              {data.exampleSentences && Array.isArray(data.exampleSentences) && data.exampleSentences.length > 0 ? (
-                data.exampleSentences.slice(0, 3).map((ex, i) => (
-                  <div key={i} className="example-item">
-                    <p className="ex-ja japanese-text">{ex.ja}</p>
-                    <p className="ex-vi">{ex.vi}</p>
-                  </div>
-                ))
-              ) : (
-                <div className="empty-placeholder">
-                  <Info size={16} />
-                  <span>Hệ thống đang cập nhật ví dụ cho từ này...</span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {data.synonyms && data.synonyms.length > 0 && (
-            <div className="info-card">
-              <h4 className="section-label">Từ đồng nghĩa</h4>
-              <div className="synonyms-list">
-                {data.synonyms.map((s, i) => <span key={i} className="synonym-tag">{s}</span>)}
+        <div className="detail-content vocab-detail-layout">
+          <div className="vocab-main-column">
+            <div className="detail-header">
+              <div className="main-word">
+                <h1 className="japanese-text">{data.wordJa}</h1>
+                <button onClick={() => playAudio(data.wordJa)} className="audio-btn" title="Nghe phát âm">
+                  <Volume2 size={24} />
+                </button>
+              </div>
+              <p className="reading-text">【{data.reading}】</p>
+              <div className="badge-row">
+                <span className="pos-badge">{getPosLabel(data.partOfSpeech)}</span>
+                <span className="level-badge">JLPT {data.jlptLevel}</span>
               </div>
             </div>
-          )}
+            
+            <div className="info-card primary-meaning-card">
+              <h4 className="section-label"><Info size={14} /> Nghĩa tiếng Việt</h4>
+              <p className="primary-meaning">{data.meaningVi || data.meaningEn || 'Chưa có bản dịch tiếng Việt'}</p>
+            </div>
+
+            <div className="info-card">
+              <div className="section-header-row">
+                <h4 className="section-label"><BookOpen size={14} /> Ví dụ minh họa</h4>
+                <button className="text-link-btn">Xem thêm</button>
+              </div>
+              <div className="examples-list">
+                {data.exampleSentences && Array.isArray(data.exampleSentences) && data.exampleSentences.length > 0 ? (
+                  data.exampleSentences.slice(0, 3).map((ex, i) => (
+                    <div key={i} className="example-item conversational">
+                      <div className="ex-content">
+                        <p className="ex-ja japanese-text">{ex.ja}</p>
+                        <p className="ex-vi">{ex.vi}</p>
+                      </div>
+                      <button onClick={() => playAudio(ex.ja)} className="ex-audio-btn"><Volume2 size={16} /></button>
+                    </div>
+                  ))
+                ) : (
+                  <div className="empty-placeholder">
+                    <span>Hệ thống đang cập nhật ví dụ cho từ này...</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {(data.synonyms?.length > 0 || data.antonyms?.length > 0) && (
+              <div className="info-card relations-card">
+                <h4 className="section-label"><Brain size={14} /> Từ liên quan</h4>
+                <div className="relations-container-inner">
+                    {data.synonyms?.length > 0 && (
+                      <div className="relation-group">
+                        <span className="relation-type-label">Đồng nghĩa:</span>
+                        <div className="synonyms-list">
+                          {data.synonyms.map((s, i) => <span key={i} className="synonym-tag japanese-text">{s}</span>)}
+                        </div>
+                      </div>
+                    )}
+                    {data.antonyms?.length > 0 && (
+                      <div className="relation-group">
+                        <span className="relation-type-label">Trái nghĩa:</span>
+                        <div className="synonyms-list">
+                          {data.antonyms.map((s, i) => <span key={i} className="antonym-tag japanese-text">{s}</span>)}
+                        </div>
+                      </div>
+                    )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="vocab-side-column">
+             {constituentKanji.length > 0 && (
+               <div className="side-section kanji-breakdown-section">
+                 <h4 className="section-label">Hán tự cấu thành</h4>
+                 <div className="kanji-side-list">
+                   {constituentKanji.map((k, i) => (
+                     <div key={i} className="kanji-side-card glass-effect">
+                       <div className="side-kanji-char japanese-text">{k}</div>
+                       <div className="side-kanji-info">
+                         <span className="side-kanji-reading">{kanjiDetails[k]?.meaningVi || '...'}</span>
+                         <span className="side-kanji-meaning">{kanjiDetails[k]?.meaningEn || 'Đang tải...'}</span>
+                       </div>
+                     </div>
+                   ))}
+                 </div>
+               </div>
+             )}
+
+             {data.mnemonicVi && (
+               <div className="side-section mnemonic-side-section glass-effect">
+                 <h4 className="section-label">💡 Mẹo nhớ</h4>
+                 <p className="side-mnemonic-text">{data.mnemonicVi}</p>
+               </div>
+             )}
+
+             <div className="side-section illustration-section">
+                <h4 className="section-label">Ảnh minh họa</h4>
+                <div className="illustration-placeholder">
+                    <img src={`https://api.dicebear.com/7.x/bottts/svg?seed=${data.wordJa}`} alt="illustration" />
+                    <span>Dữ liệu hình ảnh đang được AI tổng hợp...</span>
+                </div>
+             </div>
+          </div>
         </div>
       );
     }

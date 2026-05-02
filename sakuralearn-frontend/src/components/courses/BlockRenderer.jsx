@@ -3,49 +3,47 @@ import { Play, RefreshCcw, CheckCircle, ArrowRight } from 'lucide-react';
 import QuizBlock from './QuizBlock';
 
 const BlockRenderer = ({ block, progress, onUpdateProgress, onComplete }) => {
-  console.log(`DEBUG: [${block.blockType}] blockId: ${block.id}`, {
-    videoUrl: block.videoUrl,
-    audioUrl: block.audioUrl,
-    imageUrl: block.imageUrl,
-    contentVi: block.contentVi?.substring(0, 50)
-  });
   const [showResumePrompt, setShowResumePrompt] = useState(false);
-  const videoRef = useRef(null);
+  const mediaRef = useRef(null);
   const lastSavedTimeRef = useRef(0);
 
   useEffect(() => {
-    if (block.blockType === 'VIDEO' && progress?.lastTimestamp > 0 && !progress?.isCompleted) {
+    const hasTimestamp = progress?.lastTimestamp > 0 && !progress?.isCompleted;
+    if ((block.blockType === 'VIDEO' || block.blockType === 'AUDIO') && hasTimestamp) {
       setShowResumePrompt(true);
     }
   }, [block.id, progress?.isCompleted]);
 
   const handleResume = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = progress.lastTimestamp;
-      videoRef.current.play();
+    if (mediaRef.current) {
+      mediaRef.current.currentTime = progress.lastTimestamp;
+      mediaRef.current.play();
     }
     setShowResumePrompt(false);
   };
 
   const handleStartFromBeginning = () => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = 0;
-      videoRef.current.play();
+    if (mediaRef.current) {
+      mediaRef.current.currentTime = 0;
+      mediaRef.current.play();
     }
     setShowResumePrompt(false);
   };
 
   const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      const currentTime = videoRef.current.currentTime;
-      const duration = videoRef.current.duration;
+    if (mediaRef.current) {
+      const currentTime = mediaRef.current.currentTime;
+      const duration = mediaRef.current.duration;
       
+      // Save progress every 5 seconds
       if (Math.abs(currentTime - lastSavedTimeRef.current) >= 5) {
         onUpdateProgress(block.id, { lastTimestamp: currentTime });
         lastSavedTimeRef.current = currentTime;
       }
 
-      if (!progress?.isCompleted && duration > 0 && (currentTime / duration) >= 0.85) {
+      // Auto-complete logic: 80% for Audio, 85% for Video
+      const threshold = block.blockType === 'AUDIO' ? 0.8 : 0.85;
+      if (!progress?.isCompleted && duration > 0 && (currentTime / duration) >= threshold) {
         onComplete(block.id);
       }
     }
@@ -97,10 +95,10 @@ const BlockRenderer = ({ block, progress, onUpdateProgress, onComplete }) => {
              {showResumePrompt && (
                <div className="resume-overlay glass-effect">
                   <div className="resume-card">
-                    <p>Bạn đang học dở. Tiếp tục từ <b>{Math.floor(progress.lastTimestamp / 60)}:{(Math.floor(progress.lastTimestamp % 60)).toString().padStart(2, '0')}</b>?</p>
+                    <p>Bạn đang {block.blockType === 'VIDEO' ? 'xem' : 'nghe'} dở. Tiếp tục từ <b>{Math.floor(progress.lastTimestamp / 60)}:{(Math.floor(progress.lastTimestamp % 60)).toString().padStart(2, '0')}</b>?</p>
                     <div className="resume-btns">
-                      <button onClick={handleResume} className="btn-resume primary"><Play size={18} /> Học tiếp</button>
-                      <button onClick={handleStartFromBeginning} className="btn-resume secondary"><RefreshCcw size={18} /> Học lại từ đầu</button>
+                      <button onClick={handleResume} className="btn-resume primary"><Play size={18} /> {block.blockType === 'VIDEO' ? 'Xem tiếp' : 'Nghe tiếp'}</button>
+                      <button onClick={handleStartFromBeginning} className="btn-resume secondary"><RefreshCcw size={18} /> Bắt đầu lại</button>
                     </div>
                   </div>
                </div>
@@ -114,14 +112,14 @@ const BlockRenderer = ({ block, progress, onUpdateProgress, onComplete }) => {
                  allowFullScreen
                ></iframe>
              ) : block.videoUrl ? (
-               <video 
-                 ref={videoRef}
-                 controls 
-                 src={block.videoUrl} 
-                 width="100%" 
-                 height="auto" 
-                 onTimeUpdate={handleTimeUpdate}
-               />
+                <video 
+                  ref={mediaRef}
+                  controls 
+                  src={block.videoUrl} 
+                  width="100%" 
+                  height="auto" 
+                  onTimeUpdate={handleTimeUpdate}
+                />
              ) : (
                <div className="video-placeholder">
                   <span>🎥 Video chưa sẵn sàng</span>
@@ -134,8 +132,27 @@ const BlockRenderer = ({ block, progress, onUpdateProgress, onComplete }) => {
       );
     case 'AUDIO':
       return (
-        <div className="block-audio-content glass-effect">
-          <audio controls src={block.audioUrl} />
+        <div className="block-audio-content">
+          <div className="audio-wrapper glass-effect">
+            {showResumePrompt && (
+              <div className="resume-overlay glass-effect">
+                <div className="resume-card">
+                  <p>Bạn đang nghe dở. Tiếp tục từ <b>{Math.floor(progress.lastTimestamp / 60)}:{(Math.floor(progress.lastTimestamp % 60)).toString().padStart(2, '0')}</b>?</p>
+                  <div className="resume-btns">
+                    <button onClick={handleResume} className="btn-resume primary"><Play size={18} /> Nghe tiếp</button>
+                    <button onClick={handleStartFromBeginning} className="btn-resume secondary"><RefreshCcw size={18} /> Bắt đầu lại</button>
+                  </div>
+                </div>
+              </div>
+            )}
+            <audio 
+              ref={mediaRef}
+              controls 
+              src={block.audioUrl} 
+              onTimeUpdate={handleTimeUpdate}
+              style={{ width: '100%' }}
+            />
+          </div>
           {block.contentVi && <div className="audio-description">{block.contentVi}</div>}
           {renderFooter()}
         </div>

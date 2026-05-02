@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN srs_daily_limit INTEGER DEFAULT 80;

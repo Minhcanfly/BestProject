@@ -55,6 +55,17 @@ Dữ liệu chi tiết bao gồm:
 
 ---
 
+## 🛠️ 3. Đặc tả Chức năng chi tiết
+| Chức năng | Mô tả chi tiết nghiệp vụ | Trạng thái |
+| :--- | :--- | :--- |
+| **Master Data Library** | Hệ thống dữ liệu Kanji, Vocabulary, Grammar N5-N1 | ✅ Hoàn thiện |
+| **Search Engine** | Tìm kiếm Full-text, hỗ trợ Romaji/Kana/Kanji/Việt | ✅ Hoàn thiện |
+| **Notebook System** | Quản lý Folder, thêm từ vào sổ tay cá nhân | ✅ Hoàn thiện |
+| **Custom Item CRUD** | Cho phép user tự thêm từ vựng/ngữ pháp cá nhân | ✅ Hoàn thiện |
+| **Personal Notes** | Lưu ghi chú, mẹo nhớ (mnemonics) cho từng từ | ✅ Hoàn thiện |
+| **Media Library** | Tích hợp Audio mẫu và Stroke order (SVG) cho Kanji | ✅ Hoàn thiện |
+| **SRS Linking** | Tự động đồng bộ hóa Sổ tay với hàng chờ ôn tập SRS | ✅ Hoàn thiện |
+
 ## ⚖️ 4. Quy tắc & Kỹ thuật quản lý dữ liệu
 
 ### 🔍 Chiến lược Tìm kiếm

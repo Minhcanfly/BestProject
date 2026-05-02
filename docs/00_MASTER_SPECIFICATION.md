@@ -38,7 +38,7 @@ SakuraLearn là nền tảng học tiếng Nhật JLPT N5–N1 dành riêng cho 
 ## 🏗️ II. CHI TIẾT 8 MODULE & LUỒNG NGHIỆP VỤ LÕI
 
 ### 🔐 MODULE 1: Authentication & User Management
-- **Trạng thái:** Đã hoàn thiện – Không cần nâng cấp lớn ở giai đoạn MVP.
+- **Trạng thái:** Đã hoàn thiện (Demo-ready) ✅
 - **Chức năng chính:** 
   - Đăng ký / Đăng nhập qua Email + Password.
   - Double Opt-in (Xác thực qua email).
@@ -52,7 +52,7 @@ SakuraLearn là nền tảng học tiếng Nhật JLPT N5–N1 dành riêng cho 
   - **Forgot password:** Luồng reset hoàn chỉnh qua mã OTP hoặc Link.
 
 ### 📚 MODULE 2: Course & Lesson Management
-- **Trạng thái:** Đã có khung logic - Sẵn sàng mở rộng.
+- **Trạng thái:** Đã hoàn thiện (Demo-ready) ✅
 - **Chức năng chính:**
   - **Course:** CRUD khóa học, hỗ trợ title/desc đa ngôn ngữ, JLPT level, giá (free/paid), thumbnail, trạng thái Draft/Published.
   - **Lesson:** CRUD bài học, sắp xếp theo `order_index`.
@@ -63,7 +63,7 @@ SakuraLearn là nền tảng học tiếng Nhật JLPT N5–N1 dành riêng cho 
 - **Gợi ý nâng cấp:** Recommended Courses (Gợi ý theo JLPT), Teacher Resources (Upload PDF đính kèm), Course Teaser (Cho phép học thử bài đầu tiên).
 
 ### 🎓 MODULE 3: Learning Experience & Progress
-- **Trạng thái:** Tập trung vào Tracking & UX.
+- **Trạng thái:** Đã hoàn thiện (Demo-ready) ✅
 - **Chức năng chính:**
   - Tích hợp trình phát đa phương tiện: Video player, Audio player, Text reader.
   - Theo dõi tiến độ khóa học: Mark as Completed (Thủ công / Tự động cập nhật `%` realtime).
@@ -72,7 +72,7 @@ SakuraLearn là nền tảng học tiếng Nhật JLPT N5–N1 dành riêng cho 
 - **Gợi ý nâng cấp:** Auto-Complete Logic (tự hoàn thành khi xem ≥ 80–90% video), Continue Learning (Nút học tiếp ngay trên Dashboard), Personal Notes (Ghi chú cá nhân).
 
 ### 📖 MODULE 4: Knowledge Base (Dictionary)
-- **Trạng thái:** Hệ sinh thái nội dung từ điển.
+- **Trạng thái:** Đã hoàn thiện (Demo-ready) ✅
 - **Chức năng chính:**
   - **Tra cứu sâu:** Kanji (Radical, Onyomi/Kunyomi, Stroke order), Vocabulary (Audio, Nghĩa Vi/En, Part of speech), Grammar (Pattern, Giải thích tiếng Việt).
   - **Knowledge Graph:** Liên kết kiến thức giữa Kanji ↔ Radical ↔ Vocab.
@@ -80,7 +80,7 @@ SakuraLearn là nền tảng học tiếng Nhật JLPT N5–N1 dành riêng cho 
 - **Gợi ý nâng cấp:** Stroke Animation (Hiển thị diễn họa cách viết qua KanjiVG), Related Items (Sentence mining), Furigana Support.
 
 ### 🧠 MODULE 5: Review & Practice (SRS)
-- **Trạng thái:** Module cốt lõi tạo nên sự khác biệt.
+- **Trạng thái:** Đã hoàn thiện (Demo-ready) ✅
 - **Chức năng chính:**
   - **My Notebook:** Quản lý Flashcard cá nhân.
   - **Thuật toán SM-2:** Lõi tự động tính toán `interval`, `due_date`, `ease_factor`, `reps` cho từng thẻ.

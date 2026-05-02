@@ -17,4 +17,12 @@ public interface LessonBlockRepository extends JpaRepository<LessonBlock, UUID> 
     boolean existsByLessonIdAndOrderIndexAndIdNotAndIsDeletedFalse(UUID lessonId, Integer orderIndex, UUID id);
     
     long countByLessonCourseIdAndIsDeletedFalse(UUID courseId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("UPDATE LessonBlock b SET b.isDeleted = true WHERE b.lesson.id = :lessonId")
+    void softDeleteByLessonId(UUID lessonId);
+
+    @org.springframework.data.jpa.repository.Modifying
+    @org.springframework.data.jpa.repository.Query("UPDATE LessonBlock b SET b.isDeleted = true WHERE b.lesson.course.id = :courseId")
+    void softDeleteByCourseId(UUID courseId);
 }

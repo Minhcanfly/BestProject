@@ -118,12 +118,21 @@ public class NotebookService {
         int level4 = flashcardRepository.countByUserIdAndRepsBetween(userId, 3, 3);
         int level5 = flashcardRepository.countByUserIdAndRepsGreaterThanEqual(userId, 4);
 
+        User user = userRepository.findById(userId).orElseThrow();
+        OffsetDateTime todayStart = OffsetDateTime.now().withHour(0).withMinute(0).withSecond(0).withNano(0);
+        int todayReviewed = (int) flashcardReviewRepository.countByUserIdAndReviewedAtAfter(userId, todayStart);
+        int dailyLimit = user.getSrsDailyLimit();
+        int remaining = Math.max(0, dailyLimit - todayReviewed);
+
         return SrsStatsResponse.builder()
                 .level1(level1)
                 .level2(level2)
                 .level3(level3)
                 .level4(level4)
                 .level5(level5)
+                .todayReviewedCount(todayReviewed)
+                .dailyLimit(dailyLimit)
+                .remainingToday(remaining)
                 .build();
     }
 
@@ -353,8 +362,17 @@ public class NotebookService {
         
         if (srsMode) {
             OffsetDateTime now = OffsetDateTime.now();
+            OffsetDateTime todayStart = now.withHour(0).withMinute(0).withSecond(0).withNano(0);
+            
+            // Get user's daily limit
+            User user = userRepository.findById(userId).orElseThrow();
+            int dailyLimit = user.getSrsDailyLimit();
+            int reviewedToday = (int) flashcardReviewRepository.countByUserIdAndReviewedAtAfter(userId, todayStart);
+            int remainingAllowed = Math.max(0, dailyLimit - reviewedToday);
+
             cards = cards.stream()
                     .filter(c -> c.getDueDate().isBefore(now))
+                    .limit(remainingAllowed) // Apply daily limit
                     .collect(Collectors.toList());
         }
         
@@ -414,6 +432,11 @@ public class NotebookService {
                 });
                 break;
         }
+        
+        // Fetch note from UserNotebook if available
+        userNotebookRepository.findByUserIdAndItemTypeAndItemId(card.getUser().getId(), card.getItemType(), card.getItemId())
+            .ifPresent(un -> builder.note(un.getNote()));
+            
         return builder.build();
     }
 

@@ -11,6 +11,7 @@ import {
   Trash2,
   Bookmark
 } from 'lucide-react';
+import { notebookService } from '../../services/notebookService';
 import PracticeModePopup from './PracticeModePopup';
 import { ROUTES } from '../../constants/routes';
 import './FolderDetail.css';
@@ -31,23 +32,14 @@ const FolderDetail = () => {
     const fetchFolderData = async () => {
       setLoading(true);
       try {
-        const token = localStorage.getItem('token');
-        const headers = { 'Authorization': `Bearer ${token}` };
-
-        // Fetch folders to find this one
-        const foldersRes = await fetch('http://localhost:8080/api/v1/notebook/folders', { headers });
-        if (foldersRes.ok) {
-            const folders = await foldersRes.json();
-            const currentFolder = folders.find(f => f.id === id);
-            setFolder(currentFolder);
-        }
-
-        // Fetch items
-        const itemsRes = await fetch(`http://localhost:8080/api/v1/notebook/folders/${id}/items`, { headers });
-        if (itemsRes.ok) {
-            const itemsData = await itemsRes.json();
-            setItems(itemsData);
-        }
+        const [foldersRes, itemsRes] = await Promise.all([
+          notebookService.getFolders(),
+          notebookService.getFolderItems(id)
+        ]);
+        
+        const currentFolder = foldersRes.data?.find(f => f.id === id);
+        setFolder(currentFolder);
+        setItems(itemsRes.data || []);
       } catch (error) {
         console.error("Failed to fetch folder details", error);
       } finally {
@@ -61,11 +53,7 @@ const FolderDetail = () => {
   const handleDeleteItem = async (itemId) => {
     if (!window.confirm("Xóa từ này khỏi sổ tay?")) return;
     try {
-        const token = localStorage.getItem('token');
-        await fetch(`http://localhost:8080/api/v1/notebook/items/${itemId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        await notebookService.deleteNotebookItem(itemId);
         setItems(items.filter(item => item.id !== itemId));
     } catch (error) {
         console.error("Failed to delete item", error);
@@ -83,7 +71,7 @@ const FolderDetail = () => {
     
     switch (sortBy) {
         case 'oldest': return result.sort((a, b) => new Date(a.addedAt) - new Date(b.addedAt));
-        case 'az': return result.sort((a, b) => a.word.localeCompare(b.word));
+        case 'az': return result.sort((a, b) => (a.word || "").localeCompare(b.word || ""));
         case 'newest':
         default: return result.sort((a, b) => new Date(b.addedAt) - new Date(a.addedAt));
     }
@@ -96,15 +84,7 @@ const FolderDetail = () => {
     if (newNote === null || newNote === item.note) return;
 
     try {
-        const token = localStorage.getItem('token');
-        await fetch(`http://localhost:8080/api/v1/notebook/items/${item.id}/note`, {
-            method: 'PUT',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ note: newNote })
-        });
+        await notebookService.updateItemNote(item.id, newNote);
         setItems(items.map(i => i.id === item.id ? { ...i, note: newNote } : i));
     } catch (error) {
         console.error("Failed to update note", error);
@@ -114,23 +94,13 @@ const FolderDetail = () => {
   const handleAddCustom = async (e) => {
     e.preventDefault();
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8080/api/v1/notebook/custom/add', {
-            method: 'POST',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ ...customForm, folderId: id })
-        });
-        if (response.ok) {
+        const response = await notebookService.addCustomItem({ ...customForm, folderId: id });
+        if (response.data) {
             setIsAddModalOpen(false);
             setCustomForm({ word: '', reading: '', meaning: '', note: '' });
             // Re-fetch items
-            const itemsRes = await fetch(`http://localhost:8080/api/v1/notebook/folders/${id}/items`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (itemsRes.ok) setItems(await itemsRes.json());
+            const itemsRes = await notebookService.getFolderItems(id);
+            setItems(itemsRes.data || []);
         }
     } catch (error) {
         console.error("Failed to add custom item", error);
@@ -145,12 +115,8 @@ const FolderDetail = () => {
   const handleDeleteFolder = async () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa sổ tay này và tất cả từ vựng bên trong không?")) return;
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8080/api/v1/notebook/folders/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) navigate('/notebook');
+        await notebookService.deleteFolder(id);
+        navigate('/notebook');
     } catch (error) {
         console.error("Failed to delete folder", error);
     }
@@ -161,16 +127,7 @@ const FolderDetail = () => {
     if (!newName || newName === folder.name) return;
 
     try {
-        const token = localStorage.getItem('token');
-        await fetch(`http://localhost:8080/api/v1/notebook/folders/${id}`, {
-            method: 'PUT',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name: newName, description: folder.description || '' })
-        });
-        // Update local state
+        await notebookService.updateFolder(id, newName, folder.description || '');
         setFolder({ ...folder, name: newName });
     } catch (error) {
         console.error("Failed to edit folder", error);

@@ -21,13 +21,13 @@ Xây dựng lớp bảo mật vững chắc (Security Backbone) và hệ thống
 ---
 
 ## 3. Đặc tả Chức năng & Phân quyền
-| Chức năng | Chi tiết kỹ thuật | Role |
-| :--- | :--- | :--- |
-| **Auth Core** | Đăng ký, Đăng nhập, Quên mật khẩu (OTP) | Public |
-| **Verify Email** | Xác thực qua link email, kích hoạt tài khoản | Student |
-| **Role Mgmt** | Phân quyền STUDENT, TEACHER, ADMIN | Admin |
-| **Profile Mgmt** | Cập nhật thông tin, thay đổi Avatar (MinIO) | User |
-| **Audit Tracking** | Ghi log `created_by`, `updated_by`, `created_at` | System |
+| Chức năng | Chi tiết kỹ thuật | Role | Trạng thái |
+| :--- | :--- | :--- | :--- |
+| **Auth Core** | Đăng ký, Đăng nhập, Quên mật khẩu (OTP) | Public | ✅ Hoàn thiện |
+| **Verify Email** | Xác thực qua link email, kích hoạt tài khoản | Student | ✅ Hoàn thiện |
+| **Role Mgmt** | Phân quyền STUDENT, TEACHER, ADMIN | Admin | ✅ Hoàn thiện |
+| **Profile Mgmt** | Cập nhật thông tin, thay đổi Avatar (MinIO) | User | ✅ Hoàn thiện |
+| **Audit Tracking** | Ghi log `created_by`, `updated_by`, `created_at` | System | ✅ Hoàn thiện |
 
 ---
 
@@ -42,11 +42,11 @@ Xây dựng lớp bảo mật vững chắc (Security Backbone) và hệ thống
 ## 🚩 NHIỆM VỤ CÒN LẠI (REMAINING TASKS)
 
 ### 🔴 Cần hoàn thiện (Critical)
-- [ ] **Quên mật khẩu**: Triển khai luồng Reset Password qua Email (OTP hoặc Link).
-- [ ] **Validation nâng cao**: Chặn các ký tự đặc biệt trong Username và kiểm tra độ mạnh mật khẩu (Password Strength).
+- [x] **Quên mật khẩu**: Triển khai luồng Reset Password qua Email (OTP hoặc Link). (Đã hoàn thành ✅)
+- [x] **Validation nâng cao**: Chặn các ký tự đặc biệt trong Username và kiểm tra độ mạnh mật khẩu (Password Strength). (Đã hoàn thành ✅)
 
 ### 🟡 Nâng cấp tính năng (Enhancements)
-- [ ] **Social Login**: Tích hợp Google OAuth2 để người dùng đăng nhập nhanh.
+- [x] **Social Login**: Tích hợp Google OAuth2 để người dùng đăng nhập nhanh. (Đã hoàn thành ✅)
 - [ ] **Multi-Session Mgmt**: Cho phép người dùng xem và đăng xuất từ các thiết bị khác (Revoke Refresh Token).
 - [ ] **Account Locking**: Tự động khóa tài khoản sau 5 lần nhập sai mật khẩu liên tiếp.
 

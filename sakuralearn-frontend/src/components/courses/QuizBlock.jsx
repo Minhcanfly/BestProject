@@ -9,7 +9,7 @@ const QuizBlock = ({ blockId, onComplete }) => {
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerChecked, setIsAnswerChecked] = useState(false);
-  const [results, setResults] = useState([]); // Store correct/wrong for each question
+  const [userAnswers, setUserAnswers] = useState({}); // Store questionId -> answer
   const [isFinished, setIsFinished] = useState(false);
   const [finalScore, setFinalScore] = useState(0);
   const [error, setError] = useState(null);
@@ -49,8 +49,10 @@ const QuizBlock = ({ blockId, onComplete }) => {
     if (!selectedOption) return;
     setIsAnswerChecked(true);
     
-    const isCorrect = selectedOption === currentQuestion.correctAnswer;
-    setResults(prev => [...prev, { questionId: currentQuestion.id, isCorrect }]);
+    setUserAnswers(prev => ({
+      ...prev,
+      [currentQuestion.id]: selectedOption
+    }));
   };
 
   const handleNextQuestion = () => {
@@ -66,22 +68,21 @@ const QuizBlock = ({ blockId, onComplete }) => {
   const finishQuiz = async () => {
     setLoading(true);
     try {
-      // Calculate score locally for immediate UI, then sync with server
-      const correctCount = results.reduce((acc, curr) => acc + (curr.isCorrect ? 1 : 0), 0);
+      // Calculate score locally for immediate UI
+      let correctCount = 0;
+      quiz.questions.forEach(q => {
+        if (userAnswers[q.id] === q.correctAnswer) {
+          correctCount++;
+        }
+      });
+
       const score = (correctCount / quiz.questions.length) * 100;
       setFinalScore(score);
       setIsFinished(true);
 
       // Submit to server
-      const submissionAnswers = {};
-      results.forEach((res, idx) => {
-          // We need the selected option, but results only stored isCorrect.
-          // In a real app, you'd store the actual answer.
-          // For now, let's just use a dummy or improve results state.
-      });
-
       await quizService.submitQuiz(quiz.id, {
-        answers: {}, // We'll need to improve state to send actual answers if server requires it
+        answers: userAnswers,
         timeTakenSeconds: 0
       });
 
@@ -99,7 +100,7 @@ const QuizBlock = ({ blockId, onComplete }) => {
     setCurrentQuestionIdx(0);
     setSelectedOption(null);
     setIsAnswerChecked(false);
-    setResults([]);
+    setUserAnswers({});
     setIsFinished(false);
     setFinalScore(0);
   };
@@ -121,7 +122,7 @@ const QuizBlock = ({ blockId, onComplete }) => {
           <div className="result-stats">
             <div className="stat-item-mini">
               <span>Đúng</span>
-              <b>{results.filter(r => r.isCorrect).length}</b>
+              <b>{quiz.questions.filter(q => userAnswers[q.id] === q.correctAnswer).length}</b>
             </div>
             <div className="stat-item-mini">
               <span>Tổng câu</span>

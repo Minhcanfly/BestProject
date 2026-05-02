@@ -65,6 +65,12 @@ public class Course {
     @Formula("(SELECT COUNT(*) FROM lessons l WHERE l.course_id = id AND l.is_deleted = false)")
     private Integer lessonCount;
 
+    @Formula("(SELECT COALESCE(AVG(r.rating), 0) FROM reviews r WHERE r.course_id = id)")
+    private Double averageRating;
+
+    @Formula("(SELECT COUNT(*) FROM reviews r WHERE r.course_id = id)")
+    private Integer reviewCount;
+
     @Column(name = "is_deleted")
     @Builder.Default
     private Boolean isDeleted = false;

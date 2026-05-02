@@ -54,8 +54,8 @@ public class AuthController {
     }
 
     @PostMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-        authService.resetPassword(token, newPassword);
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody com.sakuralearn.sakuralearn_backend.dto.request.ResetPasswordRequest request) {
+        authService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok(Map.of("message", "Mật khẩu của bạn đã được thay đổi thành công!"));
     }
 }

@@ -14,4 +14,5 @@ public interface CourseService {
     List<CourseResponse> getCoursesByLevel(String jlptLevel);
     List<CourseResponse> getManagedCourses(UUID userId, boolean isAdmin);
     CourseResponse getCourseById(UUID id);
+    List<CourseResponse> searchCourses(String keyword, String jlptLevel, Double maxPrice);
 }

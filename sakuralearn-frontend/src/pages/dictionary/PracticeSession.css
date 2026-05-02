@@ -108,11 +108,12 @@
 }
 
 .practice-page .japanese-text {
-    font-size: clamp(1.5rem, 10vw, 4.5rem);
+    font-size: clamp(1.5rem, 6vw, 3.5rem);
     margin-bottom: 1rem;
     line-height: 1.2;
     word-break: break-word;
     width: 100%;
+    transition: font-size 0.2s ease;
 }
 
 .hint {
@@ -120,14 +121,14 @@
 }
 
 .reading {
-    font-size: 2rem;
+    font-size: clamp(1.2rem, 4vw, 1.8rem);
     color: var(--primary);
     margin-bottom: 1rem;
     word-break: break-word;
 }
 
 .meaning {
-    font-size: 1.4rem;
+    font-size: clamp(1rem, 3vw, 1.4rem);
     color: #ccc;
     line-height: 1.5;
     word-break: break-word;
@@ -256,4 +257,20 @@
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
+}
+
+.mnemonic-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 15px;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    color: #888;
+    font-size: 0.9rem;
+    font-style: italic;
+    width: 100%;
+    text-align: left;
 }

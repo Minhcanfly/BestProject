@@ -7,12 +7,12 @@
 ## 2. Các mục tiêu chưa đạt / Cần nâng cấp (Remaining Tasks)
 
 ### 🔴 Lỗi & Thiếu sót Logic (Critical)
-- **Logic hoàn thành Audio**: Hiện tại Audio chưa có logic tự động đánh dấu hoàn thành khi nghe đủ 80% thời lượng.
-- **Lưu trạng thái bài học (Resume State)**: Nếu user xem dở Video ở phút thứ 5 rồi tắt app, lần sau mở lại chưa resume được đúng vị trí cũ.
-- **Tiến độ realtime**: Khi chuyển bài, progress cập nhật hơi chậm hoặc yêu cầu tải lại trang. Cần cơ chế cập nhật UI tức thời (Optimistic Update) hoặc WebSocket nếu muốn mượt hơn.
+- [x] **Logic hoàn thành Audio**: (Đã xong ✅ - Tự động mark done khi nghe >80%)
+- [x] **Lưu trạng thái bài học (Resume State)**: (Đã xong ✅ - Ghi nhớ `lastTimestamp` cho cả Audio và Video)
+- [x] **Tiến độ realtime**: (Đã xong ✅ - Thêm chỉ báo "Saving Progress" và cập nhật UI ngay lập tức)
 
 ### 🟡 Tính năng nâng cấp (Enhancements)
-- **Thông điệp khích lệ (Motivational UI)**: Thiếu các popup/thông báo cổ vũ khi người dùng đạt các mốc tiến độ quan trọng (VD: "Bạn đã xong 50% khóa học!").
-- **Dark Mode**: Giao diện `LearningView` cần hỗ trợ Dark Mode chuẩn vì người Việt thường học vào ban đêm.
+- [x] **Thông điệp khích lệ (Motivational UI)**: (Đã xong ✅ - Thêm popup cổ vũ ngẫu nhiên khi hoàn thành block)
+- [x] **Dark Mode**: (Đã xong ✅ - `LearningView` đã có giao diện Deep Dark tối ưu cho ban đêm)
 - **Ghi chú cá nhân (Personal Notes)**: Đã có bảng `PersonalNote` nhưng UI tương tác trong lúc học chưa thực sự tiện lợi, có vẻ hơi dư thừa/trồng chéo với Notebook của Module 4. Cần chuẩn hóa cách lưu Note trong lúc học.
 - **Xử lý Edge Case**: Graceful fallback khi Teacher sửa nội dung LessonBlock trong lúc học viên đang mở trang học.

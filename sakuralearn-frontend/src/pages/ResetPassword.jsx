@@ -74,7 +74,7 @@ const ResetPassword = () => {
                         <input
                             type="password"
                             required
-                            minLength="6"
+                            minLength="8"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             style={{
@@ -86,6 +86,9 @@ const ResetPassword = () => {
                                 color: 'white'
                             }}
                         />
+                        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '8px' }}>
+                            Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@#$%^&+=!)
+                        </p>
                     </div>
 
                     <div style={{ marginBottom: '30px' }}>
@@ -93,6 +96,7 @@ const ResetPassword = () => {
                         <input
                             type="password"
                             required
+                            minLength="8"
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             style={{

@@ -7,11 +7,13 @@
 ## 2. Các mục tiêu chưa đạt / Cần nâng cấp (Remaining Tasks)
 
 ### 🔴 Cải thiện tính năng (Must Have)
-- **Liên kết Knowledge Graph còn yếu**: Việc click từ Kanji ra các từ vựng chứa Kanji đó làm tốt, nhưng từ Vocab click ngược lại xem chi tiết Kanji cấu thành còn rất sơ sài, thiếu dữ liệu.
-- **Dữ liệu Mẹo nhớ (Mnemonics)**: Các trường dữ liệu về mẹo nhớ Kanji/Từ vựng đang để trống hoặc sơ sài. Cần thiết kế giao diện hiển thị mnemonic rõ ràng.
-- **Tham chiếu Giáo trình**: Việc phân loại từ vựng theo giáo trình (Minna no Nihongo, Sou Matome) chưa hiển thị rõ ở giao diện (mặc dù specs có nhắc đến).
+- [x] **Liên kết Knowledge Graph**: (Đã xong ✅ - Hỗ trợ click tra cứu chéo và hiển thị Hán tự cấu thành chi tiết)
+- [x] **Dữ liệu Mẹo nhớ (Mnemonics)**: (Đã xong ✅ - Tích hợp hiển thị trong Sổ tay, Flashcards và Sidebar chi tiết)
+- [x] **Cải thiện trang chi tiết (Mazii-style)**: (Đã xong ✅ - Layout 2 cột, phân tích Hán tự động, Ví dụ dạng hội thoại)
+- [ ] **Tham chiếu Giáo trình**: (Giai đoạn 3 - Đang chờ dữ liệu)
 
-### 🟡 Tính năng mở rộng (Enhancements)
-- **Diễn họa thứ tự nét viết (Stroke Animation)**: Hiện Kanji chỉ là ảnh tĩnh. Cần tích hợp thư viện vẽ SVG (VD: `hanzi-writer` chỉnh sửa cho tiếng Nhật) để tạo độ "wow" cho app.
-- **Search Engine**: Công cụ tìm kiếm hiện tại dựa trên PostgreSQL. Khi data lớn, cần chuyển sang tìm kiếm mờ (Fuzzy Search) hoặc dùng Elasticsearch.
-- **Custom Item Review**: Cần làm quy trình duyệt (Review) cho các "Custom Item" từ User. Nếu nhiều user cùng thêm 1 từ giống nhau, Admin nên duyệt nó thành Global Master Data.
+### 🟡 Tính năng nâng cấp (Phát triển tiếp ở Giai đoạn sau)
+- [ ] **Diễn họa thứ tự nét viết (Stroke Animation)**: (Đã có SVG tĩnh, sẽ nâng cấp lên hanzi-writer ở Phase sau)
+- [ ] **Tìm kiếm bằng cách vẽ tay (Handwriting Recognition)**: (Giai đoạn 3 - Tích hợp nhận diện chữ Hán qua canvas vẽ tay)
+- [ ] **Search Engine (Elasticsearch)**: (Sẽ triển khai khi data > 10.000 records)
+- [ ] **Custom Item Review System**: (Giai đoạn 3 - Xây dựng luồng duyệt nội dung cộng đồng)

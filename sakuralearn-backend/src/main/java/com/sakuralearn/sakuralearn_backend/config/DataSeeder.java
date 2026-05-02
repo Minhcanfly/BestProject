@@ -17,11 +17,15 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+@org.springframework.context.annotation.Profile("dev")
 public class DataSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+
+    @org.springframework.beans.factory.annotation.Value("${INITIAL_ADMIN_PASSWORD:admin123}")
+    private String initialAdminPassword;
 
     @Override
     @Transactional
@@ -43,14 +47,14 @@ public class DataSeeder implements CommandLineRunner {
                     .email(adminEmail)
                     .username("admin")
                     .fullName("Sakura System Admin")
-                    .passwordHash(passwordEncoder.encode("admin123"))
+                    .passwordHash(passwordEncoder.encode(initialAdminPassword))
                     .roles(Collections.singleton(adminRole))
                     .isActive(true)
                     .emailVerified(true)
                     .build();
 
             userRepository.save(admin);
-            log.info("Default Admin created -> Email: {} | Password: {}", adminEmail, "admin123");
+            log.info("Default Admin created with email: {}", adminEmail);
         } else {
             log.info("Admin account already exists.");
         }

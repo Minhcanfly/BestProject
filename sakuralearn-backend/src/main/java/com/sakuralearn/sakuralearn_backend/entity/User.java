@@ -81,6 +81,10 @@ public class User {
     @Builder.Default
     private Integer dailyGoal = 20;
 
+    @Column(name = "srs_daily_limit")
+    @Builder.Default
+    private Integer srsDailyLimit = 80;
+
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "user_roles",

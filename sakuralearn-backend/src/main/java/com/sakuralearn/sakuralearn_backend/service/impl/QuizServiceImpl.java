@@ -26,6 +26,7 @@ public class QuizServiceImpl implements QuizService {
     private final LessonRepository lessonRepository;
     private final LessonBlockRepository lessonBlockRepository;
     private final UserRepository userRepository;
+    private final com.sakuralearn.sakuralearn_backend.service.ProgressService progressService;
 
     @Override
     @Transactional
@@ -123,6 +124,14 @@ public class QuizServiceImpl implements QuizService {
         if (scorePercentage >= 70.0) {
             user.setXp(user.getXp() + 10); // Reward 10 XP
             userRepository.save(user);
+
+            // Mark lesson block as completed
+            if (quiz.getLessonBlock() != null) {
+                com.sakuralearn.sakuralearn_backend.dto.request.LessonBlockProgressRequest progressRequest = 
+                    new com.sakuralearn.sakuralearn_backend.dto.request.LessonBlockProgressRequest();
+                progressRequest.setIsCompleted(true);
+                progressService.updateBlockProgress(userId, quiz.getLessonBlock().getId(), progressRequest);
+            }
         }
 
         return savedAttempt;

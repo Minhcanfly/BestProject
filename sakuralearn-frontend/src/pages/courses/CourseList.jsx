@@ -8,17 +8,26 @@ const CourseList = () => {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedLevel, setSelectedLevel] = useState('ALL');
+  const [maxPrice, setMaxPrice] = useState('');
 
   const levels = ['ALL', 'N5', 'N4', 'N3', 'N2', 'N1'];
 
   useEffect(() => {
-    fetchCourses();
-  }, [selectedLevel]);
+    const timer = setTimeout(() => {
+      fetchCourses();
+    }, 500); // Debounce keyword search
+
+    return () => clearTimeout(timer);
+  }, [selectedLevel, searchKeyword, maxPrice]);
 
   const fetchCourses = async () => {
     setLoading(true);
     try {
-      const params = selectedLevel !== 'ALL' ? { jlptLevel: selectedLevel } : {};
+      const params = {
+        jlptLevel: selectedLevel !== 'ALL' ? selectedLevel : null,
+        keyword: searchKeyword.trim() || null,
+        maxPrice: maxPrice || null
+      };
       const response = await courseService.getAllCourses(params);
       // Filter out drafts for public viewing
       const publishedCourses = response.data.filter(c => c.isPublished);
@@ -29,10 +38,6 @@ const CourseList = () => {
       setLoading(false);
     }
   };
-
-  const displayedCourses = courses.filter((course) =>
-    (course.titleVi || '').toLowerCase().includes(searchKeyword.trim().toLowerCase())
-  );
 
   return (
     <div className="course-list-page">
@@ -53,14 +58,25 @@ const CourseList = () => {
             </button>
           ))}
         </div>
-        <div className="search-mini">
-           <input
-             type="text"
-             placeholder="Tìm khóa học..."
-             className="search-input-mini"
-             value={searchKeyword}
-             onChange={(e) => setSearchKeyword(e.target.value)}
-           />
+        <div className="search-group">
+          <div className="price-filter">
+             <input
+               type="number"
+               placeholder="Giá tối đa..."
+               className="search-input-mini price-input"
+               value={maxPrice}
+               onChange={(e) => setMaxPrice(e.target.value)}
+             />
+          </div>
+          <div className="search-mini">
+             <input
+               type="text"
+               placeholder="Tìm khóa học..."
+               className="search-input-mini"
+               value={searchKeyword}
+               onChange={(e) => setSearchKeyword(e.target.value)}
+             />
+          </div>
         </div>
       </div>
 
@@ -71,14 +87,14 @@ const CourseList = () => {
         </div>
       ) : (
         <div className="course-grid">
-          {displayedCourses.length > 0 ? (
-            displayedCourses.map(course => (
+          {courses.length > 0 ? (
+            courses.map(course => (
               <CourseCard key={course.id} course={course} />
             ))
           ) : (
             <div className="no-courses glass-effect">
-              <h3>Chưa có khóa học nào ở cấp độ này</h3>
-              <p>Vui lòng chọn cấp độ khác hoặc quay lại sau nhé!</p>
+              <h3>Chưa tìm thấy khóa học nào phù hợp</h3>
+              <p>Thử thay đổi từ khóa hoặc bộ lọc xem sao nhé!</p>
             </div>
           )}
         </div>

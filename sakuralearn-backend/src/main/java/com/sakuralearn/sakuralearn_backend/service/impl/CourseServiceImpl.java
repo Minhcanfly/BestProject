@@ -26,6 +26,8 @@ public class CourseServiceImpl implements CourseService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final LessonRepository lessonRepository;
+    private final com.sakuralearn.sakuralearn_backend.repository.LessonBlockRepository lessonBlockRepository;
+    private final com.sakuralearn.sakuralearn_backend.repository.ReviewRepository reviewRepository;
     private final FileStorageService fileStorageService;
     private final CourseMapper courseMapper;
 
@@ -85,6 +87,10 @@ public class CourseServiceImpl implements CourseService {
         
         course.setIsDeleted(true);
         courseRepository.save(course);
+
+        // Cascade soft delete to lessons and blocks
+        lessonRepository.softDeleteByCourseId(id);
+        lessonBlockRepository.softDeleteByCourseId(id);
     }
 
     @Override
@@ -134,6 +140,9 @@ public class CourseServiceImpl implements CourseService {
                 response.setLessonCount(count);
             }
             
+            response.setAverageRating(reviewRepository.getAverageRatingByCourseId(course.getId()));
+            response.setReviewCount((int) reviewRepository.countByCourseId(course.getId()));
+            
             return response;
         }).toList();
     }
@@ -153,6 +162,8 @@ public class CourseServiceImpl implements CourseService {
                 response.setTeacherName(course.getTeacher().getFullName());
             }
             response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(course.getId()));
+            response.setAverageRating(reviewRepository.getAverageRatingByCourseId(course.getId()));
+            response.setReviewCount((int) reviewRepository.countByCourseId(course.getId()));
             return response;
         }).toList();
     }
@@ -170,11 +181,29 @@ public class CourseServiceImpl implements CourseService {
             response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(id));
         }
         
+        response.setAverageRating(reviewRepository.getAverageRatingByCourseId(id));
+        response.setReviewCount((int) reviewRepository.countByCourseId(id));
+        
         return response;
     }
 
     private Course findCourseById(UUID id) {
         return courseRepository.findByIdAndIsDeletedFalse(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Course not found"));
+    }
+
+    @Override
+    public List<CourseResponse> searchCourses(String keyword, String jlptLevel, Double maxPrice) {
+        List<Course> courses = courseRepository.searchCourses(keyword, jlptLevel, maxPrice);
+        return courses.stream().map(course -> {
+            CourseResponse response = courseMapper.toResponse(course);
+            if (course.getTeacher() != null) {
+                response.setTeacherName(course.getTeacher().getFullName());
+            }
+            response.setLessonCount((int) lessonRepository.countByCourseIdAndIsDeletedFalse(course.getId()));
+            response.setAverageRating(reviewRepository.getAverageRatingByCourseId(course.getId()));
+            response.setReviewCount((int) reviewRepository.countByCourseId(course.getId()));
+            return response;
+        }).toList();
     }
 }

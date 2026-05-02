@@ -1,0 +1,24 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+  flyway:
+    enabled: false # Disable flyway for fast unit tests, let JPA create schema
+  
+  # Mock/Disable external services for tests
+  kafka:
+    enabled: false
+  data:
+    redis:
+      repositories:
+        enabled: false
+  mail:
+    host: localhost
+    port: 1025

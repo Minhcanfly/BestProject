@@ -17,6 +17,9 @@ const CourseDetail = () => {
   const [loading, setLoading] = useState(true);
   const [enrolling, setEnrolling] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [reviews, setReviews] = useState([]);
+  const [myReview, setMyReview] = useState({ rating: 5, content: '' });
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   const isEnrolled = !!enrollment;
 
@@ -28,14 +31,16 @@ const CourseDetail = () => {
     setLoading(true);
     setErrorMessage('');
     try {
-      const [courseRes, lessonsRes, enrollRes] = await Promise.all([
+      const [courseRes, lessonsRes, enrollRes, reviewsRes] = await Promise.all([
         courseService.getCourseById(id),
         lessonService.getLessonsByCourse(id),
-        enrollmentService.checkEnrollment(id).catch(() => ({ data: null }))
+        enrollmentService.checkEnrollment(id).catch(() => ({ data: null })),
+        courseService.getReviewsByCourse(id)
       ]);
       setCourse(courseRes.data);
       setLessons(lessonsRes.data);
       setEnrollment(enrollRes.data);
+      setReviews(reviewsRes.data || []);
     } catch (error) {
       console.error('Error fetching course details:', error);
       setErrorMessage(getApiErrorMessage(error, 'Không thể tải thông tin khóa học.'));
@@ -54,12 +59,33 @@ const CourseDetail = () => {
     try {
       setErrorMessage('');
       await enrollmentService.enrollInCourse(id);
-      setIsEnrolled(true);
+      setEnrollment({ progressPercentage: 0 });
       navigate(ROUTES.LEARNING(id));
     } catch (error) {
       setErrorMessage(getApiErrorMessage(error, 'Có lỗi xảy ra khi đăng ký khóa học.'));
     } finally {
       setEnrolling(false);
+    }
+  };
+
+  const handleAddReview = async (e) => {
+    e.preventDefault();
+    if (!myReview.content.trim()) return;
+    
+    setSubmittingReview(true);
+    try {
+      await courseService.addReview(id, myReview);
+      setMyReview({ rating: 5, content: '' });
+      // Refresh reviews
+      const reviewsRes = await courseService.getReviewsByCourse(id);
+      setReviews(reviewsRes.data || []);
+      // Refresh course stats (rating)
+      const courseRes = await courseService.getCourseById(id);
+      setCourse(courseRes.data);
+    } catch (error) {
+      setErrorMessage(getApiErrorMessage(error, 'Không thể gửi đánh giá.'));
+    } finally {
+      setSubmittingReview(false);
     }
   };
 
@@ -78,7 +104,7 @@ const CourseDetail = () => {
       <div className="course-hero glass-effect">
         <div className="hero-content">
           <div className="hero-text">
-            <span className="jlpt-badge-large">{course.jlptLevel}</span>
+            <span className="jlpt-badge-large">JLPT {course.jlptLevel}</span>
             <h1 className="hero-title">{course.titleVi}</h1>
             {course.titleJa && <p className="hero-title-ja">{course.titleJa}</p>}
             <div className="hero-meta">
@@ -155,6 +181,17 @@ const CourseDetail = () => {
 
         <div className="side-info">
            <div className="sticky-card glass-effect">
+              <h3>Đánh giá khóa học</h3>
+              <div className="rating-summary">
+                <div className="avg-rating">{course.averageRating?.toFixed(1) || '0.0'}</div>
+                <div className="rating-stars">
+                  {'★'.repeat(Math.round(course.averageRating || 0))}{'☆'.repeat(5 - Math.round(course.averageRating || 0))}
+                </div>
+                <div className="review-count">({course.reviewCount || 0} đánh giá)</div>
+              </div>
+           </div>
+
+           <div className="sticky-card glass-effect" style={{ marginTop: '20px' }}>
               <h3>Bạn sẽ nhận được gì?</h3>
               <ul className="perks-list">
                 <li>✅ Truy cập trọn đời</li>
@@ -164,6 +201,57 @@ const CourseDetail = () => {
               </ul>
            </div>
         </div>
+      </div>
+
+      <div className="reviews-section-container content-inner-max">
+        <section className="reviews-section glass-effect">
+          <h2>Đánh giá từ học viên</h2>
+          
+          {isEnrolled && !reviews.some(r => r.isMine) && (
+            <div className="add-review-box">
+              <h3>Chia sẻ cảm nghĩ của bạn</h3>
+              <form onSubmit={handleAddReview}>
+                <div className="star-input">
+                  {[1,2,3,4,5].map(s => (
+                    <span 
+                      key={s} 
+                      className={s <= myReview.rating ? 'star filled' : 'star'}
+                      onClick={() => setMyReview({...myReview, rating: s})}
+                    >★</span>
+                  ))}
+                </div>
+                <textarea 
+                  placeholder="Khóa học này thế nào? Bạn thích phần nào nhất?..." 
+                  value={myReview.content}
+                  onChange={e => setMyReview({...myReview, content: e.target.value})}
+                  required
+                />
+                <button type="submit" className="submit-review-btn" disabled={submittingReview}>
+                  {submittingReview ? 'Đang gửi...' : 'Gửi đánh giá'}
+                </button>
+              </form>
+            </div>
+          )}
+
+          <div className="reviews-list">
+            {reviews.length > 0 ? (
+              reviews.map(review => (
+                <div key={review.id} className="review-item">
+                  <div className="review-header">
+                    <span className="reviewer-name">{review.userFullName || 'Học viên'}</span>
+                    <div className="review-rating-stars">
+                      {'★'.repeat(review.rating)}{'☆'.repeat(5 - review.rating)}
+                    </div>
+                  </div>
+                  <p className="review-comment">{review.content}</p>
+                  <span className="review-date">{new Date(review.createdAt).toLocaleDateString('vi-VN')}</span>
+                </div>
+              ))
+            ) : (
+              <p className="no-reviews">Chưa có đánh giá nào cho khóa học này. Hãy là người đầu tiên!</p>
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

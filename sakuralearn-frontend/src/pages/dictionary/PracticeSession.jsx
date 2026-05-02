@@ -147,12 +147,23 @@ const PracticeSession = () => {
           /* FLASHCARD MODE */
           <div className="flashcard-container">
             <div className={`flip-card ${isFlipped ? 'flipped' : ''}`} onClick={() => {
+                // Autoplay on first flip
+                if (!isFlipped && !hasFlipped) {
+                    playAudio(currentCard.word);
+                }
                 setIsFlipped(!isFlipped);
                 if (!hasFlipped) setHasFlipped(true);
             }}>
               <div className="flip-card-inner">
                 <div className="flip-card-front glass-effect">
-                  <h1 className="japanese-text">{currentCard.word}</h1>
+                  <h1 
+                    className="japanese-text"
+                    style={{ 
+                      fontSize: currentCard.word?.length > 10 ? 'clamp(1.2rem, 5vw, 2.2rem)' : '' 
+                    }}
+                  >
+                    {currentCard.word}
+                  </h1>
                   <p className="hint">Chạm để xem đáp án</p>
                 </div>
                 <div className="flip-card-back glass-effect">
@@ -161,6 +172,13 @@ const PracticeSession = () => {
                     <Volume2 size={24} />
                   </button>
                   <p className="meaning">{currentCard.meaning}</p>
+                  
+                  {currentCard.note && (
+                    <div className="mnemonic-box">
+                      <Brain size={14} />
+                      <span>{currentCard.note}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -179,7 +197,14 @@ const PracticeSession = () => {
           /* QUIZ MODE */
           <div className="quiz-container">
              <div className="quiz-question glass-effect">
-                <h1 className="japanese-text">{currentCard.word}</h1>
+                <h1 
+                  className="japanese-text"
+                  style={{ 
+                    fontSize: currentCard.word?.length > 10 ? 'clamp(1.2rem, 5vw, 2.2rem)' : '' 
+                  }}
+                >
+                  {currentCard.word}
+                </h1>
                 <button className="audio-btn" onClick={() => playAudio(currentCard.word)}>
                     <Volume2 size={24} />
                 </button>

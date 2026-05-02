@@ -561,3 +561,160 @@
 
 .mnemonic-card { background: rgba(29, 209, 161, 0.1); border-left: 4px solid #1dd1a1; } 
 .grammar-structure { background: rgba(72, 219, 251, 0.1); border-left: 4px solid #48dbfb; }
+
+/* Vocab Extensions */
+.vocab-detail-layout {
+    display: grid;
+    grid-template-columns: 1fr 240px;
+    gap: 2.5rem;
+}
+
+.vocab-main-column {
+    min-width: 0;
+}
+
+.vocab-side-column {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.side-section {
+    padding: 1.2rem;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.kanji-side-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+    margin-top: 1rem;
+}
+
+.kanji-side-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.8rem;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.kanji-side-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.side-kanji-char {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--primary);
+    width: 45px;
+    text-align: center;
+}
+
+.side-kanji-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.side-kanji-reading {
+    font-size: 0.75rem;
+    color: #999;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.side-kanji-meaning {
+    font-size: 0.85rem;
+    color: #ddd;
+}
+
+.example-item.conversational {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 1rem 1.2rem;
+    border-radius: 16px;
+    border-left: 4px solid var(--primary);
+    margin-bottom: 1rem;
+}
+
+.ex-audio-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.05);
+    color: #aaa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+}
+
+.ex-audio-btn:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.section-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.text-link-btn {
+    font-size: 0.8rem;
+    color: var(--primary);
+    background: none;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.text-link-btn:hover { opacity: 1; text-decoration: underline; }
+
+.illustration-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 0;
+    opacity: 0.5;
+}
+
+.illustration-placeholder img {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+}
+
+.illustration-placeholder span {
+    font-size: 0.75rem;
+    text-align: center;
+    color: #888;
+}
+
+.mnemonic-side-section {
+    background: rgba(29, 209, 161, 0.05);
+    border-left: 3px solid #1dd1a1;
+}
+
+.side-mnemonic-text {
+    font-size: 0.9rem;
+    color: #ccc;
+    line-height: 1.5;
+}
+
+@media (max-width: 850px) {
+    .vocab-detail-layout {
+        grid-template-columns: 1fr;
+    }
+}

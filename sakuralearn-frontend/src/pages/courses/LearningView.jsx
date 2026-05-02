@@ -18,7 +18,8 @@ import {
   Home,
   BookOpen,
   ArrowRight,
-  ArrowLeft
+  ArrowLeft,
+  RefreshCcw
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import './LearningView.css';
@@ -48,6 +49,7 @@ const LearningView = () => {
   
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
 
   const currentLessonIndex = lessons.findIndex((l) => l.id === currentLesson?.id);
   const isFirstLesson = currentLessonIndex <= 0;
@@ -136,14 +138,17 @@ const LearningView = () => {
   };
 
   const handleUpdateBlockProgress = async (blockId, data) => {
+    setIsSaving(true);
     try {
       const response = await progressService.updateBlockProgress(blockId, data);
       setBlockProgressMap(prev => ({
         ...prev,
         [blockId]: response.data
       }));
+      setTimeout(() => setIsSaving(false), 1500);
     } catch (error) {
       console.error('Error updating block progress:', error);
+      setIsSaving(false);
     }
   };
 
@@ -168,6 +173,11 @@ const LearningView = () => {
       const progressRes = await progressService.getCourseProgress(courseId);
       const progVal = typeof progressRes.data === 'number' ? progressRes.data : (progressRes.data?.progressPercentage || 0);
       setProgress(progVal);
+
+      // Motivational message for block completion
+      const randomMsg = MOTIVATIONAL_MESSAGES[Math.floor(Math.random() * MOTIVATIONAL_MESSAGES.length)];
+      setSuccessMessage(randomMsg);
+      setTimeout(() => setSuccessMessage(''), 3000);
 
       // Auto-scroll to next block
       const currentIndex = blocks.findIndex(b => b.id === blockId);
@@ -350,6 +360,12 @@ const LearningView = () => {
             </div>
           </div>
         </div>
+
+        {isSaving && (
+          <div className="saving-indicator">
+            <RefreshCcw size={16} className="animate-spin" /> Đang lưu tiến độ...
+          </div>
+        )}
       </main>
 
       {/* Right Sidebar */}

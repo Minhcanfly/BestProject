@@ -8,6 +8,7 @@ import {
   Settings,
   Folder
 } from 'lucide-react';
+import { notebookService } from '../../services/notebookService';
 import PracticeModePopup from './PracticeModePopup';
 import { ROUTES } from '../../constants/routes';
 import './MyNotebook.css';
@@ -17,7 +18,8 @@ const MyNotebook = () => {
   const [folders, setFolders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [srsStats, setSrsStats] = useState({
-      level1: 0, level2: 0, level3: 0, level4: 0, level5: 0
+      level1: 0, level2: 0, level3: 0, level4: 0, level5: 0,
+      todayReviewedCount: 0, dailyLimit: 80, remainingToday: 0
   });
   const [isCreatingFolder, setIsCreatingFolder] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
@@ -27,48 +29,30 @@ const MyNotebook = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
+ 
   const fetchData = async () => {
     setLoading(true);
     try {
-        const token = localStorage.getItem('token');
-        const headers = { 'Authorization': `Bearer ${token}` };
-
-        // Fetch folders
-        const folderRes = await fetch('http://localhost:8080/api/v1/notebook/folders', { headers });
-        if (folderRes.ok) {
-            const folderData = await folderRes.json();
-            setFolders(folderData);
-        }
-
-        // Fetch SRS stats
-        const statsRes = await fetch('http://localhost:8080/api/v1/notebook/srs-stats', { headers });
-        if (statsRes.ok) {
-            const statsData = await statsRes.json();
-            setSrsStats(statsData);
-        }
+        const [folderRes, statsRes] = await Promise.all([
+            notebookService.getFolders(),
+            notebookService.getSrsStats()
+        ]);
+        setFolders(folderRes.data || []);
+        setSrsStats(statsRes.data || srsStats);
     } catch (error) {
         console.error("Failed to fetch notebook data", error);
     } finally {
         setLoading(false);
     }
-  };  const handleCreateFolder = async () => {
+  };
+
+  const handleCreateFolder = async () => {
     if (!newFolderName.trim()) return;
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:8080/api/v1/notebook/folders/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({ name: newFolderName, description: '' })
-        });
-        if (response.ok) {
-            setNewFolderName('');
-            setIsCreatingFolder(false);
-            fetchData();
-        }
+        await notebookService.createFolder(newFolderName);
+        setNewFolderName('');
+        setIsCreatingFolder(false);
+        fetchData();
     } catch (error) {
         console.error("Failed to create folder", error);
     }
@@ -79,12 +63,8 @@ const MyNotebook = () => {
     if (!window.confirm("Bạn có chắc chắn muốn xóa sổ tay này và tất cả từ vựng bên trong không?")) return;
     
     try {
-        const token = localStorage.getItem('token');
-        const response = await fetch(`http://localhost:8080/api/v1/notebook/folders/${folderId}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (response.ok) fetchData();
+        await notebookService.deleteFolder(folderId);
+        fetchData();
     } catch (error) {
         console.error("Failed to delete folder", error);
     }
@@ -96,15 +76,7 @@ const MyNotebook = () => {
     if (!newName || newName === folder.name) return;
 
     try {
-        const token = localStorage.getItem('token');
-        await fetch(`http://localhost:8080/api/v1/notebook/folders/${folder.id}`, {
-            method: 'PUT',
-            headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ name: newName, description: folder.description || '' })
-        });
+        await notebookService.updateFolder(folder.id, newName, folder.description || '');
         fetchData();
     } catch (error) {
         console.error("Failed to edit folder", error);
@@ -177,6 +149,16 @@ const MyNotebook = () => {
                     <div className="stat-info">
                         <span className="stat-label">Nhuần nhuyễn</span>
                         <span className="stat-value">{srsStats.level5} từ</span>
+                    </div>
+                </div>
+                <div className="stat-card srs-limit-card">
+                    <div className="stat-info">
+                        <span className="stat-label">Tiến độ hôm nay</span>
+                        <span className="stat-value">{srsStats.todayReviewedCount} / {srsStats.dailyLimit}</span>
+                        <div className="limit-progress-bar">
+                            <div className="limit-progress-fill" style={{ width: `${Math.min(100, (srsStats.todayReviewedCount / srsStats.dailyLimit) * 100)}%` }}></div>
+                        </div>
+                        <span className="remaining-text">{srsStats.remainingToday > 0 ? `Còn ${srsStats.remainingToday} thẻ` : 'Đã hoàn thành!'}</span>
                     </div>
                 </div>
             </div>

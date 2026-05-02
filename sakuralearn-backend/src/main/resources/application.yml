@@ -8,9 +8,9 @@ spring:
   application:
     name: sakuralearn-backend
   datasource:
-    url: jdbc:postgresql://localhost:5433/sakuralearn_db?stringtype=unspecified
-    username: admin
-    password: 123456
+    url: ${DB_URL:jdbc:postgresql://localhost:5433/sakuralearn_db?stringtype=unspecified}
+    username: ${DB_USERNAME:admin}
+    password: ${DB_PASSWORD:123456}
     driver-class-name: org.postgresql.Driver
   servlet:
     multipart:
@@ -22,12 +22,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format_sql: true
-    show-sql: true
+        format_sql: false
+    show-sql: false
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   flyway:
     enabled: true
     baseline-on-migrate: true
@@ -35,7 +35,7 @@ spring:
   
   # --- NEW: KAFKA CONFIG ---
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
     consumer:
       group-id: sakuralearn-group
       auto-offset-reset: earliest
@@ -47,8 +47,8 @@ spring:
 
   # --- NEW: MAILPIT CONFIG ---
   mail:
-    host: localhost
-    port: 1025
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
     properties:
       mail:
         smtp:
@@ -69,7 +69,7 @@ spring:
       client:
         registration:
           google:
-            client-id: 638074642630-0el62id1khlqr1unej069gebptbjerhn.apps.googleusercontent.com
+            client-id: ${GOOGLE_CLIENT_ID:638074642630-0el62id1khlqr1unej069gebptbjerhn.apps.googleusercontent.com}
             client-secret: ${GOOGLE_CLIENT_SECRET:dummy-secret}
             scope:
               - email
@@ -78,20 +78,25 @@ spring:
 # Custom properties
 app:
   auth:
-    verify-url: http://localhost:8080/api/v1/auth/verify
-    reset-url: http://localhost:3000/reset-password
+    verify-url: ${APP_VERIFY_URL:http://localhost:8080/api/v1/auth/verify}
+    reset-url: ${APP_RESET_URL:http://localhost:3000/reset-password}
   oauth2:
-    redirect-uri: http://localhost:3000/oauth2/redirect
+    redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:3000/oauth2/redirect}
   jwt:
     secret: ${JWT_SECRET:dummy-jwt-secret-at-least-32-characters-long}
     expiration: 86400000 # 24 hours
     refreshExpirationMs: 2592000000 # 30 days
   minio:
-    url: http://localhost:9000
-    access-key: admin
-    secret-key: minio_password
-    bucket-name: sakuralearn-bucket
+    url: ${MINIO_URL:http://localhost:9000}
+    access-key: ${MINIO_ACCESS_KEY:admin}
+    secret-key: ${MINIO_SECRET_KEY:minio_password}
+    bucket-name: ${MINIO_BUCKET:sakuralearn-bucket}
   ai:
     grok:
       api-key: ${GROK_API_KEY:dummy-grok-key}
       base-url: https://api.x.ai/v1
+
+logging:
+  level:
+    root: INFO
+    com.sakuralearn.sakuralearn_backend: INFO

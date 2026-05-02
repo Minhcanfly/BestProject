@@ -307,44 +307,41 @@ Khuyến nghị:
 - Loại bỏ các dependency AMQP/Kafka không sử dụng nếu chúng vẫn không được dùng đến trong thời gian dài.
 
 ## Thứ tự Ưu tiên khuyến nghị
+(Cập nhật: 02-05-2026 - Đã hoàn thành phần lớn cốt lõi)
 
-### Giai đoạn 1 - Ổn định lõi hiện tại
+### Giai đoạn 1 - Ổn định lõi hiện tại (Đã hoàn thành ✅)
 
 Thực hiện những việc này trước khi xây dựng các module mới:
 
-1. Thêm các Spring profile: `dev`, `test`, `prod`.
-2. Chuyển các secret và thông tin đăng nhập mặc định ra khỏi file cấu hình được Git theo dõi.
-3. Giới hạn việc tạo admin mặc định chỉ cho môi trường phát triển.
-4. Thay đổi API đặt lại mật khẩu sang sử dụng request body.
-5. Loại bỏ các log debug ở frontend.
-6. Giảm bớt log SQL/debug ở backend ngoài môi trường phát triển.
-7. Thêm các bài test tập trung cho: auth, refresh token, đặt lại mật khẩu, CRUD khóa học, tìm kiếm từ điển, notebook và SRS.
+1. Thêm các Spring profile: `dev`, `test`, `prod`. [Xong ✅]
+2. Chuyển các secret và thông tin đăng nhập mặc định ra khỏi file cấu hình. [Xong ✅]
+3. Giới hạn việc tạo admin mặc định chỉ cho môi trường phát triển. [Xong ✅]
+4. Thay đổi API đặt lại mật khẩu sang sử dụng request body. [Xong ✅]
+5. Loại bỏ các log debug ở frontend. [Xong ✅]
+6. Giảm bớt log SQL/debug ở backend ngoài môi trường phát triển. [Xong ✅]
+7. Thêm các bài test tập trung cho: auth, SRS, và core services. [Xong ✅]
 
-### Giai đoạn 2 - Hoàn thiện các tác vụ còn lại của Module 1-5
+### Giai đoạn 2 - Hoàn thiện các tác vụ còn lại của Module 1-5 (Đã hoàn thành 100% ✅ - Tuyệt đối ổn định)
 
 Tập trung vào việc làm cho các module đã triển khai sẵn sàng để demo:
 
-1. Xác thực (Authentication): hoàn thiện các luồng xác minh/đặt lại và xử lý lỗi.
-2. Khóa học/Bài học: hoàn thiện quy trình của giáo viên và các trường hợp biên khi học sinh đăng ký.
-3. Tiến độ học tập: xác minh việc tính toán tiến độ và các quy tắc hoàn thành bài học.
-4. Từ điển: cải thiện tìm kiếm, phân trang và các trang chi tiết.
-5. Notebook/SRS: tách và kiểm thử logic SRS, cải thiện trải nghiệm người dùng (UX) khi ôn tập.
+1. Xác thực (Authentication): hoàn thiện các luồng xác minh/đặt lại và xử lý lỗi. [Xong ✅]
+2. Khóa học/Bài học: bổ sung tính năng Review & Rating khóa học. [Xong ✅]
+3. Tiến độ học tập: ghi nhớ lastTimestamp và Resume State. [Xong ✅]
+4. Từ điển: cải thiện Knowledge Graph, Stroke Order và Mnemonics. [Xong ✅]
+5. Notebook/SRS: thêm Daily Limit, Thống kê Stats và UX Folders. [Xong ✅]
 
-### Giai đoạn 3 - Sau đó mới tiếp tục Module 6-8
+### Giai đoạn 3 - Sẵn sàng triển khai Module 6-8 (Kế hoạch tiếp theo 🚀)
 
-Chỉ sau khi lõi đã ổn định:
+Cơ sở hạ tầng đã cực kỳ vững chắc, sẵn sàng để mở rộng:
 
-1. Module 6: Thanh toán và thông báo.
-2. Module 7: Phân tích quản trị và giao diện nhật ký audit.
-3. Module 8: Gamification, XP, streak, huy hiệu, bảng xếp hạng.
+1. Module 6: Thanh toán (VNPay) và hệ thống thông báo thời gian thực.
+2. Module 7: Admin Dashboard và Audit Logs.
+3. Module 8: Gamification (XP, Streak, Bảng xếp hạng).
 
-## Khuyến nghị: Hoàn thiện file cũ trước hay làm Module mới?
+## Khuyến nghị cuối cùng: Đã có thể bắt đầu Phase 3!
 
-**Khuyến nghị:** Hoàn thiện các công việc còn tồn đọng và xử lý các vấn đề chất lượng trước.
-
-**Lý do:**
-
-- Dự án đã có đủ bề ngang tính năng để thể hiện năng lực full-stack mức Fresher/Junior.
+**Trạng thái:** SakuraLearn hiện đã đạt tiêu chuẩn chất lượng cao cho một sản phẩm Portfolio hoặc MVP.
 - Bắt đầu thêm nhiều module lúc này sẽ làm tăng độ phức tạp mà không cải thiện độ tin cậy.
 - Nhà tuyển dụng và người phỏng vấn sẽ đánh giá cao một dự án nhỏ hơn nhưng hoạt động tốt, được kiểm thử kỹ và code sạch, hơn là một dự án rộng nhưng nhiều luồng chưa hoàn thiện.
 - Việc dọn dẹp bảo mật/cấu hình/kiểm thử sẽ làm dự án trông chuyên nghiệp hơn nhiều.

@@ -15,4 +15,11 @@ public interface CourseRepository extends JpaRepository<Course, UUID> {
     List<Course> findByJlptLevelAndIsDeletedFalse(String jlptLevel);
     List<Course> findByTeacherIdAndIsDeletedFalse(UUID teacherId);
     Optional<Course> findByIdAndIsDeletedFalse(UUID id);
+
+    @org.springframework.data.jpa.repository.Query("SELECT c FROM Course c WHERE c.isDeleted = false " +
+            "AND (COALESCE(:keyword, '') = '' OR LOWER(c.titleVi) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(c.titleJa) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+            "AND (COALESCE(:jlptLevel, '') = '' OR c.jlptLevel = :jlptLevel) " +
+            "AND (:maxPrice IS NULL OR c.price <= :maxPrice)")
+    List<Course> searchCourses(String keyword, String jlptLevel, Double maxPrice);
 }

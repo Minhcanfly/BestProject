@@ -26,5 +26,7 @@ public class CourseResponse {
     private Boolean isPublished;
     private String thumbnailUrl;
     private Integer lessonCount;
+    private Double averageRating;
+    private Integer reviewCount;
     private ZonedDateTime createdAt;
 }

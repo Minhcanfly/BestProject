@@ -42,16 +42,16 @@ Hệ thống cần đạt được các tiêu chuẩn tương đương với cá
 ---
 
 ## 🛠️ 3. Đặc tả Chức năng chi tiết
-| Chức năng | Mô tả chi tiết nghiệp vụ | Quyền hạn (Role) |
-| :--- | :--- | :--- |
-| **CRUD Course** | Quản lý Title, Desc (multi-lang), JLPT level, price, thumbnail, status, tags | Teacher + Admin |
-| **CRUD Lesson** | Quản lý tiêu đề bài học lớn, sắp xếp thứ tự hiển thị (`order_index`) | Teacher + Admin |
-| **CRUD LessonBlock** | Đa dạng các loại: VIDEO, TEXT, AUDIO, QUIZ, READING, EMBED... kèm nội dung và vị trí | Teacher + Admin |
-| **Media Upload** | Upload Media -> MinIO, xử lý trả về Presigned URL bảo mật | Teacher + Admin |
-| **Filter & Search** | Tìm kiếm khóa học theo JLPT, giá, từ khóa, trạng thái | Student (Public) |
-| **Enroll System** | Tạo bản ghi Enrollment, kiểm tra điều kiện thanh toán/miễn phí | Student |
-| **Status Control** | Quản lý trạng thái hiển thị (Draft / Published / Unpublished) | Teacher + Admin |
-| **Preview Mode** | Chế độ xem thử nội dung teaser mà không cần enroll | Teacher + Student |
+| Chức năng | Mô tả chi tiết nghiệp vụ | Quyền hạn (Role) | Trạng thái |
+| :--- | :--- | :--- | :--- |
+| **CRUD Course** | Quản lý Title, Desc (multi-lang), JLPT level, price, thumbnail, status, tags | Teacher + Admin | ✅ Hoàn thiện |
+| **CRUD Lesson** | Quản lý tiêu đề bài học lớn, sắp xếp thứ tự hiển thị (`order_index`) | Teacher + Admin | ✅ Hoàn thiện |
+| **CRUD LessonBlock** | Đa dạng các loại: VIDEO, TEXT, AUDIO, QUIZ, READING, EMBED... kèm nội dung và vị trí | Teacher + Admin | ✅ Hoàn thiện |
+| **Media Upload** | Upload Media -> MinIO, xử lý trả về Presigned URL bảo mật | Teacher + Admin | ✅ Hoàn thiện |
+| **Filter & Search** | Tìm kiếm khóa học theo JLPT, giá, từ khóa, trạng thái | Student (Public) | ✅ Hoàn thiện |
+| **Enroll System** | Tạo bản ghi Enrollment, kiểm tra điều kiện thanh toán/miễn phí | Student | ✅ Hoàn thiện |
+| **Status Control** | Quản lý trạng thái hiển thị (Draft / Published / Unpublished) | Teacher + Admin | ✅ Hoàn thiện |
+| **Preview Mode** | Chế độ xem thử nội dung teaser mà không cần enroll | Teacher + Student | ✅ Hoàn thiện |
 
 ---
 

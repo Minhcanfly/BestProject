@@ -30,6 +30,7 @@ public class LessonServiceImpl implements LessonService {
     private final CourseRepository courseRepository;
     private final LessonBlockRepository lessonBlockRepository;
     private final FileStorageService fileStorageService;
+    private final com.sakuralearn.sakuralearn_backend.service.ProgressService progressService;
     private final LessonMapper lessonMapper;
 
     @Override
@@ -100,6 +101,12 @@ public class LessonServiceImpl implements LessonService {
         Lesson lesson = findLessonInCourse(courseId, lessonId);
         lesson.setIsDeleted(true);
         lessonRepository.save(lesson);
+
+        // Also soft delete all blocks in this lesson
+        lessonBlockRepository.softDeleteByLessonId(lessonId);
+
+        // Recalculate progress for all users in the course
+        progressService.recalculateCourseProgressForAllUsers(courseId);
     }
 
     @Override

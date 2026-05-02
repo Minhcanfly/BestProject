@@ -17,4 +17,10 @@ export const courseService = {
   publishCourse: (id, publish) => API.patch(`/courses/${id}/publish?publish=${publish}`),
   getManagedCourses: () => API.get('/courses/managed'),
   generateSyllabus: (id, model = 'GPT_4O') => API.post(`/courses/${id}/generate-syllabus?model=${model}`),
+
+  // Reviews
+  getReviewsByCourse: (courseId) => API.get(`/reviews/courses/${courseId}`),
+  addReview: (courseId, reviewData) => API.post(`/reviews/courses/${courseId}`, reviewData),
+  deleteReview: (reviewId) => API.delete(`/reviews/${reviewId}`),
+  getAverageRating: (courseId) => API.get(`/reviews/courses/${courseId}/average`),
 }

@@ -72,7 +72,12 @@ const Register = () => {
           value={formData.username}
           onChange={handleChange}
           required
+          pattern="^[a-zA-Z0-9._-]+$"
+          title="Chỉ chứa chữ cái, số và . _ -"
         />
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '-12px', marginBottom: '16px' }}>
+          Chỉ chứa chữ cái, số và các ký tự . _ -
+        </p>
         <Input
           label="Email"
           name="email"
@@ -92,7 +97,11 @@ const Register = () => {
           value={formData.password}
           onChange={handleChange}
           required
+          minLength="8"
         />
+        <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '-12px', marginBottom: '16px' }}>
+          Tối thiểu 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt (@#$%^&+=!)
+        </p>
         
         {error && <p className="error-message" style={{ textAlign: 'center', marginBottom: '16px' }}>{error}</p>}
         

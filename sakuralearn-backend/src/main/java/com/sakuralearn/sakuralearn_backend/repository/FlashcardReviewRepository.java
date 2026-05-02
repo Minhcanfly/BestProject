@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface FlashcardReviewRepository extends JpaRepository<FlashcardReview, UUID> {
     List<FlashcardReview> findByUserId(UUID userId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT COUNT(r) FROM FlashcardReview r WHERE r.user.id = :userId AND r.reviewedAt >= :start")
+    long countByUserIdAndReviewedAtAfter(UUID userId, java.time.OffsetDateTime start);
 }

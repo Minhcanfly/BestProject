@@ -1,19 +1,20 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { adminService } from '../../services/adminService';
-import { 
-  Search, 
-  UserCheck, 
-  UserMinus, 
-  Shield, 
-  ShieldCheck, 
-  GraduationCap,
+import React, { useCallback, useEffect, useState } from 'react';
+import {
   Calendar,
-  MoreVertical,
   ChevronLeft,
   ChevronRight,
-  Filter
+  Filter,
+  GraduationCap,
+  MoreVertical,
+  Search,
+  Shield,
+  ShieldCheck,
+  UserCheck,
+  UserMinus,
+  Users
 } from 'lucide-react';
-import Button from '../../components/Button';
+import { adminService } from '../../services/adminService';
+import { getApiErrorMessage } from '../../utils/apiError';
 import './UserManagement.css';
 
 const AdminUserManagement = () => {
@@ -29,23 +30,20 @@ const AdminUserManagement = () => {
     setLoading(true);
     try {
       const response = await adminService.getAllUsers(page, 10, searchTerm);
-      setUsers(response.data.content);
-      setTotalPages(response.data.totalPages);
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Không thể tải danh sách người dùng.' });
+      setUsers(response.data.content || []);
+      setTotalPages(response.data.totalPages || 0);
+    } catch (error) {
+      setMessage({ type: 'error', text: getApiErrorMessage(error, 'Không thể tải danh sách người dùng.') });
     } finally {
       setLoading(false);
     }
   }, [page, searchTerm]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetchUsers();
-    }, 500); // Debounce search
+    const timer = setTimeout(fetchUsers, 500);
     return () => clearTimeout(timer);
   }, [fetchUsers]);
 
-  // Handle click outside to close menu
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (openMenuId && !event.target.closest('.action-group')) {
@@ -59,28 +57,30 @@ const AdminUserManagement = () => {
   const handleToggleStatus = async (userId, currentStatus) => {
     try {
       await adminService.updateUserStatus(userId, !currentStatus);
-      setMessage({ type: 'success', text: 'Cập nhật trạng thái người dùng thành công!' });
+      setMessage({ type: 'success', text: 'Cập nhật trạng thái người dùng thành công.' });
       fetchUsers();
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi khi cập nhật trạng thái.' });
+    } catch (error) {
+      setMessage({ type: 'error', text: getApiErrorMessage(error, 'Lỗi khi cập nhật trạng thái.') });
     }
   };
 
   const handleRoleChange = async (userId, roles) => {
     try {
       await adminService.updateUserRoles(userId, roles);
-      setMessage({ type: 'success', text: 'Cập nhật quyền thành công!' });
+      setMessage({ type: 'success', text: 'Cập nhật quyền thành công.' });
       fetchUsers();
-    } catch (err) {
-      setMessage({ type: 'error', text: 'Lỗi khi cập nhật quyền.' });
+    } catch (error) {
+      setMessage({ type: 'error', text: getApiErrorMessage(error, 'Lỗi khi cập nhật quyền.') });
     }
   };
 
-  const getRoleIcon = (roles) => {
+  const getRoleIcon = (roles = []) => {
     if (roles.includes('ADMIN')) return <ShieldCheck size={16} className="role-icon admin" />;
     if (roles.includes('TEACHER')) return <Shield size={16} className="role-icon teacher" />;
     return <GraduationCap size={16} className="role-icon student" />;
   };
+
+  const getPrimaryRole = (roles = []) => roles[0] || 'STUDENT';
 
   return (
     <div className="admin-users-container">
@@ -89,18 +89,23 @@ const AdminUserManagement = () => {
           <h1>Quản lý người dùng</h1>
           <p>Danh sách và quyền hạn thành viên hệ thống</p>
         </div>
-        
+
         <div className="admin-actions">
           <div className="search-box glass-effect">
             <Search size={18} />
-            <input 
-              type="text" 
-              placeholder="Tìm kiếm theo tên hoặc email..." 
+            <input
+              type="text"
+              placeholder="Tìm kiếm theo tên hoặc email..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(event) => {
+                setPage(0);
+                setSearchTerm(event.target.value);
+              }}
             />
           </div>
-          <button className="filter-btn glass-effect"><Filter size={18} /></button>
+          <button className="filter-btn glass-effect" title="Bộ lọc nâng cao">
+            <Filter size={18} />
+          </button>
         </div>
       </div>
 
@@ -130,94 +135,101 @@ const AdminUserManagement = () => {
                   <div className="loader"></div>
                 </td>
               </tr>
-            ) : users.map((u) => (
-              <tr key={u.id}>
-                <td>
-                  <div className="user-cell">
-                    <div className="table-avatar">
-                       {u.fullName.charAt(0)}
+            ) : users.length > 0 ? (
+              users.map((user) => (
+                <tr key={user.id}>
+                  <td>
+                    <div className="user-cell">
+                      <div className="table-avatar">
+                        {(user.fullName || user.email || '?').charAt(0).toUpperCase()}
+                      </div>
+                      <div className="user-meta">
+                        <p className="u-name">{user.fullName || 'Chưa cập nhật tên'}</p>
+                        <p className="u-email">{user.email}</p>
+                      </div>
                     </div>
-                    <div className="user-meta">
-                      <p className="u-name">{u.fullName}</p>
-                      <p className="u-email">{u.email}</p>
+                  </td>
+                  <td>
+                    <div className="role-badge">
+                      {getRoleIcon(user.roles)}
+                      <span>{getPrimaryRole(user.roles)}</span>
                     </div>
-                  </div>
-                </td>
-                <td>
-                  <div className="role-badge">
-                    {getRoleIcon(u.roles)}
-                    <span>{u.roles[0]}</span>
-                  </div>
-                </td>
-                <td>
-                  <span className={`status-dot ${u.isActive ? 'active' : 'blocked'}`}>
-                    {u.isActive ? 'Đang hoạt động' : 'Đã khóa'}
-                  </span>
-                </td>
-                <td>
-                  <div className="date-cell">
-                    <Calendar size={14} /> 
-                    <span>{new Date(u.createdAt).toLocaleDateString('vi-VN')}</span>
-                  </div>
-                </td>
-                <td>{u.lastActivityDate ? new Date(u.lastActivityDate).toLocaleDateString('vi-VN') : 'Chưa có hoạt động'}</td>
-                <td className="text-right">
-                  <div className="action-group">
-                    <button 
-                      className={`control-btn ${u.isActive ? 'block' : 'unblock'}`}
-                      onClick={() => handleToggleStatus(u.id, u.isActive)}
-                      title={u.isActive ? 'Khóa tài khoản' : 'Mở khóa'}
-                    >
-                      {u.isActive ? <UserMinus size={18} /> : <UserCheck size={18} />}
-                    </button>
-                    
-                    <button 
-                      className="control-btn promote"
-                      onClick={() => handleRoleChange(u.id, u.roles.includes('TEACHER') ? ['STUDENT'] : ['STUDENT', 'TEACHER'])}
-                      title={u.roles.includes('TEACHER') ? 'Hạ cấp xuống Học viên' : 'Thăng cấp Giảng viên'}
-                    >
-                      <Shield size={18} />
-                    </button>
-                    
-                    <div className="relative-menu-container">
-                      <button 
-                        className="control-btn more"
-                        onClick={() => setOpenMenuId(openMenuId === u.id ? null : u.id)}
+                  </td>
+                  <td>
+                    <span className={`status-dot ${user.isActive ? 'active' : 'blocked'}`}>
+                      {user.isActive ? 'Đang hoạt động' : 'Đã khóa'}
+                    </span>
+                  </td>
+                  <td>
+                    <div className="date-cell">
+                      <Calendar size={14} />
+                      <span>{user.createdAt ? new Date(user.createdAt).toLocaleDateString('vi-VN') : 'N/A'}</span>
+                    </div>
+                  </td>
+                  <td>{user.lastActivityDate ? new Date(user.lastActivityDate).toLocaleDateString('vi-VN') : 'Chưa có hoạt động'}</td>
+                  <td className="text-right">
+                    <div className="action-group">
+                      <button
+                        className={`control-btn ${user.isActive ? 'block' : 'unblock'}`}
+                        onClick={() => handleToggleStatus(user.id, user.isActive)}
+                        title={user.isActive ? 'Khóa tài khoản' : 'Mở khóa'}
                       >
-                        <MoreVertical size={18} />
+                        {user.isActive ? <UserMinus size={18} /> : <UserCheck size={18} />}
                       </button>
-                      
-                      {openMenuId === u.id && (
-                        <div className="dropdown-menu glass-effect">
-                          <button onClick={() => {
-                            setMessage({ type: 'info', text: 'Chức năng xem hồ sơ đang được phát triển.' });
-                            setOpenMenuId(null);
-                          }}>
-                            Xem chi tiết
-                          </button>
-                        </div>
-                      )}
+
+                      <button
+                        className="control-btn promote"
+                        onClick={() => handleRoleChange(
+                          user.id,
+                          user.roles?.includes('TEACHER') ? ['STUDENT'] : ['STUDENT', 'TEACHER']
+                        )}
+                        title={user.roles?.includes('TEACHER') ? 'Hạ cấp xuống học viên' : 'Thăng cấp giảng viên'}
+                      >
+                        <Shield size={18} />
+                      </button>
+
+                      <div className="relative-menu-container">
+                        <button
+                          className="control-btn more"
+                          onClick={() => setOpenMenuId(openMenuId === user.id ? null : user.id)}
+                          title="Thao tác khác"
+                        >
+                          <MoreVertical size={18} />
+                        </button>
+
+                        {openMenuId === user.id && (
+                          <div className="dropdown-menu glass-effect">
+                            <button onClick={() => {
+                              setMessage({ type: 'info', text: 'Chức năng xem hồ sơ đang được phát triển.' });
+                              setOpenMenuId(null);
+                            }}>
+                              Xem chi tiết
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="6" className="empty-users-cell">
+                  <Users size={34} />
+                  <span>Không tìm thấy người dùng phù hợp.</span>
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
         </table>
 
         <div className="pagination">
           <p>Trang {page + 1} / {totalPages || 1}</p>
           <div className="pagin-btns">
-            <button 
-              disabled={page === 0} 
-              onClick={() => setPage(p => p - 1)}
-            >
+            <button disabled={page === 0} onClick={() => setPage((current) => current - 1)}>
               <ChevronLeft size={20} />
             </button>
-            <button 
-              disabled={page >= totalPages - 1} 
-              onClick={() => setPage(p => p + 1)}
-            >
+            <button disabled={page >= totalPages - 1} onClick={() => setPage((current) => current + 1)}>
               <ChevronRight size={20} />
             </button>
           </div>

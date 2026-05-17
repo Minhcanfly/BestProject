@@ -9,6 +9,7 @@ export const ROUTES = {
   TEACHER_COURSE_EDIT: (courseId = ':id') => `/teacher/courses/edit/${courseId}`,
   TEACHER_SYLLABUS: (courseId = ':id') => `/teacher/courses/syllabus/${courseId}`,
   ADMIN_USERS: '/admin/users',
+  ADMIN_AUDIT_LOGS: '/admin/audit-logs',
   PROFILE: '/profile',
   MY_COURSES: '/my-courses',
   FORGOT_PASSWORD: '/forgot-password',

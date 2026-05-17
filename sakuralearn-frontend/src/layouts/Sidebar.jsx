@@ -8,6 +8,7 @@ import {
   Layers,
   Settings, 
   ShieldAlert,
+  ScrollText,
   LogOut,
   Library,
   X
@@ -36,7 +37,8 @@ const Sidebar = ({ isOpen, onClose }) => {
   ];
 
   const adminItems = [
-    { name: 'Quản lý User', icon: ShieldAlert, path: '/admin/users' },
+    { name: 'Quản lý User', icon: ShieldAlert, path: ROUTES.ADMIN_USERS },
+    { name: 'Audit Logs', icon: ScrollText, path: ROUTES.ADMIN_AUDIT_LOGS },
   ];
 
   return (

@@ -7,6 +7,7 @@ import ForgotPassword from '../pages/ForgotPassword';
 import ResetPassword from '../pages/ResetPassword';
 import Profile from '../pages/Profile';
 import UserManagement from '../pages/admin/UserManagement';
+import AuditLogs from '../pages/admin/AuditLogs';
 import CourseList from '../pages/courses/CourseList';
 import CourseDetail from '../pages/courses/CourseDetail';
 import LearningView from '../pages/courses/LearningView';
@@ -86,6 +87,16 @@ const AppRoutes = () => {
           <AdminRoute>
             <MainLayout title="Quản lý người dùng">
                <UserManagement />
+            </MainLayout>
+          </AdminRoute>
+        </ProtectedRoute>
+      } />
+
+      <Route path={ROUTES.ADMIN_AUDIT_LOGS} element={
+        <ProtectedRoute>
+          <AdminRoute>
+            <MainLayout title="Nhật ký hệ thống">
+               <AuditLogs />
             </MainLayout>
           </AdminRoute>
         </ProtectedRoute>

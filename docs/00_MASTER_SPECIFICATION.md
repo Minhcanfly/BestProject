@@ -75,7 +75,8 @@ SakuraLearn là nền tảng học tiếng Nhật JLPT N5–N1 dành riêng cho 
 - **Trạng thái:** Đã hoàn thiện (Demo-ready) ✅
 - **Chức năng chính:**
   - **Tra cứu sâu:** Kanji (Radical, Onyomi/Kunyomi, Stroke order), Vocabulary (Audio, Nghĩa Vi/En, Part of speech), Grammar (Pattern, Giải thích tiếng Việt).
-  - **Knowledge Graph:** Liên kết kiến thức giữa Kanji ↔ Radical ↔ Vocab.
+  - **Curriculum Tracking:** Tra cứu và lọc nội dung theo giáo trình (Minna no Nihongo, Sou Matome, Shinkanzen).
+  - **Community Mining:** Cho phép người dùng đóng góp ví dụ, ý nghĩa mới (Duyệt bởi Admin).
   - **Notebook:** Lưu trữ kiến thức cá nhân ("Add to Notebook", "Add to SRS").
 - **Gợi ý nâng cấp:** Stroke Animation (Hiển thị diễn họa cách viết qua KanjiVG), Related Items (Sentence mining), Furigana Support.
 
@@ -99,6 +100,7 @@ SakuraLearn là nền tảng học tiếng Nhật JLPT N5–N1 dành riêng cho 
 - **Trạng thái:** Quản trị toàn diện.
 - **Chức năng chính:**
   - Quản lý thực thể: User, Role, Course, Payment.
+  - **Quick Actions:** Nút tắt để Reset tiến độ học, Unlock khóa học thủ công hoặc Khóa tài khoản nhanh.
   - **Audit Log:** Lưu vết chi tiết (lưu `old_values` và `new_values`) bằng JSON để truy vết sai sót.
   - Báo cáo thống kê: Doanh thu, User activity, Course phổ biến.
 
@@ -106,7 +108,8 @@ SakuraLearn là nền tảng học tiếng Nhật JLPT N5–N1 dành riêng cho 
 - **Trạng thái:** Tăng cường tính "gây nghiện" học tập (Retention).
 - **Chức năng chính:**
   - **XP System:** Nhận điểm khi học và làm Quiz.
-  - **Streak:** Theo dõi số ngày học liên tục (Sử dụng múi giờ Việt Nam, yếu tố tâm lý *Loss aversion* rất mạnh).
+  - **Streak:** Theo dõi số ngày học liên tục (Loss aversion logic).
+  - **Virtual Pet & Building:** Ý tưởng nuôi thú ảo (Shiba) hoặc xây dựng ngôi nhà Nhật Bản của riêng mình để tăng tính gắn kết.
   - **Badge System:** Vinh danh thành tựu học tập.
   - Hệ thống bình luận (Comment) đa ngôn ngữ.
 - **Gợi ý nâng cấp:** Leaderboard, Daily Quest (VD: "Học 30 từ mới hôm nay").

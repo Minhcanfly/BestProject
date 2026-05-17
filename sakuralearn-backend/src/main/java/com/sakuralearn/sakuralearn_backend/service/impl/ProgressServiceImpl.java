@@ -3,6 +3,7 @@ package com.sakuralearn.sakuralearn_backend.service.impl;
 import com.sakuralearn.sakuralearn_backend.dto.request.LessonBlockProgressRequest;
 import com.sakuralearn.sakuralearn_backend.dto.response.LessonBlockProgressResponse;
 import com.sakuralearn.sakuralearn_backend.entity.*;
+import com.sakuralearn.sakuralearn_backend.exception.BadRequestException;
 import com.sakuralearn.sakuralearn_backend.mapper.LessonBlockProgressMapper;
 import com.sakuralearn.sakuralearn_backend.repository.*;
 import com.sakuralearn.sakuralearn_backend.service.ProgressService;
@@ -29,10 +30,12 @@ public class ProgressServiceImpl implements ProgressService {
     @Override
     @Transactional
     public void updateLastAccessed(UUID userId, UUID lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId).orElseThrow(() -> new RuntimeException("Lesson not found"));
+        ensureEnrolled(userId, lesson.getCourse().getId());
+
         LessonProgress progress = lessonProgressRepository.findByUserIdAndLessonId(userId, lessonId)
                 .orElseGet(() -> {
                     User user = userRepository.findById(userId).orElseThrow();
-                    Lesson lesson = lessonRepository.findById(lessonId).orElseThrow();
                     return LessonProgress.builder().user(user).lesson(lesson).build();
                 });
         
@@ -61,6 +64,7 @@ public class ProgressServiceImpl implements ProgressService {
         LessonBlock block = lessonBlockRepository.findById(blockId)
                 .filter(b -> !Boolean.TRUE.equals(b.getIsDeleted()))
                 .orElseThrow(() -> new RuntimeException("Lesson block not found or deleted"));
+        ensureEnrolled(userId, block.getLesson().getCourse().getId());
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -78,6 +82,9 @@ public class ProgressServiceImpl implements ProgressService {
         }
 
         if (request.getLastTimestamp() != null) {
+            if (request.getLastTimestamp() < 0) {
+                throw new BadRequestException("Last timestamp cannot be negative");
+            }
             progress.setLastTimestamp(request.getLastTimestamp());
         }
 
@@ -92,6 +99,10 @@ public class ProgressServiceImpl implements ProgressService {
 
     @Override
     public List<LessonBlockProgressResponse> getLessonBlocksProgress(UUID userId, UUID lessonId) {
+        Lesson lesson = lessonRepository.findById(lessonId)
+                .orElseThrow(() -> new RuntimeException("Lesson not found"));
+        ensureEnrolled(userId, lesson.getCourse().getId());
+
         return lessonBlockProgressMapper.toResponseList(
                 lessonBlockProgressRepository.findByUserIdAndLessonBlockLessonIdAndLessonBlockIsDeletedFalse(userId, lessonId)
         );
@@ -102,6 +113,7 @@ public class ProgressServiceImpl implements ProgressService {
     public void completeLesson(UUID userId, UUID lessonId) {
         Lesson lesson = lessonRepository.findById(lessonId)
                 .orElseThrow(() -> new RuntimeException("Lesson not found"));
+        ensureEnrolled(userId, lesson.getCourse().getId());
         User user = userRepository.findById(userId).orElseThrow();
 
         List<LessonBlock> blocks = lessonBlockRepository.findByLessonIdAndIsDeletedFalseOrderByOrderIndexAsc(lessonId);
@@ -121,6 +133,7 @@ public class ProgressServiceImpl implements ProgressService {
 
     @Override
     public List<UUID> getCompletedLessonIds(UUID userId, UUID courseId) {
+        ensureEnrolled(userId, courseId);
         return lessonProgressRepository.findByUserIdAndLessonCourseIdAndIsCompletedTrue(userId, courseId)
                 .stream()
                 .map(lp -> lp.getLesson().getId())
@@ -173,5 +186,11 @@ public class ProgressServiceImpl implements ProgressService {
             }
             enrollmentRepository.save(enrollment);
         });
+    }
+
+    private void ensureEnrolled(UUID userId, UUID courseId) {
+        if (!enrollmentRepository.existsByUserIdAndCourseId(userId, courseId)) {
+            throw new BadRequestException("You must be enrolled in this course to update learning progress");
+        }
     }
 }

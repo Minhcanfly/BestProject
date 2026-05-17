@@ -67,7 +67,6 @@ public class QuizServiceImpl implements QuizService {
 
     @Override
     public Quiz getQuizByBlockId(UUID blockId) {
-        System.out.println("DEBUG: Fetching quiz for blockId: " + blockId);
         return quizRepository.findByLessonBlockId(blockId).orElse(null);
     }
 

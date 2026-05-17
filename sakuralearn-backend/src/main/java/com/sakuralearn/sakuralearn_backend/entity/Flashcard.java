@@ -34,12 +34,15 @@ public class Flashcard {
     @Column(name = "due_date")
     private OffsetDateTime dueDate;
 
+    @Builder.Default
     @Column(name = "interval_days")
     private Integer intervalDays = 1;
 
+    @Builder.Default
     @Column(name = "ease_factor")
     private Double easeFactor = 2.5;
 
+    @Builder.Default
     @Column(name = "reps")
     private Integer reps = 0;
 

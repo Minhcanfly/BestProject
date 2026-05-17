@@ -29,8 +29,11 @@ public class ReviewController {
     }
 
     @GetMapping("/courses/{courseId}")
-    public ResponseEntity<?> getReviews(@PathVariable UUID courseId) {
-        return ResponseEntity.ok(reviewService.getReviewsByCourse(courseId));
+    public ResponseEntity<?> getReviews(
+            @AuthenticationPrincipal UserDetailsImpl userDetails,
+            @PathVariable UUID courseId) {
+        UUID currentUserId = (userDetails != null) ? userDetails.getId() : null;
+        return ResponseEntity.ok(reviewService.getReviewsByCourse(courseId, currentUserId));
     }
 
     @DeleteMapping("/{id}")

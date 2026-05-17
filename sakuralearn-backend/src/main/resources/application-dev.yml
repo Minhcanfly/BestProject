@@ -5,8 +5,10 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
-  logging:
-    level:
-      org.hibernate.SQL: DEBUG
-      org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-      com.sakuralearn.sakuralearn_backend: DEBUG
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    com.sakuralearn.sakuralearn_backend: DEBUG
+

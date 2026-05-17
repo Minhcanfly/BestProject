@@ -237,8 +237,14 @@ cmd /c mvnw.cmd test
 Latest local result:
 
 - Frontend production build: passed.
-- Backend Spring context test: passed.
-- Backend test summary: `Tests run: 1, Failures: 0, Errors: 0, Skipped: 0`.
+- Backend Spring context and focused service tests: passed.
+- Backend test summary: `Tests run: 12, Failures: 0, Errors: 0, Skipped: 0`.
+
+Current Phase 1 P0 truth map:
+
+- See `docs/PHASE_1_P0_STATUS.md`.
+- Module 1-5 are the current MVP release core.
+- Module 6 and Module 8 should be treated as planned/partial until payment, notification, and full gamification workflows are implemented in code.
 
 ## CI
 

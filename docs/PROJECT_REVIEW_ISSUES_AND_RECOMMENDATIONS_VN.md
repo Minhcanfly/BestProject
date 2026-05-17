@@ -114,7 +114,7 @@ Hành vi phát hiện:
 
 - Access token và refresh token được lưu trữ trong `localStorage`.
 
-Rủi kịch:
+Rủi ro:
 
 - Token bị lộ nếu có lỗ hổng XSS xuất hiện.
 
@@ -348,7 +348,7 @@ Cơ sở hạ tầng đã cực kỳ vững chắc, sẵn sàng để mở rộn
 
 **Chiến lược tốt nhất:**
 
-1. Hoàn thành các tác vụ còn lại cho Module 1-5.
+1. Hoàn thiện các tác vụ còn lại cho Module 1-5.
 2. Trau chuốt README, ảnh chụp màn hình và dữ liệu demo.
 3. Thêm các bài test có ý nghĩa và dọn dẹp cấu hình.
 4. Xây dựng một luồng demo ấn tượng từ: đăng nhập -> khóa học -> bài học -> từ điển -> notebook -> SRS.

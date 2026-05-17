@@ -125,3 +125,6 @@ Module Auth (M1) được thiết kế làm "Xương sống bảo mật" cho to�
 - Build sạch lại source: `./mvnw clean package`.
 
 > **Tổng kết:** Bộ tiêu chuẩn này bảo đảm SakuraLearn được phát triển nhất quán, an toàn và sẵn sàng Scale up thành nền tảng Enterprise bất kỳ lúc nào. Mọi thành viên đội ngũ bắt buộc phải nắm rõ tài liệu này.
+### 4. Tiêu chuẩn Thanh toán (Payment Standards)
+- **Idempotency**: Bắt buộc xử lý kiểm tra trùng lặp (Idempotency check) tại endpoint Webhook/IPN. Mỗi giao dịch chỉ được phép thay đổi trạng thái hệ thống một lần duy nhất.
+- **Security**: Không bao giờ tin tưởng dữ liệu số tiền gửi từ Frontend; luôn xác thực lại từ Backend và Provider (VNPay).

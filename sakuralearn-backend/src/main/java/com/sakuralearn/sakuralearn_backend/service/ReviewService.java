@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface ReviewService {
     ReviewResponse addReview(UUID userId, UUID courseId, ReviewRequest request);
-    List<ReviewResponse> getReviewsByCourse(UUID courseId);
+    List<ReviewResponse> getReviewsByCourse(UUID courseId, UUID currentUserId);
     void deleteReview(UUID userId, UUID reviewId);
     Double getAverageRating(UUID courseId);
 }

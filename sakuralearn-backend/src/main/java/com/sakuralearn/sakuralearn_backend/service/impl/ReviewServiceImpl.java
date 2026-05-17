@@ -12,6 +12,7 @@ import com.sakuralearn.sakuralearn_backend.repository.EnrollmentRepository;
 import com.sakuralearn.sakuralearn_backend.repository.ReviewRepository;
 import com.sakuralearn.sakuralearn_backend.repository.UserRepository;
 import com.sakuralearn.sakuralearn_backend.service.ReviewService;
+import com.sakuralearn.sakuralearn_backend.service.TextSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final CourseRepository courseRepository;
     private final UserRepository userRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final TextSanitizer textSanitizer;
 
     @Override
     @Transactional
@@ -49,18 +51,18 @@ public class ReviewServiceImpl implements ReviewService {
                 .user(user)
                 .course(course)
                 .rating(request.getRating())
-                .content(request.getContent())
+                .content(textSanitizer.sanitizeNullable(request.getContent()))
                 .build();
 
         Review saved = reviewRepository.save(review);
-        return mapToResponse(saved);
+        return mapToResponse(saved, userId);
     }
 
     @Override
-    public List<ReviewResponse> getReviewsByCourse(UUID courseId) {
+    public List<ReviewResponse> getReviewsByCourse(UUID courseId, UUID currentUserId) {
         return reviewRepository.findByCourseIdOrderByCreatedAtDesc(courseId)
                 .stream()
-                .map(this::mapToResponse)
+                .map(r -> mapToResponse(r, currentUserId))
                 .toList();
     }
 
@@ -83,14 +85,16 @@ public class ReviewServiceImpl implements ReviewService {
         return avg != null ? avg : 0.0;
     }
 
-    private ReviewResponse mapToResponse(Review review) {
+    private ReviewResponse mapToResponse(Review review, UUID currentUserId) {
         return ReviewResponse.builder()
                 .id(review.getId())
                 .userId(review.getUser().getId())
-                .username(review.getUser().getFullName())
+                .username(review.getUser().getEmail()) // Real username is email
+                .userFullName(review.getUser().getFullName())
                 .userAvatarUrl(review.getUser().getAvatarUrl())
                 .rating(review.getRating())
                 .content(review.getContent())
+                .isMine(currentUserId != null && review.getUser().getId().equals(currentUserId))
                 .createdAt(review.getCreatedAt())
                 .build();
     }

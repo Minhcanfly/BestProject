@@ -32,9 +32,10 @@ public class NotebookController {
     public ResponseEntity<?> addCustomItem(
             @RequestBody java.util.Map<String, String> body,
             @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        String folderId = body.get("folderId");
         notebookService.addCustomItem(
             userDetails.getId(), 
-            UUID.fromString(body.get("folderId")),
+            folderId != null && !folderId.isBlank() ? UUID.fromString(folderId) : null,
             body.get("word"),
             body.get("reading"),
             body.get("meaning"),
@@ -57,8 +58,10 @@ public class NotebookController {
 
     @GetMapping("/folders/{folderId}/items")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<?> getFolderItems(@PathVariable UUID folderId) {
-        return ResponseEntity.ok(notebookService.getFolderItems(folderId));
+    public ResponseEntity<?> getFolderItems(
+            @PathVariable UUID folderId,
+            @AuthenticationPrincipal UserDetailsImpl userDetails) {
+        return ResponseEntity.ok(notebookService.getFolderItems(userDetails.getId(), folderId));
     }
 
     @PostMapping("/folders/create")

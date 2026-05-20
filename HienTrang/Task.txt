@@ -1,0 +1,53 @@
+📋 Tiến Độ Thực Hiện: Phase 2 - Step 1 (Chuẩn Hóa API Contract & Design Patterns)
+Dưới đây là danh sách các nhiệm vụ cụ thể cần thực hiện để chuẩn hóa hệ thống SakuraLearn Backend theo đúng Quy chuẩn Golden Playbook.
+
+🛠️ Danh Sách Nhiệm Vụ (TODO List)
+[ ] Task 1: Tạo lớp ApiResponse thống nhất
+
+ Định nghĩa ApiResponse.java trong package dto.response.
+ Viết các helper methods (success(), error()).
+[ ] Task 2: Tạo Response DTO cho Dictionary
+
+ Tạo KanjiResponse.java.
+ Tạo VocabularyResponse.java.
+ Tạo GrammarResponse.java.
+ Cấu hình mapper hoặc helper method để map từ Entity sang Response DTO.
+[ ] Task 3: Bổ Sung Request DTO mới & Hài Hòa Validation
+
+ Tạo CustomNotebookItemRequest.java và UpdateNoteRequest.java thay thế raw Map.
+ Thêm validation annotations (@NotBlank, @NotNull, @Size, vv) vào các DTO: QuizRequest, QuizQuestionRequest, QuizSubmissionRequest, NotebookFolderRequest, AddToNotebookRequest, SRSReviewRequest, LessonBlockProgressRequest.
+[ ] Task 4: Refactor Toàn Bộ Controllers (Trả về ResponseEntity<ApiResponse>)
+
+ AuthController: loại bỏ wildcard ResponseEntity<?>, typed ApiResponse.
+ CourseController: typed ApiResponse.
+ NotebookController: chuyển raw Map sang DTO mới, typed ApiResponse.
+ DictionaryController: dùng Response DTO thay Entity, typed ApiResponse.
+ ProfileController: thay thế check null thủ công bằng @PreAuthorize("isAuthenticated()").
+ LessonController & LessonBlockController: typed ApiResponse.
+ ReviewController: typed ApiResponse.
+ QuizController: thêm @Valid, typed ApiResponse.
+ ProgressController & SRSController: typed ApiResponse.
+ AdminUserController: typed ApiResponse.
+[ ] Task 5: Nâng Cấp GlobalExceptionHandler
+
+ Bắt lỗi validation ConstraintViolationException trên RequestParam/PathVariable.
+ Bắt lỗi malformed JSON HttpMessageNotReadableException.
+ Bắt lỗi thiếu param MissingServletRequestParameterException.
+ Ẩn thông tin nhạy cảm của RuntimeException khi trả về client.
+[ ] Task 6: Tối Ưu Dictionary Search (Template Method)
+
+ Tạo private helper preprocessSearchQuery() trong DictionaryService.
+ Thay thế logic romaji conversion lặp ở 4 search methods.
+[ ] Task 7: Áp Dụng Strategy Pattern cho Item Hydration
+
+ Định nghĩa ItemHydrator interface trong package service.strategy.
+ Implement KanjiHydrator, VocabHydrator, GrammarHydrator, CustomHydrator.
+ Tạo ItemHydratorRegistry tự động đăng ký các hydrators.
+ Refactor NotebookService loại bỏ 2 khối switch-case lặp.
+[ ] Task 8: Áp Dụng Factory Pattern cho AI Model Selection
+
+ Định nghĩa ChatModelFactory trong package config.factory.
+ Đăng ký các bean ChatModel tự động bằng Map injection.
+ Refactor AiSyllabusServiceImpl loại bỏ 3 @Qualifier inject và khối switch model.
+🚦 Trạng Thái Hiện Tại: Chưa Khởi Động
+Mọi task sẽ được cập nhật trạng thái tương ứng ([/] - Đang làm, [x] - Đã xong) trong quá trình coding thực tế.

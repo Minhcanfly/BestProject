@@ -1,0 +1,103 @@
+
+Tôi đã rà soát tài liệu trong docs/, PV/, README và đối chiếu nhanh với code hiện tại. Kết luận PM/Senior Dev: dự án đang ở trạng thái MVP core khá mạnh cho Module 1-5, nhưng tài liệu đang “lạc pha” với code ở Module 6-8. Phase 1 chưa nên tuyên bố xong nếu mục tiêu là bản beta nghiêm túc.
+
+Định Hướng Chính
+Ưu tiên đúng nhất bây giờ: chốt Phase 1 bằng cách ổn định, kiểm chứng, làm demo flow thật mượt, thay vì mở rộng ngay sang distributed/Kafka/K8s/Elasticsearch. Dự án đã đủ rộng; điểm yếu hiện tại là độ chắc, test coverage, tài liệu bị mojibake, và một số module được ghi là “hoàn thiện” trong docs nhưng code chưa phản ánh đầy đủ.
+
+Hiện Trạng Thực Tế
+Module 1-5 có implementation đáng kể:
+
+Auth/RBAC/JWT/email/reset/OAuth hooks đã có.
+Course/Lesson/LessonBlock/Syllabus/Learning flow đã có.
+Progress, resume timestamp, quiz, personal notes đã có.
+Dictionary, notebook, SRS, daily limit đã có.
+Review/rating course đã xuất hiện trong backend/frontend.
+Admin user management, dashboard stats, audit log service đã có mức nền.
+Nhưng:
+
+Backend test hiện chỉ thấy 1 context test: SakuralearnBackendApplicationTests.java. Tài liệu nói “core service tests xong” là chưa khớp code.
+Module 6 Payment/Notification: tài liệu nói hoàn thiện, nhưng code không thấy Payment, Notification, VNPay controller/service/entity rõ ràng.
+Module 8 Gamification: có xp, currentStreak, UI hiển thị XP/streak và quiz cộng XP, nhưng chưa phải một gamification engine hoàn chỉnh.
+Tài liệu tiếng Việt bị lỗi encoding khá nhiều, làm giảm tính chuyên nghiệp khi demo/phỏng vấn.
+Phase 1 - Việc Cần Chốt Trước
+Mục tiêu Phase 1 nên là: Beta demo-ready, Module 1-5 chắc, Module 6-8 chỉ ở mức nền nếu chưa đủ thời gian.
+
+Ưu tiên P0:
+
+Làm lại truth map giữa docs và code
+
+Cập nhật README/roadmap: Module nào thật sự done, module nào partial.
+Sửa các docs bị ghi quá tay như Module 6/8 “hoàn thiện”.
+Chuẩn hóa UTF-8 cho tài liệu quan trọng.
+Bổ sung test thật
+
+Unit test cho SM-2/SRS interval/ease factor.
+Test progress calculation: completed block, lastTimestamp, course percent.
+Test auth reset password, refresh token, role guard.
+Test ownership/security cho notebook, review, progress.
+Refactor SRS
+
+Tách logic tính SM-2 khỏi NotebookService sang SrsCalculatorService.
+Việc này nhỏ nhưng rất đáng giá vì vừa sạch code vừa dễ trình bày khi phỏng vấn.
+Hardening security/API
+
+Rà ownership checks tránh IDOR.
+Sanitize hoặc policy rõ ràng cho content do teacher nhập.
+Không để docs nói “prod-ready” khi token vẫn nằm localStorage.
+Chốt demo flow
+
+Login → course list → enroll/free course → learning view → progress/resume → dictionary → save notebook → SRS review.
+Đây là luồng vàng. Mọi thứ khác phụ.
+P1 sau khi P0 xong:
+
+AI Syllabus UI nếu backend đã có.
+Course publish workflow: DRAFT -> PENDING -> PUBLISHED.
+Admin audit log viewer cơ bản.
+Frontend polish cho notes/SRS/course detail.
+Phase 2 - Professionalization
+Mục tiêu: biến MVP thành portfolio/prod-like app.
+
+Test coverage meaningful, không cần chạy theo con số 80% ngay.
+API contract rõ: DTO, validation, error response thống nhất.
+Redis cache cho dictionary/course hot data.
+Admin Dashboard v1: user, course, review, audit logs.
+Notification v1: in-app notification table + bell UI + email cho event quan trọng.
+Payment design trước, implement sau: payment state machine, idempotency key, transaction log.
+Phase 3 - Commercial/Scale Features
+Mục tiêu: thêm các feature có giá trị sản phẩm thật.
+
+VNPay sandbox integration đầy đủ:
+create payment
+return URL
+IPN/webhook
+checksum HMAC-SHA512
+idempotency
+auto enrollment unlock
+payment history
+Gamification engine v1:
+XP event table
+streak calculation server-side
+badge rules
+daily quest đơn giản
+Search upgrade:
+trước mắt PostgreSQL full-text/GIN index
+Elasticsearch chỉ đưa vào khi data/search thực sự cần.
+Phase 4 - Enterprise/Distributed
+Mục tiêu: nâng tầm kiến trúc, không làm sớm.
+
+Kafka cho notification/audit/payment events.
+BI dashboard/revenue/retention/cohort.
+Docker image + CI/CD deploy.
+Nginx reverse proxy/load balancing.
+Sau cùng mới tính Kubernetes/microservices.
+Tách service chỉ khi monolith modular đã ổn và có lý do tải/ownership rõ ràng.
+Khuyến Nghị Quyết Định
+Không nên bắt đầu Phase 3/4 ngay. Trong 1-2 tuần tới, hãy coi Phase 1 còn các đầu việc sau là “release blockers”:
+
+Sửa docs sai trạng thái.
+Thêm test core.
+Refactor SRS calculator.
+Rà security ownership.
+Chạy và quay/demo luồng vàng.
+Chuẩn hóa README + screenshots + database seed demo.
+Sau khi xong các mục này, dự án sẽ thuyết phục hơn nhiều so với việc thêm VNPay/Kafka/K8s nhưng core chưa được kiểm chứng.

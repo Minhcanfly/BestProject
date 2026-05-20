@@ -44,7 +44,7 @@ Each module was designed with production-grade challenges in mind. Here are the 
 ### 🔐 Module 1: Identity & Security Backbone
 *   **Self-Healing Sessions:** Frontend (`api.js`) implements **Axios Interceptors** to detect `401 Unauthorized` errors and automatically execute a silent **Refresh Token Rotation**. This ensures a seamless UX without manual re-logins.
 *   **Non-Blocking Audit:** The **Audit Log Service** uses Spring's **`@Async`** processing to track system-wide changes (roles, status, logins) without adding latency to the main API response time.
-*   **Security Context:** Implements a strict **Stateless JWT** architecture with secure storage strategies discussed in the [Security Review](docs/PROJECT_REVIEW_ISSUES_AND_RECOMMENDATIONS_VN.md).
+*   **Security Context:** Implements a strict **Stateless JWT** architecture with secure storage strategies discussed in the [Security Review](HienTrang/PROJECT_REVIEW_ISSUES_AND_RECOMMENDATIONS_VN.md).
 
 ### 📚 Module 2: AI-Driven CMS & Media Orchestration
 *   **Multi-Model AI Fallback:** The **Syllabus Generator** (`AiSyllabusServiceImpl`) is built to iterate through **GPT-4o, Gemini Pro, and Grok**. If all APIs fail, it gracefully falls back to a **Smart Local Template** to ensure zero downtime for teachers.

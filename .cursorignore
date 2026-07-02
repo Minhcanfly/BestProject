@@ -1,0 +1,36 @@
+﻿# Cursor index & context — exclude heavy / generated paths (SakuraLearn)
+# See: AI đánh giá/README.md
+
+# Dependencies & build
+**/node_modules/
+**/target/
+**/dist/
+**/build/
+**/.mvn/wrapper/maven-wrapper.jar
+**/.gradle/
+
+# Frontend artifacts
+sakuralearn-frontend/dist/
+
+# Large Flyway seeds (read via ETL scripts / docs, not in chat)
+sakuralearn-backend/src/main/resources/db/migration/V3__Seed_Kanji_Master.sql
+sakuralearn-backend/src/main/resources/db/migration/V4__Seed_Vocab_Master.sql
+sakuralearn-backend/src/main/resources/db/migration/V5__Seed_Grammar_Master.sql
+
+# Data pipeline
+data/raw/
+data/processed/
+data/scripts/node_modules/
+**/*.apkg
+**/*.xml
+**/*.xml.gz
+**/jmdict*.json
+
+# Logs & env
+**/*.log
+.env
+.env.*
+
+# Portfolio (not needed for implementation)
+PV/
+**/NGUYEN_QUANG_MINH_CV.*

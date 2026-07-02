@@ -1,0 +1,14 @@
+---
+description: SakuraLearn — dùng gói AI đánh giá, tiết kiệm context chat
+alwaysApply: true
+---
+
+# SakuraLearn (ngắn gọn)
+
+**Bắt đầu task:** `@AI đánh giá/README.md` (và `01`–`06` nếu cần). Tránh `@Codebase` cho câu hỏi tổng quan.
+
+**Chân lý:** code → `HienTrang/PHASE_1_P0_STATUS.md` → `docs/*_REMAINING_TASKS.md` → `00_MASTER_SPEC` (chỉ vision). **M6 thanh toán & M8 gamification chưa có Java/UI.**
+
+**Tiết kiệm context:** chat mới mỗi việc; chỉ `@` file đang sửa; không đọc migration seed V3–V5 (đã `.cursorignore`).
+
+**Khi code:** Flyway chỉ thêm `V8+`; FE dùng `src/services/api.js` + `VITE_API_BASE_URL`. Backlog: `docs/README.md`.

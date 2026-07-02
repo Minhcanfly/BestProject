@@ -67,15 +67,20 @@ Each module was designed with production-grade challenges in mind. Here are the 
 
 
 
+## AI / IDE context (read first in a new session)
+
+For ChatGPT, Cursor, Copilot, or any agent: read **[`AI đánh giá/README.md`](AI%20đánh%20giá/README.md)** (~15 min) for project truth, module status, and backlog — without scanning the full codebase.
+
 ## Repository Structure
 
 ```text
 .
+├── AI đánh giá/                 # Onboarding pack for AI & IDE agents
 ├── sakuralearn-frontend/        # React + Vite single-page application
 ├── sakuralearn-backend/         # Spring Boot REST API
 ├── database/                    # Standalone SQL schema reference
 ├── data/scripts/                # Advanced ETL pipeline (20+ scripts for dictionary processing)
-├── docs/                        # Product specs, module notes, engineering docs
+├── docs/                        # Product specs, backlog, docs↔code truth map (see docs/README.md)
 ├── diagram/                     # Database/architecture diagrams
 ├── docker-compose.yml           # Local infrastructure
 ├── QUICK_START.md               # Short local commands
@@ -153,6 +158,8 @@ Current migration set:
 - `V3__Seed_Kanji_Master.sql`: Kanji seed data.
 - `V4__Seed_Vocab_Master.sql`: vocabulary seed data.
 - `V5__Seed_Grammar_Master.sql`: grammar seed data.
+- `V6__Create_Reviews_Table.sql`: course reviews.
+- `V7__Add_SRS_Daily_Limit_To_Users.sql`: SRS daily limit on users.
 
 The backend runs with `spring.jpa.hibernate.ddl-auto=validate`, so schema changes should be made through Flyway migrations instead of Hibernate auto-update.
 
@@ -242,7 +249,7 @@ Latest local result:
 
 Current Phase 1 P0 truth map:
 
-- See `docs/PHASE_1_P0_STATUS.md`.
+- See `HienTrang/PHASE_1_P0_STATUS.md` and `docs/DOCS_CODE_CROSS_REFERENCE.md`.
 - Module 1-5 are the current MVP release core.
 - Module 6 and Module 8 should be treated as planned/partial until payment, notification, and full gamification workflows are implemented in code.
 

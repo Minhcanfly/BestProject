@@ -1,5 +1,7 @@
 # 🌸 SAKURALEARN – MASTER SPECIFICATION & ELITE ROADMAP (V3.0)
 
+> **Trạng thái triển khai:** Tài liệu này mô tả **tầm nhìn và roadmap**. Trạng thái thực tế theo code: [DOCS_CODE_CROSS_REFERENCE.md](./DOCS_CODE_CROSS_REFERENCE.md) và [../HienTrang/PHASE_1_P0_STATUS.md](../HienTrang/PHASE_1_P0_STATUS.md). Backlog: [README.md](./README.md) (mục Công việc).
+
 > **Lưu ý:** Tài liệu này là bản đặc tả cốt lõi (Master Spec), được tổng hợp chuẩn xác và đầy đủ từ 3 tài liệu: *FINAL_PRODUCT_SPECIFICATION*, *SAKURALEARN_MASTER_LOGIC_SPEC*, và *JD_GAP_ANALYSIS_AND_ROADMAP*. Nó định hình toàn bộ tầm nhìn, logic của 8 Module, phạm vi MVP, kiến trúc hệ thống và lộ trình phát triển cấp doanh nghiệp.
 
 ---

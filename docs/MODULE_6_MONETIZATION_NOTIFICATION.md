@@ -1,5 +1,7 @@
 # 🌸 PHÂN TÍCH SÂU MODULE 6: MONETIZATION & NOTIFICATION
 
+> **⚠️ Trạng thái triển khai (2026-05-23):** Tài liệu dưới đây là **đặc tả mục tiêu**. Code hiện **chưa có** Payment/Notification service hoặc controller — chỉ schema DB. Backlog: [MODULE_6_REMAINING_TASKS.md](./MODULE_6_REMAINING_TASKS.md). Đối chiếu: [DOCS_CODE_CROSS_REFERENCE.md](./DOCS_CODE_CROSS_REFERENCE.md).
+
 **Phiên bản phân tích:** 1.0 Deep Dive  
 **Mục đích:** Xây dựng hệ thống giao dịch tài chính an toàn, mượt mà và cơ chế tương tác thông minh để giữ chân người dùng (Retention).
 
@@ -49,12 +51,12 @@ Module này đóng vai trò vận hành và đảm bảo tính bền vững cho 
 ## 🛠️ 4. Đặc tả Chức năng chi tiết
 | Chức năng | Mô tả chi tiết nghiệp vụ | Trạng thái |
 | :--- | :--- | :--- |
-| **Payment Integration** | Tích hợp thư viện VNPay, tạo URL thanh toán bảo mật | ✅ Hoàn thiện |
-| **IPN Webhook Handler** | Xử lý phản hồi ngầm từ VNPay, xác thực Checksum | ✅ Hoàn thiện |
-| **Enrollment Unlock** | Tự động mở khóa khóa học ngay khi có tín hiệu IPN thành công | ✅ Hoàn thiện |
-| **Payment History** | Hiển thị danh sách hóa đơn và lịch sử giao dịch cho User | ✅ Hoàn thiện |
-| **In-app Notification** | Hệ thống lưu trữ và hiển thị thông báo nội bộ | ✅ Hoàn thiện |
-| **Email Service** | Tích hợp Spring Mail hỗ trợ template HTML chuyên nghiệp | ✅ Hoàn thiện |
+| **Payment Integration** | Tích hợp thư viện VNPay, tạo URL thanh toán bảo mật | 📋 Planned |
+| **IPN Webhook Handler** | Xử lý phản hồi ngầm từ VNPay, xác thực Checksum | 📋 Planned |
+| **Enrollment Unlock** | Tự động mở khóa khóa học ngay khi có tín hiệu IPN thành công | 📋 Planned |
+| **Payment History** | Hiển thị danh sách hóa đơn và lịch sử giao dịch cho User | 📋 Planned |
+| **In-app Notification** | Hệ thống lưu trữ và hiển thị thông báo nội bộ | 📋 Planned |
+| **Email Service** | Tích hợp Spring Mail hỗ trợ template HTML chuyên nghiệp | 🟡 Auth emails only |
 
 ---
 

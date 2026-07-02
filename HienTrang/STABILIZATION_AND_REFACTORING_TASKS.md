@@ -2,7 +2,9 @@
 
 Tài liệu này liệt kê các vấn đề kỹ thuật còn tồn đọng và kế hoạch tối ưu hóa mã nguồn dựa trên phân tích thực tế giữa tài liệu và code. Đây là bước đệm cuối cùng trước khi chuyển sang các Module thương mại (Thanh toán).
 
-Last updated: 2026-05-20
+**Chỉ mục backlog đầy đủ (2026-05-23):** [docs/README.md](../docs/README.md) · [docs/DOCS_CODE_CROSS_REFERENCE.md](../docs/DOCS_CODE_CROSS_REFERENCE.md)
+
+Last updated: 2026-05-23
 
 ---
 
@@ -20,7 +22,7 @@ Last updated: 2026-05-20
 - [x] **Tách SRS Calculator**: Di chuyển logic tính toán SM-2 từ `NotebookServiceImpl` sang `SrsCalculatorService`. ✅ *Đã hoàn thành.*
 - [x] **Test Profile Fix**: Backend test profile không còn tự tạo PostgreSQL schema trên H2. ✅ *Đã hoàn thành.*
 - [x] **Maven Wrapper Fix**: Sửa lỗi `mvnw.cmd` trên PowerShell. ✅ *Đã hoàn thành.*
-- [ ] **Migration Cleanup**: Đảm bảo toàn bộ Script Flyway (`V1` -> `V7`) chạy mượt mà trên môi trường sạch (H2 hoặc Postgres mới). *(Chưa kiểm chứng đầy đủ.)*
+- [ ] **Migration Cleanup**: Đảm bảo toàn bộ Script Flyway (`V1` -> `V7`) chạy mượt mà trên môi trường sạch (H2 hoặc Postgres mới). *(Chưa kiểm chứng đầy đủ.)* — Chi tiết: [docs/DATA_AND_MIGRATION_TASKS.md](../docs/DATA_AND_MIGRATION_TASKS.md) (gồm lỗi `radical_id` V2/V3).
 
 ### 🔒 Security Hardening
 - [x] **IDOR Prevention**: Gài ownership checks vào notebook folders, flashcard reviews, progress updates. ✅

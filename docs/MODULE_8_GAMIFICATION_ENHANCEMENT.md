@@ -1,5 +1,7 @@
 # 🌸 PHÂN TÍCH SÂU MODULE 8: GAMIFICATION & ENHANCEMENT
 
+> **⚠️ Trạng thái triển khai (2026-05-23):** Đặc tả đầy đủ; code hiện chỉ có cột `xp`/streak trên `User` và cộng XP đơn giản khi quiz — **chưa có** badge, quest, leaderboard. Backlog: [MODULE_8_REMAINING_TASKS.md](./MODULE_8_REMAINING_TASKS.md).
+
 **Phiên bản phân tích:** 1.0 Deep Dive  
 **Mục đích:** Tăng cường sự gắn bó của người dùng (User Engagement) và tạo thói quen học tập bền vững thông qua các yếu tố trò chơi và tính năng tương tác xã hội.
 

@@ -7,6 +7,7 @@
 ## 2. Các mục tiêu chưa đạt / Cần nâng cấp (Remaining Tasks)
 
 ### 🔴 Cải thiện tính năng (Must Have)
+- [ ] **Sửa liên kết Radical (Flyway V3):** `V3__Seed_Kanji_Master.sql` lookup `radicals.character = '7'` (số Kangxi) nhưng `V2` đã UPDATE thành glyph `'一'` → `radical_id` NULL trên DB migrate sạch. Chi tiết: [DATA_AND_MIGRATION_TASKS.md](./DATA_AND_MIGRATION_TASKS.md).
 - [x] **Liên kết Knowledge Graph**: (Đã xong ✅ - Hỗ trợ click tra cứu chéo và hiển thị Hán tự cấu thành chi tiết)
 - [x] **Dữ liệu Mẹo nhớ (Mnemonics)**: (Đã xong ✅ - Tích hợp hiển thị trong Sổ tay, Flashcards và Sidebar chi tiết)
 - [x] **Cải thiện trang chi tiết (Mazii-style)**: (Đã xong ✅ - Layout 2 cột, phân tích Hán tự động, Ví dụ dạng hội thoại)

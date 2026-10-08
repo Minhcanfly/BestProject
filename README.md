@@ -174,6 +174,18 @@ The backend runs with `spring.jpa.hibernate.ddl-auto=validate`, so schema change
 
 ### 1. Start Infrastructure
 
+Create the ignored local environment file, then fill every blank credential
+with a unique development value:
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Docker Compose reads the root `.env` automatically. Do not commit this file.
+The backend requires the same variables in the process environment when it is
+launched directly from Maven or an IDE; Spring Boot does not import the root
+`.env` file automatically.
+
 ```powershell
 docker compose up -d
 ```
@@ -218,14 +230,16 @@ Frontend defaults:
 
 ### 4. Development Login
 
-The local seeder creates a default admin account if it does not exist:
+The local seeder runs only with the `dev` profile and creates an admin account
+if it does not exist:
 
 ```text
 Email: admin@sakuralearn.com
-Password: admin123
+Password: value supplied through INITIAL_ADMIN_PASSWORD (minimum 12 characters)
 ```
 
-Use this only in local development. Change or remove the seeder before production use.
+There is no fallback password. Keep the seeder and its credential limited to
+local development; the `test` and `prod` profiles do not register it.
 
 ## Verification
 
@@ -245,7 +259,7 @@ Latest local result:
 
 - Frontend production build: passed.
 - Backend Spring context and focused service tests: passed.
-- Backend test summary: `Tests run: 12, Failures: 0, Errors: 0, Skipped: 0`.
+- Backend test summary: `Tests run: 20, Failures: 0, Errors: 0, Skipped: 0`.
 
 Current Phase 1 P0 truth map:
 
@@ -259,17 +273,24 @@ GitHub Actions workflows:
 
 - `.github/workflows/frontend-ci.yml`: installs dependencies and runs Vite build.
 - `.github/workflows/backend-ci.yml`: starts PostgreSQL/Redis services and runs Maven package.
+- `.github/workflows/secret-scan.yml`: scans complete Git history with Gitleaks and fully redacted output.
 
 ## Configuration Notes
 
-Current development configuration is optimized for local work. Before production deployment:
+Sensitive configuration is required through environment variables or a secret
+manager. `application.yml` contains no secret fallback, and the `prod` profile
+rejects blank, obvious placeholder and weak values during startup. Test-only
+fixtures live in `application-test.yml` and must never be reused outside tests.
 
-- Move database, MinIO, OAuth, JWT, AI, and mail secrets fully to environment variables or a secret manager.
-- Replace default Docker passwords.
-- Remove or rotate the default admin account.
+Before production deployment:
+
+- Revoke/rotate any credential that previously entered Git and complete
+  `docs/SECURITY_SECRET_INCIDENT_RUNBOOK.md`.
+- Inject database, MinIO, OAuth, JWT and AI secrets from the deployment secret
+  store; never copy test fixtures.
+- Do not activate the `dev` profile or `DataSeeder`.
 - Disable Swagger/OpenAPI public access if not needed.
 - Add production CORS origins.
-- Add a test profile so backend tests do not depend on a developer's local database.
 - Review token storage strategy on the frontend.
 
 ## Useful Commands
@@ -298,8 +319,7 @@ cmd /c mvnw.cmd test
 
 Near-term engineering improvements:
 
-- Add dedicated `dev`, `test`, and `prod` Spring profiles.
-- Replace hardcoded local secrets with environment-driven config.
+- Complete provider-side credential rotation and coordinated Git history cleanup.
 - Improve automated test coverage for auth, course management, dictionary search, notebook, and SRS.
 - Add request/response validation tests for public API contracts.
 - Finish payment, notification, analytics, and gamification workflows.

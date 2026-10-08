@@ -1,0 +1,16 @@
+---
+alwaysApply: true
+---
+
+Audit Rules
+
+- Read the whole repository before reviewing.
+- Build a project mental model.
+- Validate documentation against implementation.
+- Never rely only on README.
+- Never guess.
+- Every issue must include evidence.
+- Always provide file paths.
+- Separate Facts, Assumptions and Recommendations.
+- Report confidence level.
+- Focus on architecture before code style.

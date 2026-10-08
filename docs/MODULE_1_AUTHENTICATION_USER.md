@@ -18,6 +18,15 @@ Xây dựng lớp bảo mật vững chắc (Security Backbone) và hệ thống
 1. **Avatar**: Upload qua MinIO, lưu URL và phục vụ qua Presigned URL.
 2. **Localization**: Lưu `preferred_language` (vi/ja/en) để phục vụ i18n.
 
+### OAuth state — triển khai ngày 2026-10-06
+
+- Cookie `oauth2_auth_request` chỉ chứa opaque handle ngẫu nhiên 256-bit; request OAuth nằm trong RAM backend, tối đa 10.000 request chờ, TTL 180 giây. Không serialize/deserialize Java từ HTTP input.
+- Callback phải có đúng cookie, `state` và URL callback đã lưu (bao gồm provider trong path). Request được lấy và xóa nguyên tử trước bước đổi authorization code; replay bị từ chối.
+- Cookie dùng `HttpOnly`, `SameSite=Lax`, `Secure` khi HTTPS hoặc profile `prod`; cookie cũ `redirect_uri` được xóa, redirect frontend chỉ lấy từ cấu hình server. Thành công/thất bại đều dọn state và cookie.
+- Mỗi browser giữ một lần đăng nhập đang chờ; bắt đầu lại sẽ hủy handle trước. Restart backend làm mất lần đăng nhập chờ và người dùng phải thử lại. Nhiều replica cần sticky routing hoặc shared store có thao tác consume nguyên tử.
+- Sau reverse proxy, scheme/host/port/path mà backend thấy phải khớp callback URI đã đăng ký; chỉ tin forwarded headers từ proxy được kiểm soát. Cần smoke HTTPS trên staging.
+- F-007/F-008 vẫn mở: success handler còn đưa token/PII vào redirect URL và refresh token vẫn được frontend lưu trong Web Storage. Việc sửa state chưa giải quyết vòng đời session.
+
 ---
 
 ## 3. Đặc tả Chức năng & Phân quyền

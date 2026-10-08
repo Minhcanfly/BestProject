@@ -2,6 +2,20 @@
 
 Dưới đây là các câu lệnh hữu ích để quản lý môi trường phát triển cục bộ của bạn.
 
+## 🔐 0. Cấu hình bắt buộc
+
+Tạo file môi trường cục bộ rồi điền toàn bộ credential đang để trống bằng giá
+trị development riêng. File `.env` đã được Git ignore và không được commit.
+
+```powershell
+Copy-Item .env.example .env
+```
+
+Docker Compose tự đọc `.env`. Khi chạy backend trực tiếp bằng Maven/IDE, cần
+inject cùng các biến vào process environment; Spring Boot không tự đọc file
+`.env` ở root. Profile `dev` cần `INITIAL_ADMIN_PASSWORD` tối thiểu 12 ký tự,
+không thuộc danh sách mật khẩu yếu và không có fallback.
+
 ## 💾 1. Reset môi trường (Docker)
 Sử dụng câu lệnh này khi bạn muốn xóa sạch dữ liệu cũ trong Database, MinIO, Redis và chạy lại từ đầu với Schema mới nhất.
 

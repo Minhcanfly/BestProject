@@ -14,13 +14,20 @@ import java.io.IOException;
 @Component
 public class OAuth2AuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
 
+    private final HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository;
+
+    public OAuth2AuthenticationFailureHandler(HttpCookieOAuth2AuthorizationRequestRepository authorizationRequestRepository) {
+        this.authorizationRequestRepository = authorizationRequestRepository;
+    }
+
     @Value("${app.oauth2.redirect-uri}")
     private String redirectUri;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+        authorizationRequestRepository.removeAuthorizationRequestCookies(request, response);
         String targetUrl = UriComponentsBuilder.fromUriString(redirectUri)
-                .queryParam("error", exception.getLocalizedMessage())
+                .queryParam("error", "oauth2_authentication_failed")
                 .build().toUriString();
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);

@@ -17,7 +17,7 @@
 
 | Module | Docs chính | Trạng thái docs | Trạng thái code | Lệch pha | File công việc |
 |--------|------------|-----------------|-----------------|----------|----------------|
-| **M1** Auth | `MODULE_1_AUTHENTICATION_USER.md` | Gần đúng | ✅ MVP ổn | Nhỏ (test, cookie) | `MODULE_1_REMAINING_TASKS.md` |
+| **M1** Auth | `MODULE_1_AUTHENTICATION_USER.md` | Partial; OAuth state cập nhật 2026-10-06 | MVP; F-003 đã sửa code + test | Token/PII trên OAuth URL, session/refresh hardening và staging còn mở | `MODULE_1_REMAINING_TASKS.md` |
 | **M2** Course | `MODULE_2_*`, Master §M2 | Gần đúng | ✅ MVP | Workflow publish, AI UI | `MODULE_2_REMAINING_TASKS.md` |
 | **M3** Learning | `MODULE_3_*`, Master §M3 | Gần đúng | ✅ MVP | Notes UI, edge case teacher edit | `MODULE_3_REMAINING_TASKS.md` |
 | **M4** Dictionary | `MODULE_4_*`, Master §M4 | **Thiếu bug data** | ✅ MVP + **lỗi radical FK** | V3 seed vs V2 UPDATE | `MODULE_4_REMAINING_TASKS.md`, `DATA_AND_MIGRATION_TASKS.md` |

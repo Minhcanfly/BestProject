@@ -1,4 +1,10 @@
 spring:
+  ai:
+    openai:
+      api-key: unit-test-openai-key
+    google:
+      genai:
+        api-key: unit-test-google-genai-key
   datasource:
     url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
     driver-class-name: org.h2.Driver
@@ -25,3 +31,20 @@ spring:
   mail:
     host: localhost
     port: 1025
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: unit-test-google-client-id
+            client-secret: unit-test-google-client-secret
+
+app:
+  jwt:
+    secret: unit-test-jwt-secret-with-at-least-thirty-two-characters
+  minio:
+    access-key: unit-test-minio-access-key
+    secret-key: unit-test-minio-secret-key
+  ai:
+    grok:
+      api-key: unit-test-grok-key

@@ -18,7 +18,7 @@
 ## 2. Công việc 🔴 P0
 
 - [ ] **CI chạy tests:** `mvn test` trong `backend-ci.yml`; fail PR nếu đỏ.
-- [ ] **Secrets:** Xóa default API keys / JWT secret khỏi `application.yml` — chỉ placeholder + env bắt buộc.
+- [x] **Secrets:** Đã xóa default API keys/JWT/DB/MinIO/OAuth khỏi `application.yml` và Docker Compose; env bắt buộc, prod fail-fast, Gitleaks CI/pre-commit đã cấu hình. Provider revoke và Git history cleanup vẫn theo F-001/runbook.
 - [ ] **Quyết định Redis/Kafka Phase 1:**
   - **Option A (khuyến nghị):** Gỡ khỏi `pom.xml` + Compose comment cho đến khi implement.
   - **Option B:** Implement tối thiểu (cache dictionary list) để justify dependency.

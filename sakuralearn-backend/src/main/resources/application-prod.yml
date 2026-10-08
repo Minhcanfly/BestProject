@@ -1,0 +1,17 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+  jpa:
+    show-sql: false
+  thymeleaf:
+    cache: true
+
+app:
+  oauth2:
+    cookie-secure: true
+
+logging:
+  level:
+    root: INFO
+    com.sakuralearn.sakuralearn_backend: INFO

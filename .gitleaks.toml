@@ -1,0 +1,16 @@
+title = "SakuraLearn secret scanning"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "spring-sensitive-environment-fallback"
+description = "Sensitive Spring property must not provide an environment fallback"
+regex = '''(?i)(api-key|access-key|client-secret|jwt[^:]*secret|password|secret-key)\s*:\s*\$\{[A-Z0-9_]+:([^}?][^}]*)\}'''
+secretGroup = 2
+
+[[rules]]
+id = "initial-admin-password-fallback"
+description = "The development admin password must be explicitly injected"
+regex = '''(INITIAL_ADMIN_PASSWORD:)([^}]+)'''
+secretGroup = 2

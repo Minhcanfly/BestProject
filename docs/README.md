@@ -40,6 +40,7 @@
 | [INFRASTRUCTURE_AND_CI_TASKS.md](./INFRASTRUCTURE_AND_CI_TASKS.md) | Docker, CI, dependencies |
 | [FRONTEND_REMAINING_TASKS.md](./FRONTEND_REMAINING_TASKS.md) | React / Vite cross-cutting |
 | [DOCS_MAINTENANCE_TASKS.md](./DOCS_MAINTENANCE_TASKS.md) | Sửa tài liệu lệch thực tế |
+| [SECURITY_SECRET_INCIDENT_RUNBOOK.md](./SECURITY_SECRET_INCIDENT_RUNBOOK.md) | Xử lý credential lộ, rotation và Git history cleanup |
 
 ## Tài liệu ngoài `docs/`
 
